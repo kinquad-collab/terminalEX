@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TerminalEX</title>
+  <meta name="description" content="A safe, realistic practice terminal for students: Ubuntu bash, macOS zsh, Windows Command Prompt, PowerShell and Git Bash — all in the browser.">
+  <meta name="theme-color" content="#16181d">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181d'/%3E%3Cpath d='M8 11l6 5-6 5' stroke='%2339d98a' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M16 22h8' stroke='%23e6e6e6' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Ubuntu+Mono:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Code+Pro:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fontsource/cascadia-mono@5/index.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fontsource/cascadia-mono@5/700.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand" title="TerminalEX">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#20232b"/><path d="M8 11l6 5-6 5" stroke="#39d98a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 22h8" stroke="#e6e6e6" stroke-width="3" stroke-linecap="round"/></svg>
+        <span>Terminal<b>EX</b></span>
+      </div>
+      <nav class="tabs" id="tabs" role="tablist" aria-label="Open terminals"></nav>
+      <div class="newtab">
+        <button id="btn-new" class="icon-btn" title="New terminal (Alt+T)" aria-label="New terminal">+</button>
+        <button id="btn-new-menu" class="icon-btn caret" title="Choose a terminal" aria-label="Choose a terminal">▾</button>
+        <div class="menu" id="new-menu" role="menu"></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="actions">
+        <button id="btn-missions" class="pill" title="Missions (Alt+M)"><span aria-hidden="true">🏁</span> Missions <span class="xp-badge"><span id="xp-count">0</span> XP</span></button>
+        <button id="btn-cheat" class="icon-btn" title="Cheat sheet (Alt+C)" aria-label="Cheat sheet"><svg viewBox="0 0 24 24"><path d="M5 4h10a3 3 0 013 3v13H8a3 3 0 01-3-3z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 17a3 3 0 013-3h10" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+        <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="3.2 2.3"/></svg></button>
+        <button id="btn-full" class="icon-btn" title="Full screen (Alt+Enter)" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section id="panes" aria-label="Terminal"></section>
+      <aside id="drawer" aria-label="Help panel">
+        <div class="drawer-head">
+          <div class="drawer-tabs">
+            <button class="drawer-tab active" data-tab="missions">Missions</button>
+            <button class="drawer-tab" data-tab="cheat">Cheat sheet</button>
+            <button class="drawer-tab" data-tab="keys">Keys &amp; tips</button>
+          </div>
+          <button id="drawer-close" class="icon-btn" aria-label="Close panel">×</button>
+        </div>
+        <div id="drawer-body"></div>
+      </aside>
+    </main>
+
+    <div id="touch-keys" aria-hidden="true">
+      <button data-k="Tab">Tab</button><button data-k="C-c">^C</button><button data-k="ArrowUp">↑</button><button data-k="ArrowDown">↓</button><button data-k="ArrowLeft">←</button><button data-k="ArrowRight">→</button><button data-k="Escape">Esc</button><button data-k="|">|</button><button data-k="-">-</button><button data-k="/">/</button><button data-k="\">\</button><button data-k="~">~</button><button data-k="$">$</button>
+    </div>
+
+    <div id="launcher" class="hidden" role="dialog" aria-modal="true" aria-labelledby="launcher-title">
+      <div class="launcher-inner">
+        <button id="launcher-close" class="icon-btn" aria-label="Close start page">×</button>
+        <div class="hero">
+          <div class="hero-logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#20232b"/><path d="M8 11l6 5-6 5" stroke="#39d98a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 22h8" stroke="#e6e6e6" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <h1 id="launcher-title">Terminal<b>EX</b></h1>
+          <p>Six real-feeling terminals, three pretend computers, zero risk. Pick one to start.</p>
+        </div>
+        <div id="launcher-grid" class="launch-grid"></div>
+        <div class="launch-tips">
+          <div><b>New here?</b> Open a terminal, then click <span class="kb">🏁 Missions</span> for guided challenges that check themselves.</div>
+          <div><b>It's all connected.</b> cmd, PowerShell and Git Bash share one Windows disk. <code>ssh student@ubuntu-lab</code> from the Mac. <code>wsl</code> from Windows.</div>
+          <div><b>Can't break it.</b> <code>rm -rf</code> away — <code>reset-machine</code> brings everything back.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-settings" class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-card">
+        <div class="modal-head"><h2 id="settings-title">Settings</h2><button id="settings-close" class="icon-btn" aria-label="Close settings">×</button></div>
+        <div id="settings-body"></div>
+      </div>
+    </div>
+
+    <div id="toasts" aria-live="polite"></div>
+  </div>
+
+  <script src="js/util.js"></script>
+  <script src="js/vfs.js"></script>
+  <script src="js/machines.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/apps.js"></script>
+  <script src="js/awk.js"></script>
+  <script src="js/posix.js"></script>
+  <script src="js/posix-cmds.js"></script>
+  <script src="js/posix-sys.js"></script>
+  <script src="js/git.js"></script>
+  <script src="js/cmd.js"></script>
+  <script src="js/ps-parser.js"></script>
+  <script src="js/ps-runtime.js"></script>
+  <script src="js/ps-cmdlets.js"></script>
+  <script src="js/lang.js"></script>
+  <script src="js/docs.js"></script>
+  <script src="js/missions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
