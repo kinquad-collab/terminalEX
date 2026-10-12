@@ -152,7 +152,7 @@
     if (ex) TX.app.activate(ex); else TX.app.newTab(L.shell);
     TX.app.hideLauncher();
     TX.app.toggleDrawer('missions', true);
-    if (id === 'automation' && TX.app.active) setTimeout(() => TX.app.active.term.paste('cd ~/automation'), 400);
+    if (id === 'automation') setTimeout(() => TX.app.toast('🤖 Start with:  <code>cd ~/automation</code>  then  <code>ls</code>', true), 600);
     if (!UI.state.guides[id]) UI.showGuide(L);
   };
   UI.showGuide = (L) => {
