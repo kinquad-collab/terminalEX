@@ -85,9 +85,9 @@
     const segs = sh.resolve(target);
     const node = sh.vfs.get(segs);
     const zsh = sh.flavor === 'zsh';
-    if (!node) { c.err(zsh ? `cd: no such file or directory: ${target}\n` : `bash: cd: ${target}: No such file or directory\n`); return 1; }
-    if (node.t !== 'd') { c.err(zsh ? `cd: not a directory: ${target}\n` : `bash: cd: ${target}: Not a directory\n`); return 1; }
-    if (!canEnter(sh, node, c.user)) { c.err(zsh ? `cd: permission denied: ${target}\n` : `bash: cd: ${target}: Permission denied\n`); return 1; }
+    if (!node) { c.err(zsh ? `cd: no such file or directory: ${target}\n` : `${c.sh.name}: cd: ${target}: No such file or directory\n`); return 1; }
+    if (node.t !== 'd') { c.err(zsh ? `cd: not a directory: ${target}\n` : `${c.sh.name}: cd: ${target}: Not a directory\n`); return 1; }
+    if (!canEnter(sh, node, c.user)) { c.err(zsh ? `cd: permission denied: ${target}\n` : `${c.sh.name}: cd: ${target}: Permission denied\n`); return 1; }
     sh.vars.OLDPWD = sh.fmt(sh.cwd);
     sh.cwd = segs;
     sh.vars.PWD = sh.fmt(segs);
@@ -153,7 +153,7 @@
     }
     for (const a of args) {
       const m = /^([A-Za-z_][A-Za-z0-9_]*)(?:=(.*))?$/s.exec(a);
-      if (!m) { c.err(`bash: export: \`${a}': not a valid identifier\n`); return 1; }
+      if (!m) { c.err(`${c.sh.name}: export: \`${a}': not a valid identifier\n`); return 1; }
       if (m[2] !== undefined) sh.vars[m[1]] = m[2];
       else if (sh.vars[m[1]] === undefined) sh.vars[m[1]] = '';
       if (c.name === 'export') sh.exported.add(m[1]);
@@ -185,12 +185,12 @@
     let code = 0;
     for (const a of c.args) {
       const eq = a.indexOf('=');
-      if (eq < 0) { if (sh.aliases[a] !== undefined) c.outln(`alias ${a}='${sh.aliases[a]}'`); else { c.err(`bash: alias: ${a}: not found\n`); code = 1; } continue; }
+      if (eq < 0) { if (sh.aliases[a] !== undefined) c.outln(`alias ${a}='${sh.aliases[a]}'`); else { c.err(`${c.sh.name}: alias: ${a}: not found\n`); code = 1; } continue; }
       sh.aliases[a.slice(0, eq)] = a.slice(eq + 1);
     }
     return code;
   });
-  def('unalias', (c) => { if (c.args[0] === '-a') { c.sh.aliases = {}; return; } c.args.forEach((a) => { if (c.sh.aliases[a] === undefined) c.err(`bash: unalias: ${a}: not found\n`); delete c.sh.aliases[a]; }); });
+  def('unalias', (c) => { if (c.args[0] === '-a') { c.sh.aliases = {}; return; } c.args.forEach((a) => { if (c.sh.aliases[a] === undefined) c.err(`${c.sh.name}: unalias: ${a}: not found\n`); delete c.sh.aliases[a]; }); });
   def('history', (c) => {
     const H = c.sh.history;
     if (c.args[0] === '-c') { H.length = 0; return; }
@@ -202,7 +202,7 @@
   def('source .', async (c) => {
     if (!c.args.length) return c.fail('filename argument required', 2);
     let text;
-    try { text = c.vfs.readFile(c.path(c.args[0]), { user: c.user }); } catch (e) { c.err(`bash: ${c.args[0]}: ${FS_MSG[e.code]}\n`); return 1; }
+    try { text = c.vfs.readFile(c.path(c.args[0]), { user: c.user }); } catch (e) { c.err(`${c.sh.name}: ${c.args[0]}: ${FS_MSG[e.code]}\n`); return 1; }
     const saved = c.sh.params;
     c.sh.params = c.args.slice(1);
     try { return await c.sh.run(text.replace(/^#!.*\n/, ''), c.io); } finally { c.sh.params = saved; }
@@ -229,7 +229,7 @@
       else if (['cd', 'echo', 'export', 'alias', 'pwd', 'history', 'exit', 'source', 'type', 'set', 'unset', 'read', 'test', 'printf', 'kill', 'jobs', 'true', 'false'].includes(n)) c.outln(`${n} is a shell builtin`);
       else if (['if', 'then', 'else', 'fi', 'for', 'while', 'do', 'done'].includes(n)) c.outln(`${n} is a shell keyword`);
       else if (c.sh.available(n)) c.outln(`${n} is ${binPath(c.sh, n)}`);
-      else { c.err(`bash: type: ${n}: not found\n`); code = 1; }
+      else { c.err(`${c.sh.name}: type: ${n}: not found\n`); code = 1; }
     }
     return code;
   });
@@ -307,7 +307,7 @@
     let a = c.args.slice();
     if (c.name === '[') { if (a[a.length - 1] !== ']') return c.fail("missing `]'", 2); a.pop(); }
     if (c.name === '[[') { if (a[a.length - 1] !== ']]') return c.fail("missing `]]'", 2); a.pop(); }
-    try { return test(a, c) ? 0 : 1; } catch (e) { c.err(`bash: ${c.name}: ${e.message}\n`); return 2; }
+    try { return test(a, c) ? 0 : 1; } catch (e) { c.err(`${c.sh.name}: ${c.name}: ${e.message}\n`); return 2; }
   });
   def('sleep', async (c) => {
     if (!c.args.length) return c.fail('missing operand');
@@ -348,7 +348,7 @@
   def('ls', (c) => {
     const sh = c.sh;
     const { f, rest } = getopt(c.args, 'laAhR1tSrdFGiCsnog', { all: 'a', 'almost-all': 'A', 'human-readable': 'h', recursive: 'R', reverse: 'r', directory: 'd', classify: 'F', color: true, size: 's' });
-    const color = c.tty && f['--color'] !== 'never' && (f['--color'] || f.G || sh.flavor !== 'zsh' || true);
+    const color = c.tty && f['--color'] !== 'never' && (f['--color'] || f.G || ['bash', 'zsh', 'gitbash'].includes(sh.flavor) || !!sh.vars.CLICOLOR);
     const long = f.l || f.n || f.o || f.g;
     const targets = rest.length ? rest : ['.'];
     let code = 0;

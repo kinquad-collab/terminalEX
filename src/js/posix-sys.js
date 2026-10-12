@@ -306,9 +306,9 @@
   });
   function killPid(c, pid, sig) {
     const p = c.m.procs.find((x) => x.pid === pid);
-    if (!p) { c.err(`${c.sh.flavor === 'zsh' ? 'kill: kill ' + pid + ' failed: no such process' : `bash: kill: (${pid}) - No such process`}\n`); return 1; }
-    if (p.user !== c.user && c.user !== 'root') { c.err(c.sh.flavor === 'zsh' ? `kill: kill ${pid} failed: operation not permitted\n` : `bash: kill: (${pid}) - Operation not permitted\n`); return 1; }
-    if (pid === 1) { c.err('bash: kill: (1) - Operation not permitted\n'); return 1; }
+    if (!p) { c.err(`${c.sh.flavor === 'zsh' ? 'kill: kill ' + pid + ' failed: no such process' : `${c.sh.name}: kill: (${pid}) - No such process`}\n`); return 1; }
+    if (p.user !== c.user && c.user !== 'root') { c.err(c.sh.flavor === 'zsh' ? `kill: kill ${pid} failed: operation not permitted\n` : `${c.sh.name}: kill: (${pid}) - Operation not permitted\n`); return 1; }
+    if (pid === 1) { c.err(c.sh.name + ': kill: (1) - Operation not permitted\n'); return 1; }
     if (sig === 'STOP' || sig === '19') { p.stat = 'T'; return 0; }
     if (sig === 'CONT' || sig === '18') { p.stat = 'S'; return 0; }
     c.m.kill(pid);
@@ -323,9 +323,9 @@
     for (const a of c.args) {
       if (/^-(\d+|[A-Z]+)$/.test(a)) sig = a.slice(1).replace(/^SIG/, '');
       else if (a === '-s') continue;
-      else if (/^%\d+$/.test(a)) { const j = c.sh.jobs.find((x) => x.id === +a.slice(1)); if (j) { pids.push(j.pid); j.done = true; j.code = 143; } else c.err(`bash: kill: ${a}: no such job\n`); }
+      else if (/^%\d+$/.test(a)) { const j = c.sh.jobs.find((x) => x.id === +a.slice(1)); if (j) { pids.push(j.pid); j.done = true; j.code = 143; } else c.err(`${c.sh.name}: kill: ${a}: no such job\n`); }
       else if (/^\d+$/.test(a)) pids.push(+a);
-      else { c.err(`bash: kill: ${a}: arguments must be process or job IDs\n`); return 1; }
+      else { c.err(`${c.sh.name}: kill: ${a}: arguments must be process or job IDs\n`); return 1; }
     }
     if (!pids.length) { c.err('kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]\n'); return 2; }
     let code = 0;
@@ -713,8 +713,10 @@
     const target = c.args.filter((a) => a !== '-' && a !== '-l')[0] || 'root';
     if (c.user === 'root') { c.sh.session.pushShell(new TX.PosixShell(c.sh.session, c.m, c.sh.flavor, { user: target })); return 0; }
     const pw = await c.readLine('Password: ', { hidden: true });
-    const ok = (target === 'teacher' && pw === 'teacher') || (target === 'student' && pw === 'student');
-    if (!ok) { await c.sleep(1500); c.err('su: Authentication failure\n'); if (target === 'root') c.err(C.dim('(hint: Ubuntu locks the root password. Try  sudo -i  instead.)\n')); return 1; }
+    // FreeBSD, Solaris and old UNIX give root a real password (here: student); Ubuntu and macOS lock it.
+    const rootPw = ['freebsd', 'solaris', 'unix'].includes(c.m.kind);
+    const ok = (target === 'teacher' && pw === 'teacher') || (target === 'student' && pw === 'student') || (target === 'root' && rootPw && pw === 'student');
+    if (!ok) { await c.sleep(1500); c.err(c.m.kind === 'unix' ? 'Sorry\n' : 'su: Authentication failure\n'); if (target === 'root') c.err(C.dim(rootPw ? '(hint: in TerminalEX the root password is  student )\n' : c.m.kind === 'mac' ? '(hint: macOS disables root. Try  sudo -i  instead.)\n' : '(hint: Ubuntu locks the root password. Try  sudo -i  instead.)\n')); return 1; }
     c.sh.session.pushShell(new TX.PosixShell(c.sh.session, c.m, c.sh.flavor, { user: target }));
     return 0;
   }, { only: UNIX });

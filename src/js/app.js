@@ -27,6 +27,10 @@
     gruvbox: { name: 'Gruvbox', bg: '#282828', fg: '#EBDBB2', cursor: '#EBDBB2', sel: '#504945', pal: ['#282828', '#CC241D', '#98971A', '#D79921', '#458588', '#B16286', '#689D6A', '#A89984', '#928374', '#FB4934', '#B8BB26', '#FABD2F', '#83A598', '#D3869B', '#8EC07C', '#EBDBB2'] },
     light: { name: 'One Half Light', bg: '#FAFAFA', fg: '#383A42', cursor: '#4F525D', sel: '#BFCEFF', pal: ['#383A42', '#E45649', '#50A14F', '#C18401', '#0184BC', '#A626A4', '#0997B3', '#8A8C94', '#4F525D', '#DF6C75', '#6FAD57', '#C18301', '#61AFEF', '#C577DD', '#56B5C1', '#FFFFFF'] },
     retro: { name: 'Retro Green CRT', bg: '#0A120A', fg: '#39FF6A', cursor: '#39FF6A', sel: '#1F5F2E', pal: ['#0A120A', '#39FF6A', '#39FF6A', '#9DFFB0', '#2FCB55', '#39FF6A', '#9DFFB0', '#39FF6A', '#1E8F3A', '#9DFFB0', '#9DFFB0', '#CFFFD8', '#39FF6A', '#9DFFB0', '#CFFFD8', '#E8FFEC'] },
+    freebsd: { name: 'FreeBSD console', bg: '#000000', fg: '#C0C0C0', cursor: '#C0C0C0', sel: '#FFFFFF44', pal: ['#000000', '#AA0000', '#00AA00', '#AA5500', '#0000AA', '#AA00AA', '#00AAAA', '#AAAAAA', '#555555', '#FF5555', '#55FF55', '#FFFF55', '#5555FF', '#FF55FF', '#55FFFF', '#FFFFFF'] },
+    solaris: { name: 'Solaris dtterm (CDE)', bg: '#1B1F2B', fg: '#E8E4D8', cursor: '#F29111', sel: '#F2911155', pal: ['#1B1F2B', '#E0533B', '#8CB369', '#F29111', '#5B8FD9', '#B67FD0', '#4FB3BF', '#D8D4C8', '#6B7280', '#FF6B4F', '#A6D17F', '#FFB347', '#7AA9F0', '#CF99E6', '#6FD0DB', '#FFFFFF'] },
+    dos: { name: 'MS-DOS (VGA text mode)', bg: '#000000', fg: '#AAAAAA', cursor: '#AAAAAA', sel: '#AAAAAA55', pal: ['#000000', '#AA0000', '#00AA00', '#AA5500', '#0000AA', '#AA00AA', '#00AAAA', '#AAAAAA', '#555555', '#FF5555', '#55FF55', '#FFFF55', '#5555FF', '#FF55FF', '#55FFFF', '#FFFFFF'] },
+    teletype: { name: 'Teletype paper (1979)', bg: '#F3EEDC', fg: '#2B2A26', cursor: '#2B2A26', sel: '#2B2A2633', pal: ['#2B2A26', '#8B1E1E', '#2E5E2E', '#7A5A10', '#23406E', '#6A2E6A', '#245E66', '#2B2A26', '#5A574E', '#8B1E1E', '#2E5E2E', '#7A5A10', '#23406E', '#6A2E6A', '#245E66', '#000000'] },
     amber: { name: 'Retro Amber', bg: '#140C00', fg: '#FFB000', cursor: '#FFB000', sel: '#5F4100', pal: ['#140C00', '#FFB000', '#FFB000', '#FFCC66', '#E09A00', '#FFB000', '#FFCC66', '#FFB000', '#8F6200', '#FFCC66', '#FFCC66', '#FFE0A3', '#FFB000', '#FFCC66', '#FFE0A3', '#FFF3D9'] },
   };
   const FONTS = {
@@ -34,16 +38,8 @@
     jetbrains: "'JetBrains Mono', monospace", cascadia: "'Cascadia Mono', 'Cascadia Code', Consolas, monospace", ubuntu: "'Ubuntu Mono', monospace", fira: "'Fira Code', monospace", source: "'Source Code Pro', monospace", plex: "'IBM Plex Mono', monospace",
   };
 
-  // ------------------------------------------------------------------ shells
-  const SHELLS = {
-    bash: { label: 'Ubuntu', sub: 'bash 5.2 · Ubuntu 24.04 LTS', machine: 'linux', os: 'linux', theme: 'ubuntu', font: "'Ubuntu Mono', 'DejaVu Sans Mono', monospace", fontScale: 1.12, badge: '$_', color: '#E95420' },
-    zsh: { label: 'macOS', sub: 'zsh 5.9 · macOS Sequoia 15', machine: 'mac', os: 'mac', theme: 'macos', font: "'SF Mono', Menlo, 'JetBrains Mono', monospace", fontScale: 1, badge: '%', color: '#A2AAAD' },
-    cmd: { label: 'Command Prompt', sub: 'cmd.exe · Windows 11', machine: 'windows', os: 'windows', theme: 'campbell', font: "'Cascadia Mono', Consolas, monospace", fontScale: 1, badge: 'C:\\', color: '#9E9E9E' },
-    powershell: { label: 'Windows PowerShell', sub: 'PowerShell 5.1 · Windows 11', machine: 'windows', os: 'windows', theme: 'powershell', font: "'Cascadia Mono', Consolas, monospace", fontScale: 1, badge: '>_', color: '#2671BE' },
-    pwsh: { label: 'PowerShell 7', sub: 'pwsh 7.4 · cross-platform', machine: 'windows', os: 'windows', theme: 'campbell', font: "'Cascadia Mono', Consolas, monospace", fontScale: 1, badge: '❯_', color: '#5391FE' },
-    gitbash: { label: 'Git Bash', sub: 'MINGW64 · Git for Windows 2.46', machine: 'windows', os: 'gitbash', theme: 'mintty', font: "Consolas, 'Lucida Console', 'Cascadia Mono', monospace", fontScale: 1, badge: '◆', color: '#F05032' },
-  };
-  TX.SHELLS = SHELLS;
+  // ------------------------------------------------------------------ shells (defined in shells.js)
+  const SHELLS = TX.SHELLS;
 
   // ------------------------------------------------------------------ Session
   let sessionSeq = 0;
@@ -72,16 +68,7 @@
     get top() { return this.stack[this.stack.length - 1]; }
     machine() { return this.app.machine(this.def.machine); }
     makeRoot() {
-      const m = this.machine();
-      switch (this.kind) {
-        case 'bash': return new TX.PosixShell(this, m, 'bash', {});
-        case 'zsh': return new TX.PosixShell(this, m, 'zsh', {});
-        case 'gitbash': return new TX.PosixShell(this, m, 'gitbash', {});
-        case 'cmd': return new TX.CmdShell(this, m, { admin: this.opts.admin });
-        case 'powershell': return new TX.PowerShell(this, m, { admin: this.opts.admin });
-        case 'pwsh': return new TX.PowerShell(this, m, { pwsh: true, admin: this.opts.admin });
-      }
-      return null;
+      return TX.makeShell(this.kind, this, this.machine(), this.opts.admin ? { admin: true } : {});
     }
     pushShell(sh, ssh) {
       this.stack.push(sh);
@@ -101,14 +88,17 @@
       this.term.write(root.banner ? root.banner() : '');
       this.refreshTitle();
       this.applyTheme();
+      if (root.boot) { try { await root.boot(); } catch (e) { console.error(e); } }
       while (gen === this.gen) {
         const sh = this.top;
         if (!sh) break;
         if (sh.reportJobs) sh.reportJobs();
         this.refreshTitle();
         let line;
-        const hl = this.app.settings.highlight && sh.highlight ? (s) => sh.highlight(s) : null;
-        line = await this.term.readLine({ prompt: sh.prompt(), history: sh.history, completer: sh.completer ? (b, p) => sh.completer(b, p) : null, highlight: hl, onEOF: sh.kind === 'posix', escClears: sh.kind !== 'posix' });
+        // UNIX V7 (1979) and MS-DOS without DOSKEY had no arrow-key history and no Tab completion.
+        const old = sh.noLineEditing || (sh.m && sh.m.def && sh.m.def.noLineEditing);
+        const hl = this.app.settings.highlight && sh.highlight && !old ? (s) => sh.highlight(s) : null;
+        line = await this.term.readLine({ prompt: sh.prompt(), history: old ? [] : sh.history, completer: sh.completer && !old ? (b, p) => sh.completer(b, p) : null, highlight: hl, onEOF: sh.kind === 'posix', escClears: sh.kind !== 'posix' });
         if (gen !== this.gen) break;
         if (line === null) continue;
         if (line === '\x04') { line = 'exit'; this.term.write(sh.kind === 'posix' && sh.flavor !== 'zsh' ? 'exit\n' : '\n'); }
@@ -146,7 +136,7 @@
         this.app.afterCommand(this);
       }
     }
-    trackKey() { const t = this.stack[0]; if (!t) return this.kind; return this.kind === 'pwsh' ? 'powershell' : this.kind; }
+    trackKey() { return TX.trackOf(this.kind); }
     refreshTitle() {
       const sh = this.top;
       let t = this.def.label;
@@ -173,7 +163,7 @@
       host.style.setProperty('--term-size', Math.round(s.fontSize * (s.font === 'auto' ? this.def.fontScale : 1)) + 'px');
       host.classList.toggle('crt', !!s.crt || key === 'retro' || key === 'amber');
       host.classList.toggle('noblink', !s.cursorBlink);
-      host.classList.toggle('light-theme', key === 'light');
+      host.classList.toggle('light-theme', key === 'light' || key === 'teletype');
       if (this.colorOverride) this.setColors(this.colorOverride[0], this.colorOverride[1]);
       requestAnimationFrame(() => this.term.measure());
     }
@@ -193,6 +183,10 @@
     const x = '<svg viewBox="0 0 10 10"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="currentColor" stroke-width="1.2"/></svg>';
     if (os === 'mac') return `<div class="window-bar wb-mac"><div class="wb-lights">${btn('wb-close', '')}${btn('wb-min', '')}${btn('wb-max', '')}</div><div class="wb-title"></div><div class="wb-spacer"></div></div>`;
     if (os === 'linux') return `<div class="window-bar wb-linux"><div class="wb-left"><span class="wb-ico">⊞</span></div><div class="wb-title"></div><div class="wb-right">${btn('wb-min', minus)}${btn('wb-max', box)}${btn('wb-close', x)}</div></div>`;
+    if (os === 'dos') return `<div class="window-bar wb-dos"><div class="wb-left"><span class="wb-appico dos">C:\\</span><span class="wb-title"></span></div><div class="wb-right">${btn('wb-min', '▼')}${btn('wb-max', '▲')}${btn('wb-close', x)}</div></div>`;
+    if (os === 'tty') return `<div class="window-bar wb-tty"><div class="wb-left"><span class="wb-ico">DEC VT100</span></div><div class="wb-title"></div><div class="wb-right">${btn('wb-close', x)}</div></div>`;
+    if (os === 'solaris') return `<div class="window-bar wb-cde"><div class="wb-left"><span class="wb-ico">☀</span></div><div class="wb-title"></div><div class="wb-right">${btn('wb-min', '<span class="cde-min"></span>')}${btn('wb-max', '<span class="cde-max"></span>')}${btn('wb-close', x)}</div></div>`;
+    if (os === 'bsd') return `<div class="window-bar wb-linux wb-bsd"><div class="wb-left"><span class="wb-ico">😈</span></div><div class="wb-title"></div><div class="wb-right">${btn('wb-min', minus)}${btn('wb-max', box)}${btn('wb-close', x)}</div></div>`;
     if (os === 'gitbash') return `<div class="window-bar wb-win wb-mintty"><div class="wb-left"><span class="wb-appico gb">◆</span><span class="wb-title"></span></div><div class="wb-right">${btn('wb-min', minus)}${btn('wb-max', box)}${btn('wb-close', x)}</div></div>`;
     return `<div class="window-bar wb-win"><div class="wb-left"><span class="wb-appico">&gt;_</span><span class="wb-title"></span></div><div class="wb-right">${btn('wb-min', minus)}${btn('wb-max', box)}${btn('wb-close', x)}</div></div>`;
   }
@@ -235,12 +229,14 @@
           if (saved.users) m.users = saved.users;
           if (saved.disks) m.disks = saved.disks;
           if (saved.hostname) m.net.hostname = saved.hostname;
+          if (saved.extra) m.extra = saved.extra;
+          if (saved.services) m.services = saved.services;
         } catch (e) { console.warn('Could not restore machine', kind, e); m = null; }
       }
       if (!m) {
         m = new TX.Machine(kind);
         const url = 'https://github.com/student/hello-web.git';
-        try { TX.git.seedRepo(m.vfs, m.home.concat('projects', 'hello-web'), 'student', url); } catch (e) { console.warn(e); }
+        if (m.vfs.get(m.home.concat('projects'))) { try { TX.git.seedRepo(m.vfs, m.home.concat('projects', 'hello-web'), 'student', url); } catch (e) { console.warn(e); } }
       }
       m.vfs.onChange = () => this.save();
       this.machines[kind] = m;
@@ -261,7 +257,7 @@
       clearTimeout(this.saveTimer);
       Object.keys(this.machines).forEach((k) => {
         const m = this.machines[k];
-        const ok = store.set('fs.' + k, { root: m.vfs.root, installed: [...m.installed], users: m.users, disks: m.disks, hostname: m.net.hostname });
+        const ok = store.set('fs.' + k, { root: m.vfs.root, installed: [...m.installed], users: m.users, disks: m.disks, hostname: m.net.hostname, extra: m.extra, services: m.family === 'unix' && m.kind !== 'linux' && m.kind !== 'mac' ? m.services : undefined });
         if (!ok && !this.warnedQuota) { this.warnedQuota = true; this.toast('⚠️ Browser storage is full — changes may not be saved. Try reset-machine.'); }
       });
       store.set('remotes', TX.gitRemotes);
@@ -357,7 +353,7 @@
     },
     buildNewMenu() {
       const menu = $('#new-menu');
-      menu.innerHTML = Object.keys(SHELLS).map((k, i) => `<button class="menu-item" data-kind="${k}"><span class="tab-badge" style="--c:${SHELLS[k].color}">${badge(k)}</span>${SHELLS[k].label}<kbd>Alt+${i + 1}</kbd></button>`).join('') + '<div class="menu-sep"></div><button class="menu-item" data-kind="powershell" data-admin="1"><span class="tab-badge" style="--c:#2671BE">🛡</span>PowerShell (Administrator)</button><button class="menu-item" data-act="launcher"><span class="tab-badge" style="--c:#888">⌂</span>Start page<kbd>Alt+T</kbd></button>';
+      menu.innerHTML = TX.SHELL_ORDER.map((k, i) => `<button class="menu-item" data-kind="${k}"><span class="tab-badge" style="--c:${SHELLS[k].color}">${badge(k)}</span>${SHELLS[k].label}<kbd>Alt+${(i + 1) % 10}</kbd></button>`).join('') + '<div class="menu-sep"></div><button class="menu-item" data-kind="powershell" data-admin="1"><span class="tab-badge" style="--c:#2671BE">🛡</span>PowerShell (Administrator)</button><button class="menu-item" data-act="launcher"><span class="tab-badge" style="--c:#888">⌂</span>Start page<kbd>Alt+T</kbd></button>';
       menu.addEventListener('click', (e) => {
         const b = e.target.closest('.menu-item');
         if (!b) return;
@@ -383,8 +379,8 @@
         if (e.key === 'Escape') { if ($('#modal-settings').classList.contains('open')) { this.closeSettings(); e.preventDefault(); return; } if (!$('#launcher').classList.contains('hidden') && this.sessions.length) { this.hideLauncher(); e.preventDefault(); return; } }
         if (!e.altKey || e.ctrlKey || e.metaKey) return;
         const k = e.key.toLowerCase();
-        const kinds = Object.keys(SHELLS);
-        if (/^[1-6]$/.test(k)) { e.preventDefault(); this.newTab(kinds[+k - 1]); }
+        const kinds = TX.SHELL_ORDER;
+        if (/^[0-9]$/.test(k)) { e.preventDefault(); this.newTab(kinds[k === '0' ? 9 : +k - 1]); }
         else if (k === 't') { e.preventDefault(); this.showLauncher(); }
         else if (k === 'w') { e.preventDefault(); if (this.active) this.closeTab(this.active); }
         else if (k === 'arrowright' || k === 'arrowleft') { e.preventDefault(); if (!this.active) return; const i = this.sessions.indexOf(this.active); const n = this.sessions[(i + (k === 'arrowright' ? 1 : -1) + this.sessions.length) % this.sessions.length]; this.activate(n); }
@@ -551,6 +547,12 @@
 
   function badge(kind) {
     const map = { bash: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#E95420"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="18.6" cy="12" r="1.9" fill="#fff"/><circle cx="8.7" cy="6.3" r="1.9" fill="#fff"/><circle cx="8.7" cy="17.7" r="1.9" fill="#fff"/></svg>', zsh: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="4" fill="#3a3a3c"/><path d="M6 9l3 3-3 3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 15h6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>', cmd: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2" fill="#0c0c0c" stroke="#8a8a8a"/><text x="4.2" y="15.5" font-size="8" font-family="Consolas,monospace" fill="#ccc">C:\\</text></svg>', powershell: '<svg viewBox="0 0 24 24"><path d="M5 3h16l-3 18H2z" fill="#2671BE"/><path d="M7 8l5 4-6 4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>', pwsh: '<svg viewBox="0 0 24 24"><path d="M5 3h16l-3 18H2z" fill="#1d2a3d" stroke="#5391FE" stroke-width="1.2"/><path d="M7 8l5 4-6 4" stroke="#5391FE" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16h4" stroke="#5391FE" stroke-width="1.8" stroke-linecap="round"/></svg>', gitbash: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5" transform="rotate(45 12 12)" fill="#F05032"/><circle cx="12" cy="8" r="1.6" fill="#fff"/><circle cx="12" cy="16" r="1.6" fill="#fff"/><circle cx="15.5" cy="12" r="1.6" fill="#fff"/><path d="M12 8v8M12 9.5l3.5 2.5" stroke="#fff" stroke-width="1.3"/></svg>' };
+    Object.assign(map, {
+      freebsd: '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8.5" fill="#AB2B28"/><path d="M4.2 4.5c1.8-.4 3.5.3 4.3 1.6M19.8 4.5c-1.8-.4-3.5.3-4.3 1.6" stroke="#AB2B28" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="9.3" cy="12" r="1.3" fill="#fff"/><circle cx="14.7" cy="12" r="1.3" fill="#fff"/><path d="M9 16.2c1.8 1.3 4.2 1.3 6 0" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>',
+      solaris: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#F29111"/><g stroke="#F29111" stroke-width="2" stroke-linecap="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></g></svg>',
+      dos: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="#000" stroke="#00A8A8"/><text x="4" y="15.5" font-size="8" font-family="Consolas,monospace" fill="#AAAAAA">C&gt;_</text></svg>',
+      unix: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2" fill="#F3EEDC" stroke="#8a7f62"/><text x="4.5" y="15.5" font-size="8.5" font-family="Courier New,monospace" font-weight="700" fill="#2B2A26">$ _</text></svg>',
+    });
     return map[kind] || '>_';
   }
 

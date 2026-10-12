@@ -50,7 +50,7 @@
   function HELLO_WEB_COMMITS(owner) {
     return [
       { msg: 'Initial commit: add index.html', files: { 'index.html': '<!DOCTYPE html>\n<html>\n  <head><title>Hello</title></head>\n  <body>\n    <h1>Hello, world!</h1>\n  </body>\n</html>\n' }, author: owner },
-      { msg: 'Add app.js with greet function', files: { 'app.js': '// Tiny web app used for git practice\nfunction greet(name) {\n  return "Hello, " + name + "!";\n}\n\nconsole.log(greet("world"));\n', 'index.html': '<!DOCTYPE html>\n<html>\n  <head><title>Hello</title></head>\n  <body>\n    <h1>Hello, world!</h1>\n    <script src="app.js"></script>\n  </body>\n</html>\n' }, author: owner },
+      { msg: 'Add app.js with greet function', files: { 'app.js': '// Tiny web app used for git practice\nfunction greet(name) {\n  return "Hello, " + name + "!";\n}\n\nconsole.log(greet("world"));\n', 'index.html': '<!DOCTYPE html>\n<html>\n  <head><title>Hello</title></head>\n  <body>\n    <h1>Hello, world!</h1>\n    <script src="app.js"><\/script>\n  </body>\n</html>\n' }, author: owner },
       { msg: 'Add basic styles', files: { 'style.css': 'body {\n  font-family: sans-serif;\n  background: #fafafa;\n}\n' }, author: owner },
     ];
   }

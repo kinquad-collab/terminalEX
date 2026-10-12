@@ -127,7 +127,7 @@ Get-Volume | Where-Object { $_.DriveLetter } | Format-Table DriveLetter, FileSys
   // hello-world git repo (created by git module later, placeholder dir)
   function projectFiles() {
     return {
-      'hello-web': { 'index.html': '<!DOCTYPE html>\n<html>\n  <head><title>Hello</title></head>\n  <body>\n    <h1>Hello, world!</h1>\n    <script src="app.js"></script>\n  </body>\n</html>\n', 'app.js': HELLO_JS, 'style.css': 'body {\n  font-family: sans-serif;\n  background: #fafafa;\n}\n' },
+      'hello-web': { 'index.html': '<!DOCTYPE html>\n<html>\n  <head><title>Hello</title></head>\n  <body>\n    <h1>Hello, world!</h1>\n    <script src="app.js"><\/script>\n  </body>\n</html>\n', 'app.js': HELLO_JS, 'style.css': 'body {\n  font-family: sans-serif;\n  background: #fafafa;\n}\n' },
       'python-practice': { 'hello.py': HELLO_PY, 'numbers.txt': '42\n7\n19\n3\n88\n15\n61\n7\n23\n' },
     };
   }
@@ -486,24 +486,35 @@ export EDITOR=nano
   }
 
   // ------------------------------------------------------------ Machine
+  // Each kind of computer is described once here; new computers (MS-DOS, Solaris, FreeBSD, UNIX V7) register
+  // themselves with TX.defineMachine from their own files.
+  const KINDS = (TX.MACHINE_KINDS = TX.MACHINE_KINDS || {});
+  TX.defineMachine = (kind, d) => { KINDS[kind] = d; NET[kind] = d.net; HW[kind] = d.hw; DISKS[kind] = d.disks || []; };
+  KINDS.linux = { build: buildLinux, procs: LINUX_PROCS, services: LINUX_SERVICES, users: ['root', 'student', 'teacher'], installed: ['git', 'curl', 'nano', 'vim', 'htop', 'python3', 'wget'], home: ['home', 'student'], ci: false };
+  KINDS.mac = { build: buildMac, procs: MAC_PROCS, services: LINUX_SERVICES, users: ['root', 'student', 'teacher'], installed: ['git', 'curl', 'nano', 'vim', 'python3', 'net-tools', 'traceroute'], home: ['Users', 'student'], ci: true };
+  KINDS.windows = { build: buildWindows, procs: WIN_PROCS, services: WIN_SERVICES, users: ['student', 'Administrator', 'Guest', 'DefaultAccount', 'WDAGUtilityAccount'], installed: ['git', 'curl', 'nano', 'vim', 'python3', 'node'], home: ['C:', 'Users', 'student'], ci: true };
+
   class Machine {
     constructor(kind, savedRoot) {
-      this.kind = kind; // linux | mac | windows
+      const d = KINDS[kind];
+      if (!d) throw new Error('Unknown machine kind: ' + kind);
+      this.kind = kind; // linux | mac | windows | dos | solaris | freebsd | unix
+      this.def = d;
+      this.family = d.family || (kind === 'windows' || kind === 'dos' ? 'windows' : 'unix');
       this.hw = HW[kind];
       this.net = Object.assign({}, NET[kind]);
-      this.disks = JSON.parse(JSON.stringify(DISKS[kind]));
+      this.disks = JSON.parse(JSON.stringify(DISKS[kind] || []));
       this.boot = Date.now() - 1000 * 60 * TX.randInt(90, 60 * 30);
-      this.procs = kind === 'linux' ? LINUX_PROCS() : kind === 'mac' ? MAC_PROCS() : WIN_PROCS();
+      this.procs = d.procs();
       this.nextPid = Math.max(...this.procs.map((p) => p.pid)) + 100;
-      this.services = kind === 'windows' ? WIN_SERVICES() : LINUX_SERVICES();
-      this.users = kind === 'windows' ? ['student', 'Administrator', 'Guest', 'DefaultAccount', 'WDAGUtilityAccount'] : ['root', 'student', 'teacher'];
-      this.installed = new Set(kind === 'mac' ? ['git', 'curl', 'nano', 'vim', 'python3', 'net-tools', 'traceroute'] : kind === 'windows' ? ['git', 'curl', 'nano', 'vim', 'python3', 'node'] : ['git', 'curl', 'nano', 'vim', 'htop', 'python3', 'wget']);
-      const root = savedRoot || (kind === 'linux' ? buildLinux() : kind === 'mac' ? buildMac() : buildWindows());
-      this.vfs = new TX.VFS(root, { ci: kind !== 'linux', gens: null });
-      this.vfs.gens = gens(kind, this);
-      if (kind === 'linux') this.home = ['home', 'student'];
-      else if (kind === 'mac') this.home = ['Users', 'student'];
-      else this.home = ['C:', 'Users', 'student'];
+      this.services = d.services();
+      this.users = d.users.slice();
+      this.installed = new Set(d.installed);
+      const root = savedRoot || d.build();
+      this.vfs = new TX.VFS(root, { ci: d.ci, gens: null });
+      this.vfs.gens = d.gens ? d.gens(this) : gens(kind, this);
+      this.home = d.home.slice();
+      this.extra = d.extra ? d.extra() : {};
       this.env = {};
       this.memCache = null;
     }
@@ -519,6 +530,8 @@ export EDITOR=nano
     kill(pid) { const i = this.procs.findIndex((p) => p.pid === pid); if (i < 0) return false; this.procs.splice(i, 1); return true; }
   }
   TX.Machine = Machine;
+  TX.mkProcs = mkProcs;
+  TX.SAMPLE = { README, HELLO_PY, GROCERIES, GRADES, POEM, SECRET, TODO, projectFiles };
   TX.HW = HW;
   TX.DISKS = DISKS;
 

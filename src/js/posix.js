@@ -355,15 +355,19 @@
       this.term = session.term;
       this.m = machine;
       this.vfs = machine.vfs;
-      this.flavor = flavor; // bash | zsh | gitbash
+      this.flavor = flavor; // bash | zsh | gitbash | sh (FreeBSD) | ksh (Solaris ksh93) | v7 (1979 Bourne shell)
+      this.old = flavor === 'v7';
       this.kind = 'posix';
       this.paths = flavor === 'gitbash' ? TX.Paths.gitbash : TX.Paths.posix;
       this.user = opts.user || 'student';
-      this.home = this.user === 'root' ? (machine.kind === 'mac' ? ['var', 'root'] : ['root']) : machine.home.slice();
+      this.home = this.user === 'root' ? (machine.def.rootHome || (machine.kind === 'mac' ? ['var', 'root'] : ['root'])).slice() : machine.home.slice();
       this.cwd = opts.cwd ? opts.cwd.slice() : this.home.slice();
       this.history = session.historyFor(flavor + ':' + machine.kind);
       this.aliases = Object.assign({}, flavor === 'zsh' ? { ll: 'ls -lah', gs: 'git status', 'run-help': 'man' } : { ll: 'ls -alF', la: 'ls -A', l: 'ls -CF' });
-      if (flavor !== 'zsh') { this.aliases.ls = 'ls --color=auto'; this.aliases.grep = 'grep --color=auto'; }
+      if (flavor === 'bash' || flavor === 'gitbash') { this.aliases.ls = 'ls --color=auto'; this.aliases.grep = 'grep --color=auto'; }
+      if (flavor === 'sh') this.aliases = { h: 'fc -l', j: 'jobs', ll: 'ls -laFo', l: 'ls -l', m: 'more' };
+      if (flavor === 'ksh') this.aliases = { ll: 'ls -l', la: 'ls -a', history: 'fc -l', r: 'fc -e -' };
+      if (flavor === 'v7') this.aliases = {}; // the 1979 Bourne shell had no aliases at all
       if (flavor === 'gitbash') { this.aliases.node = 'winpty node.exe'; delete this.aliases.node; }
       this.funcs = {};
       this.jobs = [];
@@ -381,8 +385,10 @@
       };
       if (flavor === 'gitbash') Object.assign(this.vars, { MSYSTEM: 'MINGW64', COMPUTERNAME: hn, USERNAME: 'student', OS: 'Windows_NT', USERPROFILE: 'C:\\Users\\student' });
       if (flavor === 'zsh') this.vars.PROMPT = '%n@%m %1~ %# ';
+      const prof = machine.def.shellVars && machine.def.shellVars(this);
+      if (prof) { Object.assign(this.vars, prof); Object.keys(this.vars).forEach((k) => { if (this.vars[k] === null) delete this.vars[k]; }); }
       this.exported = new Set(Object.keys(this.vars));
-      this.name = flavor === 'zsh' ? 'zsh' : 'bash';
+      this.name = { zsh: 'zsh', sh: 'sh', ksh: 'ksh', v7: 'sh' }[flavor] || 'bash';
     }
 
     get env() { return this.vars; }
@@ -401,6 +407,9 @@
     prompt() {
       const u = this.user, h = this.m.net.hostname;
       const root = u === 'root';
+      if (this.flavor === 'v7') return root ? '# ' : '$ ';
+      if (this.flavor === 'ksh' && !this.vars.PS1) return u + '@' + h + ':' + this.pretty(this.cwd) + (root ? '# ' : '$ ');
+      if (this.flavor === 'sh' && !this.vars.PS1) return u + '@' + h + ':' + this.pretty(this.cwd) + (root ? ' # ' : ' $ ');
       if (this.vars.PS1 && this.flavor !== 'zsh') return this.expandPS1(this.vars.PS1);
       if (this.flavor === 'zsh') return this.expandZshPrompt(this.vars.PROMPT || '%n@%m %1~ %# ');
       if (this.flavor === 'gitbash') {
@@ -449,6 +458,7 @@
         return `Welcome to ${C.bold('Ubuntu 24.04.1 LTS')} (GNU/Linux ${this.m.hw.kernel} x86_64)\n\n * Documentation:  https://help.ubuntu.com\n * Management:     https://landscape.canonical.com\n * Support:        https://ubuntu.com/pro\n\n System information as of ${TX.unixDate(Date.now())}\n\n  System load:  ${this.m.load()[0].toFixed(2)}               Processes:             ${this.m.procs.length + 214}\n  Usage of /:   19.4% of 466.34GB   Users logged in:       1\n  Memory usage: ${Math.round((mem.used / mem.total) * 100)}%                IPv4 address for ${this.m.net.iface}: ${this.m.net.ip}\n  Swap usage:   0%\n\n${C.dim('Tip: type')} ${C.cyan('help')} ${C.dim('for a list of commands, or open the Missions panel.')}\n\nLast login: ${TX.unixDate(Date.now() - 1000 * 60 * 60 * 20).replace(/ EDT/, '')} from 192.168.1.57\n`;
       }
       if (this.flavor === 'zsh') return `Last login: ${TX.unixDate(Date.now() - 1000 * 60 * 60 * 3).replace(/ EDT \d+$/, '')} on ttys000\n${C.dim('Tip: type')} ${C.cyan('help')} ${C.dim('for a list of commands.')}\n`;
+      if (this.m.def.banner) return this.m.def.banner(this);
       if (this.flavor === 'gitbash') return C.dim('Git Bash (MINGW64) — git version 2.46.0.windows.1. Type ') + C.cyan('help') + C.dim(' for commands.') + '\n';
       return '';
     }
@@ -533,8 +543,11 @@
       const c = TX.posixCmds[name];
       if (!c) return false;
       if (c.only && !c.only.includes(this.flavor === 'gitbash' ? 'gitbash' : this.m.kind)) return false;
+      if (c.not && c.not.includes(this.m.kind)) return false;
+      if (this.m.def.allow && !this.m.def.allow.has(name)) return false;
       if (c.pkg && !this.m.installed.has(c.pkg)) return false;
       if (c.pkgLinux && this.m.kind === 'linux' && !this.m.installed.has(c.pkgLinux)) return false;
+      if (c.pkgOn && c.pkgOn[this.m.kind] && !this.m.installed.has(c.pkgOn[this.m.kind])) return false;
       return true;
     }
     lookup(name) {
@@ -544,6 +557,7 @@
 
     // -------------------------------------------------- execution
     async exec(line) {
+      if (this.old) { const why = TX.v7Check && TX.v7Check(line); if (why) { this.term.write(why); this.lastCode = 2; return; } }
       // history expansion
       if (/(^|\s)!(!|-?\d+|[A-Za-z])/.test(line) && !/^\s*echo\s+'/.test(line)) {
         const H = this.history;
@@ -846,6 +860,9 @@
     displayErrPath(p) { return p.startsWith('/') ? p : p; }
     notFound(name) {
       const pk = TX.posixCmds[name] && (TX.posixCmds[name].pkg || (this.m.kind === 'linux' && TX.posixCmds[name].pkgLinux));
+      if (this.flavor === 'v7') return `${name}: not found\n`;
+      if (this.flavor === 'ksh') return `ksh: ${name}: not found [No such file or directory]\n`;
+      if (this.flavor === 'sh') { const s2 = this.m.def.pkgHint && this.m.def.pkgHint(name); return `sh: ${name}: not found\n` + (s2 || ''); }
       if (this.flavor === 'zsh') {
         if (pk) return `zsh: command not found: ${name}\n${C.dim(`(hint: install it with  brew install ${pk})`)}\n`;
         return `zsh: command not found: ${name}\n`;
@@ -911,7 +928,7 @@
 
     // -------------------------------------------------- expansion
     getVar(name) {
-      if (/^\d$/.test(name)) return name === '0' ? (this.vars['0'] || (this.flavor === 'zsh' ? 'zsh' : 'bash')) : (this.params[+name - 1] ?? '');
+      if (/^\d$/.test(name)) return name === '0' ? (this.vars['0'] || (this.flavor === 'zsh' ? 'zsh' : this.flavor === 'ksh' ? '-ksh' : this.flavor === 'bash' || this.flavor === 'gitbash' ? 'bash' : 'sh')) : (this.params[+name - 1] ?? '');
       switch (name) {
         case '?': return String(this.lastCode);
         case '$': return String(this.session.pid || 2230);
@@ -1117,6 +1134,7 @@
   }
 
   function flavor2title(sh) {
+    if (sh.m.def.title) return sh.m.def.title(sh);
     return (sh.flavor === 'gitbash' ? 'MINGW64:' + sh.fmt(sh.cwd) : sh.user + '@' + sh.m.net.hostname + ': ' + sh.pretty(sh.cwd));
   }
 

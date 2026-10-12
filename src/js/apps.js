@@ -168,7 +168,7 @@
         const out = [];
         const title = ed.name || (notepad ? 'Untitled' : 'New Buffer');
         if (notepad) {
-          out.push({ html: `<div class="np-title"><span>${ed.dirty ? '*' : ''}${TX.escapeHtml(title)} - ${opts.edit ? 'Microsoft Edit' : 'Notepad'}</span><span class="np-menu">${btn('s', 'File', '→ Save (Ctrl+S)', true)} ${btn('Escape', 'Close', '(Esc)')}</span></div>` });
+          out.push({ html: `<div class="np-title"><span>${ed.dirty ? '*' : ''}${TX.escapeHtml(title)} - ${opts.dosEdit ? 'MS-DOS Editor' : opts.edit ? 'Microsoft Edit' : 'Notepad'}</span><span class="np-menu">${btn('s', 'File', '→ Save (Ctrl+S)', true)} ${btn('Escape', 'Close', '(Esc)')}</span></div>` });
         } else {
           const left = '  GNU nano 7.2', right = ed.dirty ? 'Modified  ' : '';
           const mid = title;

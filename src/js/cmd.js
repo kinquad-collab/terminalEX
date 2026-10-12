@@ -781,23 +781,27 @@
         this.cwd = (this.driveCwd[drive] || [drive]).slice();
         return 0;
       }
-      if (lname === '/?' || args[0] === '/?') { io.out(TX.docs.cmdHelp(lname) + '\n'); return 0; }
-      const fn = INTERNAL[lname];
+      if (lname === '/?' || args[0] === '/?') { io.out(this.helpFor(lname) + '\n'); return 0; }
+      const fn = this.internal(lname);
       try {
         if (fn) { const r = await fn.call(this, ctx); return typeof r === 'number' ? r : 0; }
-        const ext = X[lname.replace(/\.(exe|com)$/, '')];
+        const ext = this.external(lname.replace(/\.(exe|com)$/, ''));
         if (ext) { const r = await ext(ctx); return typeof r === 'number' ? r : 0; }
         // batch file / script by path
         return await this.runExternal(name, args, restRaw, io, ctx);
       } catch (e) {
         if (e.interrupt) { io.out('^C\n'); return 1; }
         if (e.exitShell) throw e;
-        if (e instanceof TX.FsError) { io.err((ERR[e.code] || e.message) + '\n'); return 1; }
+        if (e instanceof TX.FsError) { io.err(this.errText(e) + '\n'); return 1; }
         console.error(e);
         io.err(String(e.message || e) + '\n');
         return 1;
       }
     }
+    internal(n) { return INTERNAL[n]; }
+    external(n) { return X[n]; }
+    helpFor(n) { return TX.docs.cmdHelp(n); }
+    errText(e) { return ERR[e.code] || e.message; }
     async runExternal(name, args, restRaw, io, ctx) {
       const lname = name.toLowerCase().replace(/^"|"$/g, '');
       const bridges = { git: 1, curl: 1, tar: 1, ssh: 1 };
@@ -882,7 +886,7 @@
   }
 
   // ------------------------------------------------------------------ internal commands
-  const INTERNAL = {};
+  const INTERNAL = (TX.cmdInternal = {});
   const lower = (a) => a.map((x) => x.toLowerCase());
   INTERNAL.cls = function (c) { c.term.clear(); this.needBlank = false; };
   INTERNAL.echo = function (c) {

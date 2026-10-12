@@ -1,0 +1,12 @@
+{
+  "name": "terminalex",
+  "version": "2.0.0",
+  "description": "Classroom terminal simulator: Ubuntu, macOS, FreeBSD, Solaris, Windows cmd/PowerShell/Git Bash, MS-DOS and UNIX V7 in one page.",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node build.js && node tests/browser-smoke.js"
+  },
+  "license": "UNLICENSED"
+}

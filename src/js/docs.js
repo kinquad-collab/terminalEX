@@ -237,6 +237,7 @@
   ];
 
   TX.docs = {
+    add: ([name, summary, synopsis, desc, options, examples, see]) => { DB[name] = { name, summary, synopsis, desc, options: options || [], examples: examples || [], see }; },
     get: (n) => DB[n],
     all: () => Object.values(DB),
     manPage,
