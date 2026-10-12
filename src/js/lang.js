@@ -172,7 +172,7 @@
             if (this.isName('finally')) { this.i++; this.eat(':'); fin = this.block(); }
             return [{ k: 'try', body, handlers, els, fin, line }];
           }
-          case 'with': { this.i++; this.expr(); if (this.isName('as')) { this.i += 2; } this.eat(':'); return this.block(); }
+          case 'with': { this.i++; const e = this.expr(); let as = null; if (this.isName('as')) { this.i++; as = this.p.v; this.i++; } this.eat(':'); return [{ k: 'with', e, as, body: this.block(), line }]; }
         }
       }
       return this.simpleLine();
@@ -402,8 +402,8 @@
         type: (a) => ({ __pyType: typeName(a[0]), toString() { return `<class '${typeName(a[0])}'>`; } }),
         abs: (a) => (isF(a[0]) ? new PyFloat(Math.abs(a[0].v)) : Math.abs(num(a[0]))),
         round: (a) => { const x = num(a[0]); if (a[1] === undefined || a[1] === null) { const f = Math.floor(x); const d = x - f; return d === 0.5 ? (f % 2 === 0 ? f : f + 1) : Math.round(x); } const p = num(a[1]); return new PyFloat(Number(x.toFixed(p))); },
-        min: (a, kw) => { const xs = a.length === 1 ? iter(a[0]) : a; if (!xs.length) throw new PyErr('ValueError', 'min() arg is an empty sequence'); return xs.reduce((m, x) => (cmp(x, m) < 0 ? x : m)); },
-        max: (a, kw) => { const xs = a.length === 1 ? iter(a[0]) : a; if (!xs.length) throw new PyErr('ValueError', 'max() arg is an empty sequence'); return xs.reduce((m, x) => (cmp(x, m) > 0 ? x : m)); },
+        min: async (a, kw) => { const xs = a.length === 1 ? iter(a[0]) : a; if (!xs.length) { if (kw.default !== undefined) return kw.default; throw new PyErr('ValueError', 'min() arg is an empty sequence'); } const keys = []; for (const x of xs) keys.push(kw.key ? await I.callFn(kw.key, [x], {}) : x); let bi = 0; for (let i = 1; i < xs.length; i++) if (cmp(keys[i], keys[bi]) < 0) bi = i; return xs[bi]; },
+        max: async (a, kw) => { const xs = a.length === 1 ? iter(a[0]) : a; if (!xs.length) { if (kw.default !== undefined) return kw.default; throw new PyErr('ValueError', 'max() arg is an empty sequence'); } const keys = []; for (const x of xs) keys.push(kw.key ? await I.callFn(kw.key, [x], {}) : x); let bi = 0; for (let i = 1; i < xs.length; i++) if (cmp(keys[i], keys[bi]) > 0) bi = i; return xs[bi]; },
         sum: (a) => { const xs = iter(a[0]); let f = false; let s = a[1] !== undefined ? num(a[1]) : 0; xs.forEach((x) => { if (!isNum(x)) throw new PyErr('TypeError', `unsupported operand type(s) for +: 'int' and '${typeName(x)}'`); if (isF(x)) f = true; s += num(x); }); return mkNum(s, f); },
         sorted: async (a, kw) => { const xs = iter(a[0]); return I.sortList(xs, kw); },
         reversed: (a) => iter(a[0]).reverse(),
@@ -427,9 +427,13 @@
           const vfs = I.ctx.vfs;
           let buf = mode.startsWith('a') && vfs.get(segs) ? vfs.content(vfs.get(segs)) : '';
           if (mode.startsWith('r')) { const n = vfs.get(segs); if (!n) throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(str(a[0]))}`); buf = vfs.content(n); }
-          const f = { __file: true, read: () => buf, readlines: () => buf.split(/(?<=\n)/), write: (s) => { buf += str(s[0]); return str(s[0]).length; }, close: () => { if (/[wa]/.test(mode)) vfs.writeFile(segs, buf, { owner: I.ctx.user, user: I.ctx.user }); return null; }, __iter: () => buf.split(/(?<=\n)/) };
+          let closed = false;
+          const f = { __file: true, name: str(a[0]), mode, read: () => buf, readline: () => { const i = buf.indexOf('\n'); const l = i < 0 ? buf : buf.slice(0, i + 1); buf = buf.slice(l.length); return l; }, readlines: () => buf.split(/(?<=\n)/).filter(Boolean), write: (s) => { if (closed) throw new PyErr('ValueError', 'I/O operation on closed file.'); if (!/[wa+]/.test(mode)) throw new PyErr('io.UnsupportedOperation', 'not writable'); buf += str(s[0]); return str(s[0]).length; }, close: () => { if (!closed && /[wa]/.test(mode)) vfs.writeFile(segs, buf, { owner: I.ctx.user, user: I.ctx.user }); closed = true; return null; }, __iter: () => buf.split(/(?<=\n)/).filter(Boolean) };
+          if (/[wa]/.test(mode)) { (I.openFiles = I.openFiles || []).push(f); vfs.writeFile(segs, buf, { owner: I.ctx.user, user: I.ctx.user }); }
           return f;
         },
+        next: (a) => { const x = a[0]; if (Array.isArray(x)) { if (!x.length) { if (a.length > 1) return a[1]; throw new PyErr('StopIteration', ''); } return x.shift(); } if (x && x.__file) return x.readline([]); throw new PyErr('TypeError', `'${typeName(x)}' object is not an iterator`); },
+        iter: (a) => (Array.isArray(a[0]) ? a[0] : iter(a[0]).slice()),
       };
       Object.keys(B).forEach((k) => { B[k].pyName = k; });
       ['int', 'str', 'float', 'list', 'dict', 'bool', 'tuple', 'set'].forEach((t) => { B[t].__pyTypeName = t; });
@@ -449,8 +453,23 @@
       if (name === 'math') return { __module: 'math', pi: new PyFloat(Math.PI), e: new PyFloat(Math.E), tau: new PyFloat(Math.PI * 2), inf: new PyFloat(Infinity), sqrt: (a) => new PyFloat(Math.sqrt(num(a[0]))), floor: (a) => Math.floor(num(a[0])), ceil: (a) => Math.ceil(num(a[0])), pow: (a) => new PyFloat(Math.pow(num(a[0]), num(a[1]))), sin: (a) => new PyFloat(Math.sin(num(a[0]))), cos: (a) => new PyFloat(Math.cos(num(a[0]))), tan: (a) => new PyFloat(Math.tan(num(a[0]))), log: (a) => new PyFloat(a[1] !== undefined ? Math.log(num(a[0])) / Math.log(num(a[1])) : Math.log(num(a[0]))), log10: (a) => new PyFloat(Math.log10(num(a[0]))), log2: (a) => new PyFloat(Math.log2(num(a[0]))), factorial: (a) => { let r = 1; for (let i = 2; i <= num(a[0]); i++) r *= i; return r; }, gcd: (a) => { let x = Math.abs(num(a[0])), y = Math.abs(num(a[1])); while (y) [x, y] = [y, x % y]; return x; }, fabs: (a) => new PyFloat(Math.abs(num(a[0]))), isclose: (a) => Math.abs(num(a[0]) - num(a[1])) < 1e-9, radians: (a) => new PyFloat(num(a[0]) * Math.PI / 180), degrees: (a) => new PyFloat(num(a[0]) * 180 / Math.PI), hypot: (a) => new PyFloat(Math.hypot(...a.map(num))) };
       if (name === 'random') return { __module: 'random', random: () => new PyFloat(Math.random()), randint: (a) => num(a[0]) + Math.floor(Math.random() * (num(a[1]) - num(a[0]) + 1)), choice: (a) => { const l = iter(a[0]); if (!l.length) throw new PyErr('IndexError', 'Cannot choose from an empty sequence'); return l[Math.floor(Math.random() * l.length)]; }, shuffle: (a) => { const l = a[0]; for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return null; }, uniform: (a) => new PyFloat(num(a[0]) + Math.random() * (num(a[1]) - num(a[0]))), randrange: (a) => { const [s, e] = a.length === 1 ? [0, num(a[0])] : [num(a[0]), num(a[1])]; return s + Math.floor(Math.random() * (e - s)); }, sample: (a) => { const l = iter(a[0]).slice(); for (let i = l.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; } return l.slice(0, num(a[1])); }, seed: () => null };
       if (name === 'time') return { __module: 'time', time: () => new PyFloat(Date.now() / 1000), sleep: async (a) => { await TX.sleep(num(a[0]) * 1000, I.ctx.signal); return null; }, ctime: () => new Date().toString().slice(0, 24), perf_counter: () => new PyFloat(performance.now() / 1000) };
-      if (name === 'os') return { __module: 'os', getcwd: () => I.ctx.fmt(I.ctx.cwd), listdir: (a) => { const segs = a.length ? I.ctx.resolve(str(a[0])) : I.ctx.cwd; const n = I.ctx.vfs.get(segs); if (!n || n.t !== 'd') throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(a.length ? str(a[0]) : '.')}`); return Object.keys(n.ch).sort(); }, name: I.ctx.m.kind === 'windows' ? 'nt' : 'posix', sep: I.ctx.m.kind === 'windows' ? '\\' : '/', getenv: (a) => null, path: { __module: 'os.path', exists: (a) => !!I.ctx.vfs.get(I.ctx.resolve(str(a[0]))), join: (a) => a.map(str).join('/') } };
-      if (name === 'sys') return { __module: 'sys', version: '3.12.3 (main, Sep 11 2024, 14:17:37) [GCC 13.2.0]', platform: I.ctx.m.kind === 'windows' ? 'win32' : I.ctx.m.kind === 'mac' ? 'darwin' : 'linux', argv: I.argv || [''], exit: () => { throw new PyErr('SystemExit', ''); }, maxsize: 9223372036854775807 };
+      if (name === 'os') return { __module: 'os', getcwd: () => I.ctx.fmt(I.ctx.cwd), listdir: (a) => { const segs = a.length ? I.ctx.resolve(str(a[0])) : I.ctx.cwd; const n = I.ctx.vfs.get(segs); if (!n || n.t !== 'd') throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(a.length ? str(a[0]) : '.')}`); return Object.keys(n.ch).sort(); }, name: I.ctx.m.kind === 'windows' ? 'nt' : 'posix', sep: I.ctx.m.kind === 'windows' ? '\\' : '/', getenv: (a) => null, path: { __module: 'os.path', exists: (a) => !!I.ctx.vfs.get(I.ctx.resolve(str(a[0]))), join: (a) => a.map(str).join(I.ctx.m.kind === 'windows' ? '\\' : '/'), basename: (a) => str(a[0]).split(/[\\/]/).pop(), dirname: (a) => str(a[0]).split(/[\\/]/).slice(0, -1).join('/'), splitext: (a) => { const b = str(a[0]); const i = b.lastIndexOf('.'); return new PyTuple(i > 0 ? [b.slice(0, i), b.slice(i)] : [b, '']); }, getsize: (a) => { const n = I.ctx.vfs.get(I.ctx.resolve(str(a[0]))); if (!n) throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(str(a[0]))}`); return I.ctx.vfs.size(n); }, isdir: (a) => { const n = I.ctx.vfs.get(I.ctx.resolve(str(a[0]))); return !!n && n.t === 'd'; }, isfile: (a) => { const n = I.ctx.vfs.get(I.ctx.resolve(str(a[0]))); return !!n && n.t === 'f'; } },
+        makedirs: (a, kw) => { try { I.ctx.vfs.mkdir(I.ctx.resolve(str(a[0])), { parents: true, owner: I.ctx.user }); } catch (e) { if (!kw.exist_ok) throw new PyErr('FileExistsError', `[Errno 17] File exists: ${repr(str(a[0]))}`); } return null; },
+        mkdir: (a) => { try { I.ctx.vfs.mkdir(I.ctx.resolve(str(a[0])), { owner: I.ctx.user }); } catch (e) { throw new PyErr('FileExistsError', `[Errno 17] File exists: ${repr(str(a[0]))}`); } return null; },
+        remove: (a) => { try { I.ctx.vfs.remove(I.ctx.resolve(str(a[0]))); } catch (e) { throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(str(a[0]))}`); } return null; },
+        rename: (a) => { try { I.ctx.vfs.move(I.ctx.resolve(str(a[0])), I.ctx.resolve(str(a[1]))); } catch (e) { throw new PyErr('FileNotFoundError', `[Errno 2] No such file or directory: ${repr(str(a[0]))}`); } return null; } };
+      if (name === 'csv') {
+        const parse = (text) => { const rows = []; let row = [], f = '', q = false; for (let i = 0; i < text.length; i++) { const ch = text[i]; if (q) { if (ch === '"' && text[i + 1] === '"') { f += '"'; i++; } else if (ch === '"') q = false; else f += ch; } else if (ch === '"') q = true; else if (ch === ',') { row.push(f); f = ''; } else if (ch === '\n') { row.push(f); rows.push(row); row = []; f = ''; } else if (ch !== '\r') f += ch; } if (f || row.length) { row.push(f); rows.push(row); } return rows; };
+        const textOf = (src) => (src && src.__file ? src.__iter().join('') : Array.isArray(src) ? src.map(str).join('') : str(src));
+        const cell = (v) => { const t = v === null ? '' : str(v); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+        return { __module: 'csv',
+          reader: (a) => parse(textOf(a[0])),
+          DictReader: (a) => { const rows = parse(textOf(a[0])); const head = rows.shift() || []; return rows.filter((r) => r.length > 1 || r[0] !== '').map((r) => { const m = new Map(); head.forEach((h, i) => m.set(h, r[i] === undefined ? null : r[i])); return m; }); },
+          writer: (a) => { const f = a[0]; const w = { writerow: (b) => { f.write([iter(b[0]).map(cell).join(',') + '\n']); return null; } }; w.writerows = (b) => { iter(b[0]).forEach((r) => w.writerow([r])); return null; }; return w; },
+          DictWriter: (a, kw) => { const f = a[0]; const names = iter(kw.fieldnames || a[1]); return { writeheader: () => { f.write([names.map(cell).join(',') + '\n']); return null; }, writerow: (b) => { const m = b[0]; f.write([names.map((n) => cell(m instanceof Map ? (m.has(n) ? m.get(n) : '') : '')).join(',') + '\n']); return null; } }; },
+        };
+      }
+      if (name === 'sys') return { __module: 'sys', version: '3.12.3 (main, Sep 11 2024, 14:17:37) [GCC 13.2.0]', platform: I.ctx.m.kind === 'windows' ? 'win32' : I.ctx.m.kind === 'mac' ? 'darwin' : 'linux', argv: I.argv || [''], exit: (a) => { const e = new PyErr('SystemExit', ''); e.exitCode = a && a.length ? (typeof a[0] === 'number' ? a[0] : (I.write(str(a[0]) + '\n'), 1)) : 0; throw e; }, maxsize: 9223372036854775807 };
       if (name === 'datetime') { const dt = { now: () => ({ __str: TX.isoDate(Date.now()) + '.' + String(new Date().getMilliseconds()).padStart(3, '0') + '000', year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate(), hour: new Date().getHours(), minute: new Date().getMinutes(), strftime: (a) => str(a[0]).replace(/%([YmdHMSAaBbp])/g, (_, k) => { const d = new Date(); return { Y: d.getFullYear(), m: TX.p2(d.getMonth() + 1), d: TX.p2(d.getDate()), H: TX.p2(d.getHours()), M: TX.p2(d.getMinutes()), S: TX.p2(d.getSeconds()), A: TX.DAYS[d.getDay()], a: TX.DAY[d.getDay()], B: TX.MONTHS[d.getMonth()], b: TX.MON[d.getMonth()], p: d.getHours() >= 12 ? 'PM' : 'AM' }[k]; }), toString() { return this.__str; } }) }; dt.today = dt.now; return { __module: 'datetime', datetime: dt, date: { today: () => ({ toString() { return TX.isoDate(Date.now()).slice(0, 10); } }) } }; }
       if (name === 'turtle' || name === 'tkinter' || name === 'pygame') throw new PyErr('ModuleNotFoundError', `No module named '${name}' (graphics modules need a real desktop — TerminalEX is text-only)`);
       throw new PyErr('ModuleNotFoundError', `No module named '${name}'`);
@@ -517,6 +536,12 @@
             try { await this.execBlock(s.body, env); } catch (e) { if (e === BREAK) return; if (e === CONT) continue; throw e; }
           }
           if (s.els) await this.execBlock(s.els, env);
+          return;
+        }
+        case 'with': {
+          const v = await this.eval(s.e, env);
+          if (s.as) this.assignName(s.as, v, env);
+          try { await this.execBlock(s.body, env); } finally { if (v && v.__file && v.close) v.close([]); }
           return;
         }
         case 'break': throw BREAK;
@@ -664,7 +689,7 @@
       const bind = (fn) => { fn.pyName = name; return fn; };
       if (typeof obj === 'string') {
         const m = {
-          upper: () => obj.toUpperCase(), lower: () => obj.toLowerCase(), title: () => obj.replace(/\b\w/g, (c) => c.toUpperCase()), capitalize: () => obj.charAt(0).toUpperCase() + obj.slice(1).toLowerCase(), swapcase: () => [...obj].map((c) => (c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase())).join(''),
+          upper: () => obj.toUpperCase(), lower: () => obj.toLowerCase(), title: () => obj.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()), capitalize: () => obj.charAt(0).toUpperCase() + obj.slice(1).toLowerCase(), swapcase: () => [...obj].map((c) => (c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase())).join(''),
           strip: (a) => (a[0] ? obj.replace(new RegExp(`^[${esc(a[0])}]+|[${esc(a[0])}]+$`, 'g'), '') : obj.trim()), lstrip: (a) => (a[0] ? obj.replace(new RegExp(`^[${esc(a[0])}]+`), '') : obj.replace(/^\s+/, '')), rstrip: (a) => (a[0] ? obj.replace(new RegExp(`[${esc(a[0])}]+$`), '') : obj.replace(/\s+$/, '')),
           split: (a) => (a[0] === undefined || a[0] === null ? obj.trim().split(/\s+/).filter((x) => x !== '') : obj.split(str(a[0]))), splitlines: () => obj.split(/\r?\n/), join: (a) => iter(a[0]).map((x) => { if (typeof x !== 'string') throw new PyErr('TypeError', `sequence item 0: expected str instance, ${typeName(x)} found`); return x; }).join(obj),
           replace: (a) => obj.split(str(a[0])).join(str(a[1])), find: (a) => obj.indexOf(str(a[0])), index: (a) => { const i = obj.indexOf(str(a[0])); if (i < 0) throw new PyErr('ValueError', 'substring not found'); return i; }, count: (a) => obj.split(str(a[0])).length - 1,
@@ -733,10 +758,11 @@
     if (files.length) {
       let src;
       try { src = ctx.vfs.readFile(ctx.resolve(files[0])); } catch (e) { ctx.err(`python3: can't open file '${ctx.fmt(ctx.resolve(files[0]))}': [Errno 2] No such file or directory\n`); return 2; }
-      interp.argv = files;
-      try { await interp.run(src, files[0]); return 0; }
+      interp.argv = args.filter((a, i) => i >= args.indexOf(files[0]));
+      const flush = () => (interp.openFiles || []).forEach((f) => f.close([]));
+      try { await interp.run(src, files[0]); flush(); return 0; }
       catch (e) {
-        if (e instanceof PyErr) { if (e.pyType === 'SystemExit') return 0; if (e.pyType === 'KeyboardInterrupt') { ctx.err('Traceback (most recent call last):\n  File "' + files[0] + '", line ' + (interp.line || 1) + '\nKeyboardInterrupt\n'); return 130; } ctx.err(pyTrace(e, files[0], src)); return 1; }
+        if (e instanceof PyErr) { if (e.pyType === 'SystemExit') { (interp.openFiles || []).forEach((f) => f.close([])); return e.exitCode || 0; } if (e.pyType === 'KeyboardInterrupt') { ctx.err('Traceback (most recent call last):\n  File "' + files[0] + '", line ' + (interp.line || 1) + '\nKeyboardInterrupt\n'); return 130; } ctx.err(pyTrace(e, files[0], src)); return 1; }
         if (e.interrupt) { ctx.err('\nKeyboardInterrupt\n'); return 130; }
         throw e;
       }

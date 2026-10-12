@@ -43,7 +43,7 @@
       write(s) { state.out += s; },
       clear() { /* keep the output so students can see it */ },
       async readLine(o = {}) { if (state.input.length) { const l = state.input.shift(); state.out += (o.prompt || '') + (o.hidden ? '' : l) + '\n'; return l; } if (o.prompt) state.out += o.prompt + '\n'; return null; },
-      async readKey() { return state.input.length ? String(state.input.shift())[0] || ' ' : ' '; },
+      async readKey() { return state.input.length ? String(state.input.shift())[0] || ' ' : '\x03'; }, // no more input = Ctrl+C
       runApp(app) { state.out += '[' + (app && app.title ? app.title : 'full-screen program') + ' — open a real terminal tab to use it]\n'; return Promise.resolve(); },
       renderApp() {}, bell() {}, focus() {}, measure() {}, scrollBottom() {}, paste() {},
     };
@@ -70,7 +70,9 @@
     const timer = setTimeout(() => { timedOut = true; term.signal.abort(); }, opts.timeout || 4000);
     const go = async () => {
       if (root.boot) { const keep = state.out; await root.boot({ tty: false, out: () => {}, err: () => {} }); state.out = keep; }
+      let idx = 0;
       while (lines.length) {
+        if (opts.captureFrom != null && idx++ === opts.captureFrom) state.mark = state.out.length;
         let line = lines.shift();
         const sh = stack[stack.length - 1];
         if (!sh) break;
@@ -90,7 +92,7 @@
     try { await seeded((opts.seed == null ? 42 : opts.seed) + 7, go); }
     finally { clearTimeout(timer); }
     const top = stack[stack.length - 1] || root;
-    return { out: state.out, code: top.lastCode, m, sh: top, timedOut };
+    return { out: state.out, captured: state.mark != null ? state.out.slice(state.mark) : state.out, code: top.lastCode, m, sh: top, timedOut };
   }
 
   // Normalize output for comparing answers: no colors, no \r, no trailing spaces, no trailing blank lines.
@@ -98,5 +100,7 @@
     return TX.stripAnsi(String(s)).replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/, '')).join('\n').replace(/^\n+|\n+$/g, '');
   }
 
+  // Without the real app (tests, build) commands that save or open tabs talk to this stand-in instead.
+  if (!TX.app) TX.app = { headless: true, save() {}, saveNow() {}, toast() {}, confetti() {}, newTab() {}, activeShell: () => null, resetMachine() {}, machine: (k) => machine(k) };
   TX.sandbox = { run, machine, seeded, norm, rng };
 })();

@@ -840,6 +840,14 @@
       if (io.bg && /^(nano|pico|vim?|view|nvim|top|htop|watch|less|more|man|sl|cmatrix|python3?|node|bc)$/.test(name)) { io.err(`\n[${this.jobs.length}]+  Stopped                 ${argv.join(' ')}\n`); return 148; }
       const cmd = TX.posixCmds[name];
       if (!cmd || !this.available(name)) {
+        // a script file in a PATH folder ("" = the current folder, as in PATH=:/bin)
+        if (this.flavor !== 'gitbash') {
+          for (const dir of String(this.vars.PATH || '').split(':')) {
+            const segs = (dir === '' || dir === '.' ? this.cwd : this.resolve(dir)).concat(name);
+            const n = this.vfs.get(segs);
+            if (n && n.t === 'f' && (n.mode & 0o111) && !n.sz) return this.runPath(this.fmt(segs), args, io);
+          }
+        }
         const hint = this.notFound(name);
         io.err(hint);
         return 127;

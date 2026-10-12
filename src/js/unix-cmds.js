@@ -33,6 +33,16 @@
   addKinds('sudo', NEWUNIX); // Solaris 11 ships sudo; FreeBSD only after  pkg install sudo  (pkgOn below)
   cmds.sudo.pkgOn = { freebsd: 'sudo' };
 
+  // Shells you can start by name on the new UNIXes (FreeBSD and V7: sh; Solaris: sh, ksh and bash).
+  addKinds('sh', ALLNEW); addKinds('bash', SOL);
+  cmds.ksh = Object.assign({}, cmds.sh, { only: SOL.concat(['mac']) });
+  def('fc', (c) => {
+    // fc -l: list recent commands (the POSIX/ksh way to see history)
+    const H = c.sh.history || [];
+    if (c.args[0] === '-l' || !c.args.length) { H.slice(-16).forEach((h, i, a) => c.outln(String(H.length - a.length + i + 1).padEnd(6) + h)); return 0; }
+    c.err('fc: only  fc -l  is simulated in TerminalEX\n'); return 1;
+  }, { only: ['linux', 'mac', 'gitbash', 'solaris', 'freebsd'] });
+
   // ------------------------------------------------------------------ uname
   override('uname', NEWUNIX, (c) => {
     const k = c.m.kind, n = c.m.net.hostname;
@@ -116,6 +126,15 @@
       return;
     }
     c.outln(c.m.kind === 'solaris' ? `\nTCP: IPv4\n   Local Address        Remote Address    Swind Send-Q Rwind Recv-Q    State\n-------------------- -------------------- ----- ------ ----- ------ -----------\nsol-lab.22           192.168.1.42.51022   64128      0 128872      0 ESTABLISHED\nsol-lab.80           192.168.1.57.60311   64128      0 128872      0 TIME_WAIT\n` : `Active Internet connections\nProto Recv-Q Send-Q Local Address          Foreign Address        (state)\ntcp4       0      0 freebsd-lab.ssh        192.168.1.42.51022     ESTABLISHED\ntcp4       0      0 freebsd-lab.http       192.168.1.57.60311     TIME_WAIT`);
+  });
+
+  // Solaris ping just says whether a host answers; ping -s shows the replies (like Linux's ping).
+  override('ping', SOL, (c, orig) => {
+    const host = c.args.filter((a) => !a.startsWith('-') && !/^\d+$/.test(a))[0];
+    if (!host) { c.err('usage: ping host [timeout]\n       ping -s [-l | -U] host [data size] [npackets]\n'); return 2; }
+    if (!c.args.includes('-s')) { if (!TX.resolve(host)) { c.err(`ping: unknown host ${host}\n`); return 1; } c.outln(`${host} is alive`); return 0; }
+    const n = c.args.filter((a) => /^\d+$/.test(a));
+    return orig.fn(Object.assign({}, c, { args: [host, '-c', n[1] || '3'] }));
   });
 
   // ------------------------------------------------------------------ who / date / id / uptime

@@ -305,6 +305,7 @@ export EDITOR=nano
       Videos: {},
       projects: projectFiles(),
       scripts: { 'backup.sh': { $file: SCRIPT_SH, $mode: 0o755 } },
+      automation: TX.automationFolder('unix'),
       'groceries.txt': GROCERIES,
     };
     const spec = {
@@ -334,7 +335,7 @@ export EDITOR=nano
       media: { student: { STUDENT_USB: { $uid: 'student', 'project-backup.zip': { $size: 3355443 }, 'resume.docx': { $size: 30120 } } } },
       mnt: { data: { $mode: 0o777, 'backups': {}, 'movies': { 'nature-doc.mkv': { $size: 4294967296 } }, 'shared-notes.txt': 'Shared drive for the lab.\n' } },
       opt: {},
-      proc: { cpuinfo: { $gen: 'cpuinfo' }, meminfo: { $gen: 'meminfo' }, uptime: { $gen: 'uptime' }, version: { $gen: 'version' }, loadavg: { $gen: 'loadavg' } },
+      proc: { mdstat: { $gen: 'mdstat' }, cpuinfo: { $gen: 'cpuinfo' }, meminfo: { $gen: 'meminfo' }, uptime: { $gen: 'uptime' }, version: { $gen: 'version' }, loadavg: { $gen: 'loadavg' } },
       root: { $mode: 0o700, '.bashrc': '# root bashrc\n', 'flag.txt': 'root flag: SUDO-POWER-42\n' },
       run: {},
       srv: {},
@@ -372,6 +373,7 @@ export EDITOR=nano
       Library: { Preferences: {}, 'Application Support': {} },
       Movies: {}, Music: { 'playlist.m3u': '#EXTM3U\n' }, Pictures: { 'Photos Library.photoslibrary': {} }, Public: {},
       projects: projectFiles(),
+      automation: TX.automationFolder('unix'),
       'groceries.txt': GROCERIES,
     };
     const spec = {
@@ -413,6 +415,7 @@ export EDITOR=nano
       Pictures: { 'Screenshots': { 'Screenshot 2026-09-18 101512.png': { $size: 402811 } }, 'wallpaper.jpg': { $size: 2940000 } },
       'Saved Games': {}, Searches: {}, Videos: { 'Captures': {} },
       projects: projectFiles(),
+      automation: TX.automationFolder('windows'),
       'groceries.txt': GROCERIES,
       'NTUSER.DAT': { $size: 3145728, $hidden: true, $sys: true },
     };
@@ -530,6 +533,7 @@ export EDITOR=nano
     kill(pid) { const i = this.procs.findIndex((p) => p.pid === pid); if (i < 0) return false; this.procs.splice(i, 1); return true; }
   }
   TX.Machine = Machine;
+  TX.machineGens = gens;
   TX.mkProcs = mkProcs;
   TX.SAMPLE = { README, HELLO_PY, GROCERIES, GRADES, POEM, SECRET, TODO, projectFiles };
   TX.HW = HW;

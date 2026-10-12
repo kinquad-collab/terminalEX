@@ -27,7 +27,9 @@
       ['SETVER.EXE', 12015], ['SMARTDRV.EXE', 45145], ['SORT.EXE', 6922], ['SYS.COM', 9432], ['TREE.COM', 6898], ['UNDELETE.EXE', 26420], ['XCOPY.EXE', 16930], ['DOSHELP.HLP', 5651], ['QBASIC.HLP', 130810]]
       .forEach(([n, s]) => { dosExe[n] = sys(s); });
     const spec = {
+      // DOS had no users or permissions: everything belongs to whoever sits at the keyboard.
       'C:': {
+        $uid: 'student',
         'IO.SYS': sys(40774, { $hidden: true, $sys: true, $ro: true }),
         'MSDOS.SYS': sys(38138, { $hidden: true, $sys: true, $ro: true }),
         'COMMAND.COM': sys(54645),
@@ -46,7 +48,7 @@
           REPORTS: { 'BOOK.TXT': 'My book report: The Hobbit by J.R.R. Tolkien.\n', 'SCIENCE.TXT': 'Science fair: Does music help plants grow?\n' },
         },
       },
-      'D:': { 'README.TXT': { $file: 'TerminalEX Encyclopedia CD-ROM (1995)\nThis drive is read-only, like a real CD.\n', $ro: true, $mt: DOS_TIME }, 'SETUP.EXE': sys(310000, { $ro: true }), DATA: { 'ENCYCLO.DAT': sys(512000000, { $ro: true }) } },
+      'D:': { $uid: 'student', 'README.TXT': { $file: 'TerminalEX Encyclopedia CD-ROM (1995)\nThis drive is read-only, like a real CD.\n', $ro: true, $mt: DOS_TIME }, 'SETUP.EXE': sys(310000, { $ro: true }), DATA: { 'ENCYCLO.DAT': sys(512000000, { $ro: true }) } },
     };
     const root = TX.build(spec, '');
     // MS-DOS, Windows and the games were installed in 1994-95; only STUDENT holds recent files.
@@ -638,7 +640,8 @@
     const keys = (cm ? cm[1] : 'YN').toUpperCase();
     const text = c.raw.replace(/\/\S+/g, '').trim().replace(/^"|"$/g, '');
     c.out(`${text}[${keys.split('').join(',')}]?`);
-    for (;;) {
+    for (let tries = 0; ; tries++) {
+      if (tries > 40) { c.outln(keys[0]); return 1; }
       const k = (await c.term.readKey()) || keys[0];
       if (k === '\x03') throw new TX.Interrupt();
       const i = keys.indexOf(String(k).toUpperCase());

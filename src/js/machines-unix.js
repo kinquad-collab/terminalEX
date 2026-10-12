@@ -41,7 +41,7 @@
         zones: { 'index': 'global:installed:/\nwebzone:running:/zones/webzone:a1b2c3d4\n' },
         'ssh': { sshd_config: 'Port 22\nPermitRootLogin no\n' },
       },
-      export: { home: { student: studentHome({ '.profile': '# ~/.profile — read by ksh at login\nexport PATH=/usr/bin:/usr/sbin:/usr/gnu/bin\nexport EDITOR=vi\n' }), teacher: { $uid: 'teacher', $mode: 0o750, 'answer-key.txt': { $file: 'Nice try! :)\n', $mode: 0o600, $uid: 'teacher' } } } },
+      export: { home: { student: studentHome({ automation: TX.automationFolder('unix'), '.profile': '# ~/.profile — read by ksh at login\nexport PATH=/usr/bin:/usr/sbin:/usr/gnu/bin\nexport EDITOR=vi\n' }), teacher: { $uid: 'teacher', $mode: 0o750, 'answer-key.txt': { $file: 'Nice try! :)\n', $mode: 0o600, $uid: 'teacher' } } } },
       home: {},
       kernel: { drv: {}, fs: {} },
       opt: {},
@@ -151,7 +151,7 @@
         jail: { 'web.conf': 'web {\n  path = "/usr/jails/web";\n  host.hostname = "web.lan";\n  ip4.addr = "192.168.1.71";\n  exec.start = "/bin/sh /etc/rc";\n}\n' },
         pkg: { 'FreeBSD.conf': 'FreeBSD: {\n  url: "pkg+http://pkg.FreeBSD.org/${ABI}/quarterly",\n  enabled: yes\n}\n' },
       },
-      home: { student: studentHome({ '.shrc': '# $FreeBSD$\n#\n# .shrc - bourne shell startup file\nalias h=\'fc -l\'\nalias j=jobs\nalias m="$PAGER"\nalias ll=\'ls -laFo\'\nalias l=\'ls -l\'\n', '.profile': 'PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$HOME/bin; export PATH\nENV=$HOME/.shrc; export ENV\n' }) },
+      home: { student: studentHome({ automation: TX.automationFolder('unix'), '.shrc': '# $FreeBSD$\n#\n# .shrc - bourne shell startup file\nalias h=\'fc -l\'\nalias j=jobs\nalias m="$PAGER"\nalias ll=\'ls -laFo\'\nalias l=\'ls -l\'\n', '.profile': 'PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$HOME/bin; export PATH\nENV=$HOME/.shrc; export ENV\n' }) },
       root: { $mode: 0o700, 'flag.txt': 'root flag: BEASTIE-1993\n', '.shrc': '# root .shrc\n' },
       tmp: { $mode: 0o1777 },
       usr: {

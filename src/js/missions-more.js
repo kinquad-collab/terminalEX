@@ -79,10 +79,49 @@
   ];
   void BH;
 
+  // Automation Lab (Ubuntu) -----------------------------------------------------------------------
+  const AU = ['home', 'student', 'automation'];
+  const lines = (c, segs) => { const n = node(c, segs); return n && n.t === 'f' ? c.vfs.content(n).split('\n').filter(Boolean).length : 0; };
+  const auto = [
+    { id: 'a-hello', title: 'Run a script with an argument', xp: 10, lesson: 'automation', text: 'Go into ~/automation and run hello.py so that it says hello to YOU.', hint: 'cd ~/automation  then  python3 hello.py YourName  — the word after the script name is an "argument".', answer: 'python3 hello.py Ada', check: (c) => H.ran(c, /python3?\s+(\S*\/)?hello\.py\s+\S/) },
+    { id: 'a-read', title: 'Read before you run', xp: 10, lesson: 'automation', text: 'Professionals read a script before they trust it. Print grade_report.py and find where it decides the letter grade.', hint: 'cat grade_report.py  (or less grade_report.py)', answer: 'cat grade_report.py', check: (c) => H.ran(c, /(cat|less|more|head|nano|vim?)\s+\S*grade_report\.py/) },
+    { id: 'a-report', title: 'Feed it a CSV', xp: 15, lesson: 'automation', text: 'Run grade_report.py on data/grades.csv with a 5-point curve. It saves a report file too: find it and print it.', hint: 'python3 grade_report.py data/grades.csv 5   then   cat reports/grade_report.txt', answer: 'python3 grade_report.py data/grades.csv 5', check: (c) => H.fileHas(c, AU.concat('reports', 'grade_report.txt'), /curve/) && H.ran(c, /cat\s+\S*grade_report\.txt/) },
+    { id: 'a-save', title: 'Save what a script prints', xp: 15, lesson: 'automation', text: 'Run sales_total.py on data/sales.csv and send its output into a file called sales.txt instead of the screen.', hint: 'python3 sales_total.py data/sales.csv > sales.txt', answer: 'python3 sales_total.py data/sales.csv > sales.txt', check: (c) => H.fileHas(c, AU.concat('sales.txt'), /Best seller/) },
+    { id: 'a-chain', title: 'Only if it worked', xp: 20, lesson: 'automation', text: 'Run inventory_check.py on data/inventory.csv and, ONLY if it succeeds, print the reorder.csv it creates — in one line.', hint: 'python3 inventory_check.py data/inventory.csv && cat reorder.csv', answer: 'python3 inventory_check.py data/inventory.csv && cat reorder.csv', check: (c) => H.ran(c, /inventory_check\.py.*&&\s*cat\s+\S*reorder\.csv/) },
+    { id: 'a-data', title: 'Change the data, not the code', xp: 20, lesson: 'automation', text: 'The store just ran out of erasers. Add the line  erasers,supplies,2,10,0.50  to the end of data/inventory.csv WITHOUT an editor, then run the check again.', hint: 'echo "erasers,supplies,2,10,0.50" >> data/inventory.csv  — two arrows APPEND. One arrow would erase the file!', answer: 'echo "erasers,supplies,2,10,0.50" >> data/inventory.csv', check: (c) => H.fileHas(c, AU.concat('data', 'inventory.csv'), /^item,category/) && H.fileHas(c, AU.concat('data', 'inventory.csv'), /erasers/) && lines(c, AU.concat('data', 'inventory.csv')) >= 12 && H.fileHas(c, AU.concat('reorder.csv'), /erasers/) },
+    { id: 'a-clean', title: 'Clean messy data', xp: 15, lesson: 'automation', text: 'Clean the club sign-up sheet with clean_signups.py, then compare the messy and clean files.', hint: 'python3 clean_signups.py data/signups.csv   then   cat data/signups.csv data/signups_clean.csv', answer: 'python3 clean_signups.py data/signups.csv', check: (c) => H.exists(c, AU.concat('data', 'signups_clean.csv')) },
+    { id: 'a-organize', title: 'Tidy a messy folder', xp: 20, lesson: 'automation', text: 'The inbox folder is a mess. Run organize_files.py on it, then look inside with ls -R.', hint: 'python3 organize_files.py inbox   then   ls -R inbox', answer: 'python3 organize_files.py inbox', check: (c) => H.isDir(c, AU.concat('inbox', 'images')) && H.ran(c, /ls\s+.*inbox/) },
+    { id: 'a-pipeline', title: 'One command runs them all', xp: 25, lesson: 'automation', text: 'run_all.sh is a script that runs the other scripts and keeps a log. Run it, then read the log.', hint: 'bash run_all.sh   then   cat morning.log', answer: 'bash run_all.sh', check: (c) => H.fileHas(c, AU.concat('morning.log'), /Morning reports/) && H.ran(c, /(cat|less|tail|head)\s+\S*morning\.log/) },
+    { id: 'a-own', title: 'Your own automation', xp: 30, lesson: 'automation', text: 'Write a 2-line shell script called mine.sh that runs weather_stats.py for Cumming and then hello.py, make it executable, and run it with ./mine.sh', hint: 'echo "python3 weather_stats.py data/weather.csv Cumming" > mine.sh  →  echo "python3 hello.py" >> mine.sh  →  chmod +x mine.sh  →  ./mine.sh', answer: 'chmod +x mine.sh && ./mine.sh', check: (c) => { const n = node(c, AU.concat('mine.sh')); return !!n && !!(n.mode & 0o100) && /weather_stats/.test(c.vfs.content(n)) && H.ran(c, /\.\/mine\.sh/); } },
+  ];
+  TX.missions.tracks.bash.list.push(...auto);
+
+  // Disks & RAID ----------------------------------------------------------------------------------
+  const md = (c) => (c.m.extra && c.m.extra.md) || {};
+  const raidL = [
+    { id: 'r-disks', title: 'Meet the lab disks', xp: 10, lesson: 'raid', text: 'List the disks as a tree. Two new blank disks (sdc and sdd) have been added for you to practice on.', hint: 'lsblk', answer: 'lsblk', check: (c) => H.ran(c, /^lsblk/) },
+    { id: 'r-mirror', title: 'Build a mirror (RAID 1)', xp: 30, lesson: 'raid', text: 'Turn sdc and sdd into one mirrored disk called /dev/md0, then watch it copy with /proc/mdstat.', hint: 'sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdc /dev/sdd   (answer y)   then   cat /proc/mdstat', answer: 'sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdc /dev/sdd', check: (c) => !!md(c).md0 && md(c).md0.level === 1 && H.ran(c, /\/proc\/mdstat/) },
+    { id: 'r-mount', title: 'Format and mount it', xp: 25, lesson: 'raid', text: 'Put an ext4 file system on /dev/md0, make the folder /mnt/raid, mount the array there, and save a file into it.', hint: 'sudo mkfs.ext4 /dev/md0  →  sudo mkdir /mnt/raid  →  sudo mount /dev/md0 /mnt/raid  →  echo safe > /mnt/raid/test.txt', answer: 'sudo mount /dev/md0 /mnt/raid', check: (c) => !!md(c).md0 && !!md(c).md0.mount && c.vfs.get(c.vfs.canon(md(c).md0.mount.split('/').filter(Boolean))) && Object.keys(c.vfs.get(c.vfs.canon(md(c).md0.mount.split('/').filter(Boolean))).ch).length > 0 },
+    { id: 'r-fail', title: 'Pull the plug', xp: 25, lesson: 'raid', text: 'Pretend sdc just died: mark it failed. Then prove your file is still there.', hint: 'sudo mdadm /dev/md0 --fail /dev/sdc   →   cat /proc/mdstat   (see [_U]?)   →   cat /mnt/raid/test.txt', answer: 'sudo mdadm /dev/md0 --fail /dev/sdc', check: (c) => !!md(c).md0 && md(c).md0.devices.some((d) => d.state === 'faulty' || d.dev === 'sdc') && H.ran(c, /--fail/) && H.ran(c, /cat\s+\/mnt\//) },
+    { id: 'r-rebuild', title: 'Replace the disk', xp: 30, lesson: 'raid', text: 'Remove the failed disk and add it back (as if you put in a new one). Watch the mirror rebuild.', hint: 'sudo mdadm /dev/md0 --remove /dev/sdc  →  sudo mdadm /dev/md0 --add /dev/sdc  →  cat /proc/mdstat', answer: 'sudo mdadm /dev/md0 --add /dev/sdc', check: (c) => !!md(c).md0 && md(c).md0.recovering && md(c).md0.devices.every((d) => d.state === 'active') },
+  ];
+  TX.missions.tracks.bash.list.push(...raidL);
+  const pools = (c) => (c.m.extra && c.m.extra.pools) || [];
+  TX.missions.tracks.powershell.list.push(
+    { id: 'r-ps-disk', title: 'Show and set a disk', xp: 20, lesson: 'raid', text: 'List the disks. Disks 3 and 4 are new and Offline. Bring Disk 3 online with Set-Disk, then check again.', hint: 'Get-Disk   →   Set-Disk -Number 3 -IsOffline $false   →   Get-Disk', answer: 'Set-Disk -Number 3 -IsOffline $false', check: (c) => { const d = c.m.disks.find((x) => x.num === 3); return !!d && !d.offline && H.ran(c, /^get-disk/i); } },
+    { id: 'r-ps-pool', title: 'Storage Spaces mirror', xp: 30, lesson: 'raid', text: 'Pool the two lab disks together, then make a Mirror virtual disk from the pool (Windows\' version of RAID 1).', hint: 'New-StoragePool -FriendlyName Pool1 -PhysicalDisks (Get-PhysicalDisk -CanPool $true) -StorageSubSystemFriendlyName "Windows Storage*"   then   New-VirtualDisk -StoragePoolFriendlyName Pool1 -FriendlyName Mirror1 -ResiliencySettingName Mirror -UseMaximumSize', answer: 'New-VirtualDisk -StoragePoolFriendlyName Pool1 -FriendlyName Mirror1 -ResiliencySettingName Mirror -UseMaximumSize', check: (c) => ((c.m.extra && c.m.extra.vdisks) || []).some((v) => v.res === 'Mirror') && pools(c).length > 0 },
+  );
+  TX.missions.tracks.cmd.list.push(
+    { id: 'r-dp', title: 'diskpart: online and mirror', xp: 30, lesson: 'raid', text: 'In diskpart, bring disks 3 and 4 online and create a mirrored volume across them.', hint: 'diskpart  →  select disk 3  →  online disk  →  select disk 4  →  online disk  →  create volume mirror disk=3,4  →  exit', answer: 'create volume mirror disk=3,4', check: (c) => c.m.disks.filter((d) => d.lab).every((d) => d.parts.some((p) => p.type === 'Mirror')) },
+  );
+
   Object.assign(TX.missions.tracks, {
     dos: { name: 'MS-DOS', list: dos },
     unix: { name: 'UNIX V7', list: v7 },
     solaris: { name: 'Solaris', list: sol },
     freebsd: { name: 'FreeBSD', list: bsd },
   });
+  TX.missions.tracks.solaris.list.push(
+    { id: 'r-zmirror', title: 'A ZFS mirror', xp: 30, lesson: 'raid', text: 'Create a mirrored ZFS pool called tank from the lab disks c2t0d0 and c2t1d0, then take one disk offline and read the pool status.', hint: 'pfexec zpool create tank mirror c2t0d0 c2t1d0  →  pfexec zpool offline tank c2t0d0  →  zpool status tank', answer: 'pfexec zpool create tank mirror c2t0d0 c2t1d0', check: (c) => pools(c).some((p) => p.name === 'tank' && p.mirror && (p.offline || []).length) && H.ran(c, /zpool\s+status/) },
+  );
 })();

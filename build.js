@@ -7,9 +7,9 @@ const path = require('path');
 const SRC = path.join(__dirname, 'src');
 // Engine files run in the browser AND in Node (tests, build). UI files need a real page.
 const JS_ENGINE = [
-  'util.js', 'seal.js', 'vfs.js', 'machines.js', 'machines-unix.js', 'terminal.js', 'apps.js', 'awk.js',
+  'util.js', 'seal.js', 'vfs.js', 'samples.js', 'machines.js', 'machines-unix.js', 'terminal.js', 'apps.js', 'awk.js',
   'posix.js', 'posix-cmds.js', 'posix-sys.js', 'unix-cmds.js', 'git.js', 'cmd.js', 'dos.js', 'basic.js',
-  'ps-parser.js', 'ps-runtime.js', 'ps-cmdlets.js', 'lang.js', 'docs.js', 'docs-more.js', 'missions.js', 'missions-more.js',
+  'ps-parser.js', 'ps-runtime.js', 'ps-cmdlets.js', 'storage.js', 'lang.js', 'docs.js', 'docs-more.js', 'missions.js', 'missions-more.js',
   'shells.js', 'sandbox.js', 'reference.js', 'lessons.js', 'certtest.js',
 ];
 const JS_UI = ['@TESTBANK', 'ui-core.js', 'ui-home.js', 'ui-reference.js', 'ui-test.js', 'ui-cert.js', 'app.js'];
