@@ -42,7 +42,7 @@
       cols: 100, rows: 30, signal: new TX.Signal(),
       write(s) { state.out += s; },
       clear() { /* keep the output so students can see it */ },
-      async readLine(o = {}) { if (state.input.length) { const l = state.input.shift(); state.out += (o.prompt || '') + (o.hidden ? '' : l) + '\n'; return l; } if (o.prompt) state.out += o.prompt + '\n'; return null; },
+      async readLine(o = {}) { if (state.input.length) { const l = state.input.shift(); state.out += (o.prompt || '') + (o.hidden ? '' : l) + '\n'; return l; } if (/password/i.test(o.prompt || '')) { state.out += o.prompt + '\n'; return 'student'; } if (o.prompt) state.out += o.prompt + '\n'; return null; },
       async readKey() { return state.input.length ? String(state.input.shift())[0] || ' ' : '\x03'; }, // no more input = Ctrl+C
       runApp(app) { state.out += '[' + (app && app.title ? app.title : 'full-screen program') + ' — open a real terminal tab to use it]\n'; return Promise.resolve(); },
       renderApp() {}, bell() {}, focus() {}, measure() {}, scrollBottom() {}, paste() {},

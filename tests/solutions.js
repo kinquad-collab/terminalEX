@@ -1,0 +1,81 @@
+// Reference solutions for every mission: the lines a student would type (and any answers to prompts).
+// tests/missions.test.js runs them IN ORDER on one fresh machine per track and checks each mission passes.
+// A mission without an entry here uses its own "answer" field.
+module.exports = {
+  // ---------------- Linux
+  'l-ls': ['ls -a'],
+  'l-secret': ['cat .secret_message'],
+  'l-mkdir': ['mkdir -p ~/projects/terminal-practice'],
+  'l-write': ['echo "Hello" > ~/projects/terminal-practice/hello.txt'],
+  'l-pipe': ['sort groceries.txt | uniq | wc -l'],
+  'l-sudo': { lines: ['sudo cat /root/flag.txt'], input: ['student'] },
+  'l-apt': { lines: ['sudo apt install -y cowsay', 'cowsay hi'], input: ['student'] },
+  'l-script': ['cd ~', 'echo \'echo "I made a script!"\' > hello.sh', 'chmod +x hello.sh', './hello.sh'],
+  'l-proc': ['kill 2011'],
+  'l-net': ['ip addr', 'ping -c 1 google.com'],
+  'l-disk': ['lsblk', 'df -h'],
+  'l-git1': ['cd ~/projects/terminal-practice', 'git config --global user.name "Student"', 'git config --global user.email "student@school.edu"', 'git init', 'git add .', 'git commit -m "first commit"', 'cd ~'],
+  'l-git2': ['cd ~/projects/hello-web', 'git merge feature/dark-mode', 'cd ~'],
+  'a-hello': ['cd ~/automation', 'python3 hello.py Ada'],
+  'a-read': ['cat grade_report.py'],
+  'a-report': ['python3 grade_report.py data/grades.csv 5', 'cat reports/grade_report.txt'],
+  'a-save': ['python3 sales_total.py data/sales.csv > sales.txt'],
+  'a-chain': ['python3 inventory_check.py data/inventory.csv && cat reorder.csv'],
+  'a-data': ['echo "erasers,supplies,2,10,0.50" >> data/inventory.csv', 'python3 inventory_check.py data/inventory.csv'],
+  'a-clean': ['python3 clean_signups.py data/signups.csv'],
+  'a-organize': ['python3 organize_files.py inbox', 'ls -R inbox'],
+  'a-pipeline': ['bash run_all.sh', 'cat morning.log'],
+  'a-own': ['echo "python3 weather_stats.py data/weather.csv Cumming" > mine.sh', 'echo "python3 hello.py" >> mine.sh', 'chmod +x mine.sh', './mine.sh', 'cd ~'],
+  'r-disks': ['lsblk'],
+  'r-mirror': { lines: ['sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdc /dev/sdd', 'cat /proc/mdstat'], input: ['student', 'y'] },
+  'r-mount': ['sudo mkfs.ext4 /dev/md0', 'sudo mkdir /mnt/raid', 'sudo mount /dev/md0 /mnt/raid', 'echo safe > /mnt/raid/test.txt'],
+  'r-fail': ['sudo mdadm /dev/md0 --fail /dev/sdc', 'cat /proc/mdstat', 'cat /mnt/raid/test.txt'],
+  'r-rebuild': ['sudo mdadm /dev/md0 --remove /dev/sdc', 'sudo mdadm /dev/md0 --add /dev/sdc', 'cat /proc/mdstat'],
+  // ---------------- macOS
+  'm-brew': ['brew install tree', 'tree projects'],
+  'm-git': ['git clone https://github.com/terminalex/cs-principles.git', 'cd cs-principles', 'git log --oneline', 'cd ~'],
+  // ---------------- cmd
+  'c-hidden': ['dir /a', 'type .secret_message'],
+  'c-cd': ['D:', 'cd "Class Projects"', 'C:', 'cd %USERPROFILE%'],
+  // ---------------- PowerShell
+  'p-new': ['New-Item -ItemType Directory PowerShellPractice', 'New-Item PowerShellPractice\\notes.txt'],
+  'p-disk': ['Get-Disk', 'Get-Volume'],
+  'p-func': ['function Get-Greeting { param($Name) "Hello, $Name!" }', 'Get-Greeting -Name Ada'],
+  // ---------------- Git Bash
+  'g-branch': ['cd ~/hello-world', 'git switch -c add-spanish'],
+  'g-commit': ['echo "Hola, mundo!" > hola.txt', 'git add hola.txt', 'git commit -m "Add Spanish"'],
+  'g-push': { lines: ['git push -u origin add-spanish'], input: ['student', 'ghp_classroomtoken'] },
+  // ---------------- PowerShell (Windows disks)
+  'r-ps-disk': ['Get-Disk', 'Set-Disk -Number 3 -IsOffline $false', 'Get-Disk'],
+  'r-ps-pool': ['New-StoragePool -FriendlyName Pool1 -PhysicalDisks (Get-PhysicalDisk -CanPool $true) -StorageSubSystemFriendlyName "Windows Storage*"', 'New-VirtualDisk -StoragePoolFriendlyName Pool1 -FriendlyName Mirror1 -ResiliencySettingName Mirror -UseMaximumSize'],
+  'r-dp': { lines: ['diskpart'], input: ['select disk 3', 'online disk', 'select disk 4', 'online disk', 'create volume mirror disk=3,4', 'exit'] },
+  // ---------------- MS-DOS
+  'd-cd': ['CD STUDENT'],
+  'd-hidden': ['DIR /A', 'TYPE SECRET.TXT'],
+  'd-83': ['MD MYHOMEWORK2026', 'DIR'],
+  'd-copycon': { lines: ['COPY CON NOTES.TXT'], input: ['My notes from 1994', '^Z'] },
+  'd-pipe': ['TYPE GROCERY.TXT | SORT > SORTED.TXT'],
+  'd-attrib': ['ATTRIB +R POEM.TXT', 'DEL POEM.TXT'],
+  'd-undelete': { lines: ['DEL TODO.TXT', 'UNDELETE'], input: ['Y', 'T'] },
+  'd-bat': ['ECHO ECHO Hi there! > HI.BAT', 'HI'],
+  'd-floppy': ['INSERT', 'COPY GRADES.CSV A:'],
+  'd-path': ['PATH', 'DIR C:\\DOS\\MEM.EXE'],
+  // ---------------- UNIX V7
+  'u-ed': { lines: ['ed notes'], input: ['a', 'remember the milk', '.', 'w', 'q'] },
+  'u-sendmail': { lines: ['mail dmr'], input: ['Hi Dennis, thanks for C!', '.'] },
+  'u-home': ['cd /', 'cd $HOME'],
+  'u-backquote': ['echo Today is `date`'],
+  // ---------------- Solaris
+  's-log': ['cat /var/svc/log/application-print-cups:default.log'],
+  's-prstat': ['prstat 1 1', 'kill 1188'],
+  's-rollback': ['rm groceries.txt', 'pfexec zfs rollback rpool/export/home/student@safe', 'ls'],
+  's-pkg': ['pfexec pkg install tree', 'tree'],
+  'r-zmirror': ['pfexec zpool create tank mirror c2t0d0 c2t1d0', 'pfexec zpool offline tank c2t0d0', 'zpool status tank'],
+  // ---------------- FreeBSD
+  'b-sudo': { lines: ['sudo ls', 'su', 'exit'], input: ['student'] },
+  'b-pkg': { lines: ['su', 'pkg install -y cowsay', 'exit', 'cowsay hello'], input: ['student'] },
+  'b-ports': { lines: ['su', 'cd /usr/ports/games/sl', 'make install clean', 'exit'], input: ['student'] },
+  'b-sysrc': { lines: ['su', 'sysrc pf_enable=YES', 'exit'], input: ['student'] },
+  'b-ps': ['ps aux', 'kill 1240'],
+  'b-zfs': { lines: ['su', 'zfs snapshot zroot/home/student@monday', 'exit'], input: ['student'] },
+};
