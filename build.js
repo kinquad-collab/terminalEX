@@ -34,9 +34,33 @@ async function build() {
 
   fs.mkdirSync(path.join(__dirname, 'dist'), { recursive: true });
   fs.writeFileSync(path.join(__dirname, 'dist', 'index.html'), html);
-  fs.writeFileSync(path.join(__dirname, 'apps-script', 'Index.html'), html);
+  writeAppsScript(template, css, JS_ENGINE.concat(JS_UI).map((f) => '// ---- ' + f + ' ----\n' + (f === '@TESTBANK' ? bankJs : fs.readFileSync(path.join(SRC, 'js', f), 'utf8'))));
   const nq = Object.values(built.bank).reduce((a, b) => a + b.length, 0);
-  console.log('Built dist/index.html and apps-script/Index.html (' + Math.round(html.length / 1024) + ' KB; ' + nq + ' certification-test questions)');
+  console.log('Built dist/index.html (' + Math.round(html.length / 1024) + ' KB; ' + nq + ' certification-test questions)');
+}
+
+// Google Apps Script copes badly with one huge HTML file (the editor can stall or cut off a 1.6 MB paste),
+// so the Apps Script copy is split: a small Index page plus Styles and Js1..JsN files, each under ~350 KB,
+// stitched together at serve time by Code.gs with the standard include() pattern.
+function writeAppsScript(template, css, jsParts) {
+  const dir = path.join(__dirname, 'apps-script');
+  fs.readdirSync(dir).filter((f) => /^(Index|Styles|Js\d+)\.html$/.test(f)).forEach((f) => fs.unlinkSync(path.join(dir, f)));
+  const LIMIT = 350 * 1024;
+  const chunks = [];
+  let cur = '';
+  for (const part of jsParts) {
+    if (cur && cur.length + part.length > LIMIT) { chunks.push(cur); cur = ''; }
+    cur += part + '\n';
+  }
+  if (cur) chunks.push(cur);
+  const body = template.slice(template.indexOf('<body>') + 6, template.indexOf('<script>')).replace(/\s+$/, '');
+  const index = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<base target="_top">\n<meta charset="utf-8">\n<title>TerminalEX</title>\n<style>\n<?!= include(\'Styles\') ?>\n</style>\n</head>\n<body>' + body + '\n' +
+    chunks.map((_, i) => `<script>\n<?!= include('Js${i + 1}') ?>\n</script>`).join('\n') + '\n</body>\n</html>\n';
+  if (/<\?(?!!= include\('(Styles|Js\d+)'\) \?>)/.test(index)) throw new Error('Apps Script Index has an unexpected <? scriptlet');
+  fs.writeFileSync(path.join(dir, 'Index.html'), index);
+  fs.writeFileSync(path.join(dir, 'Styles.html'), css);
+  chunks.forEach((c, i) => fs.writeFileSync(path.join(dir, `Js${i + 1}.html`), c));
+  console.log(`Apps Script: Index.html + Styles.html + ${chunks.map((c, i) => `Js${i + 1}.html (${Math.round(c.length / 1024)} KB)`).join(', ')}`);
 }
 
 module.exports = { JS_ENGINE, JS_UI };

@@ -13,13 +13,20 @@
 var MARKER = '__TX_' + 'CLASS_KEY__';
 
 function doGet() {
-  var html = HtmlService.createHtmlOutputFromFile('Index').getContent();
+  // Index is a small page that pulls in Styles and Js1, Js2, ... with include() below.
+  // (Only Index is a template; the included files are inserted as plain text, never run as scriptlets.)
+  var html = HtmlService.createTemplateFromFile('Index').evaluate().getContent();
   var parts = html.split(MARKER);
   if (parts.length === 2) html = parts[0] + classKey_() + parts[1];
   return HtmlService.createHtmlOutput(html)
     .setTitle('TerminalEX — Terminal Explorer')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/** Used by Index.html: returns another HTML file's text exactly as it is. */
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
 }
 
 /** The deployment's class key: 32 random hex characters, created once. */

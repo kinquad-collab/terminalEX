@@ -5,7 +5,14 @@ const fs = require('fs');
 let chromium;
 try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright')); }
 
-const FILE = 'file://' + path.join(__dirname, '..', 'dist', 'index.html');
+// APPS=1: test the page exactly as apps-script/Code.gs would serve it (assembled from Index + Styles + Js1..N).
+let FILE = 'file://' + path.join(__dirname, '..', 'dist', 'index.html');
+if (process.env.APPS) {
+  const out = path.join(require('os').tmpdir(), 'terminalex-appsscript.html');
+  fs.writeFileSync(out, require('./appsscript.js')().html);
+  FILE = 'file://' + out;
+  console.log('Testing the Apps Script page: ' + out);
+}
 const SHOTS = process.env.SHOTS || '';
 const fail = (m) => { console.error('✗ ' + m); process.exitCode = 1; };
 const ok = (m) => console.log('✓ ' + m);

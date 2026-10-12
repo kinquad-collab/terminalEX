@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.js",
     "test": "node --test tests/*.test.js",
-    "test:browser": "node build.js && node tests/browser-smoke.js",
+    "test:browser": "node build.js && node tests/browser-smoke.js && APPS=1 node tests/browser-smoke.js",
     "test:all": "node build.js && node --test tests/*.test.js && node tests/browser-smoke.js"
   },
   "license": "UNLICENSED"

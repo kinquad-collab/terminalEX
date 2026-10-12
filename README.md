@@ -121,11 +121,23 @@ in Script Properties; it has no gradebook and no function the page can call. Pro
 
 ## Deploy on Google Apps Script and embed in Canvas
 
+The Apps Script copy is split into small files (none over 350 KB) because pasting one huge file into the Apps Script
+editor is unreliable. Everything you need is in [`apps-script/`](apps-script/):
+
+| File in the repo | Create in Apps Script as | Type |
+|---|---|---|
+| `Code.gs` | `Code` (replace what is there) | Script |
+| `Index.html` | `Index` | HTML |
+| `Styles.html` | `Styles` | HTML |
+| `Js1.html` … `Js6.html` | `Js1` … `Js6` | HTML |
+
 1. <https://script.google.com> → **New project**, name it `TerminalEX`.
-2. Replace `Code.gs` with [`apps-script/Code.gs`](apps-script/Code.gs).
-3. **＋ → HTML**, name it exactly `Index`, paste the whole of [`apps-script/Index.html`](apps-script/Index.html)
-   (one self-contained file, about 1.6 MB).
-4. **Deploy → New deployment → Web app** · *Execute as:* **Me** · *Who has access:* **Anyone** (or your school domain).
+2. Replace everything in `Code.gs` with [`apps-script/Code.gs`](apps-script/Code.gs).
+3. For each HTML file: **＋ → HTML**, type the name **exactly** (`Index`, `Styles`, `Js1`, `Js2` … — Apps Script adds
+   `.html` itself), delete the placeholder text, paste the file's whole contents, save. All of them are required; a missing
+   or misnamed one shows an error naming it.
+4. **Deploy → New deployment → ⚙ Web app** · *Execute as:* **Me** · *Who has access:* **Anyone** (or your school domain).
+   Approve the permission prompt (it only asks to store the class key in the script's own properties).
 5. Copy the **Web app URL** (ends in `/exec`) and **open it once yourself** — that creates your class key.
 6. In Canvas: Page → **HTML Editor**:
 
@@ -135,7 +147,11 @@ in Script Properties; it has no gradebook and no function the page can call. Pro
            title="TerminalEX"></iframe>
    ```
 
-**Updating:** paste the new `Index.html`, then **Deploy → Manage deployments → ✏️ → Version: New version**. The URL and
+If it doesn't load: open the `/exec` URL directly (not the `/dev` URL and not the editor's Run button), and check that
+every file name matches the table above exactly. The test suite runs `Code.gs` with stand-ins for Apps Script and
+loads the page it serves in a browser, so the files in the repo are known to assemble correctly.
+
+**Updating:** paste the new versions of the HTML files (the build may change how many `Js` files there are — delete any extra old ones), then **Deploy → Manage deployments → ✏️ → Version: New version**. The URL and
 class key stay the same, so students keep their progress. **New semester:** run `newClassKey` once in the editor; every
 old progress file stops being accepted.
 
