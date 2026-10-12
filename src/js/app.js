@@ -88,6 +88,7 @@
       this.term.write(root.banner ? root.banner() : '');
       this.refreshTitle();
       this.applyTheme();
+      if (TX.UI) TX.UI.visit(this.kind);
       if (root.boot) { try { await root.boot(); } catch (e) { console.error(e); } }
       while (gen === this.gen) {
         const sh = this.top;
@@ -199,7 +200,6 @@
     active: null,
     histories: store.get('history', {}),
     log: store.get('log', {}),
-    done: store.get('missions', {}),
     settings: Object.assign({}, DEFAULT_SETTINGS, store.get('settings', {})),
     saveTimer: null,
 
@@ -207,6 +207,9 @@
       const remotes = store.get('remotes', null);
       if (remotes) Object.assign(TX.gitRemotes, remotes);
       TX.psExecPolicy = store.get('psExecPolicy', null) || undefined;
+      const UI = TX.UI;
+      UI.settleOpenTests();
+      UI.onChange = () => { this.renderDrawer(); if (!$('#launcher').classList.contains('hidden')) UI.renderHome(); this.renderStudent(); };
       this.buildLauncher();
       this.buildNewMenu();
       this.bindUI();
@@ -214,7 +217,9 @@
       const open = store.get('openTabs', []);
       if (open.length) open.forEach((k) => this.newTab(k, {}, true));
       if (this.sessions.length) this.activate(this.sessions[0]); else this.showLauncher(true);
-      window.addEventListener('beforeunload', () => this.saveNow());
+      this.renderStudent();
+      if (!UI.state.name) setTimeout(() => UI.welcome(), 300);
+      window.addEventListener('beforeunload', () => { this.saveNow(); UI.saveNow(); });
       document.addEventListener('visibilitychange', () => { if (document.hidden) this.saveNow(); });
     },
 
@@ -246,8 +251,6 @@
       store.del('fs.' + kind);
       delete this.machines[kind];
       this.sessions.filter((s) => s.def.machine === kind).forEach((s) => { s.colorOverride = null; s.start(); });
-      Object.keys(this.done).forEach((id) => { const t = this.trackOfMission(id); if (t && SHELLS[t] && SHELLS[t].machine === kind) delete this.done[id]; });
-      store.set('missions', this.done);
       this.renderDrawer();
       this.toast('♻️  Machine reset to factory settings');
     },
@@ -329,27 +332,26 @@
       const ctx = this.missionCtx(track);
       const won = [];
       t.list.forEach((mi) => {
-        if (this.done[mi.id]) return;
+        if (TX.UI.isDone(mi.id)) return;
         let ok = false;
         try { ok = mi.check(ctx); } catch (e) { ok = false; }
-        if (ok) { this.done[mi.id] = Date.now(); won.push(mi); }
+        if (ok) won.push([mi, TX.UI.completeMission(mi)]);
       });
       if (!won.length) return;
       // One command can finish several missions at once; show one combined toast instead of a stack.
-      if (won.length === 1) this.toast(`🏁 Mission complete: <b>${TX.escapeHtml(won[0].title)}</b> <span class="xp">+${won[0].xp} XP</span>`, true);
-      else this.toast(`🏁 ${won.length} missions complete: <b>${won.slice(0, 3).map((mi) => TX.escapeHtml(mi.title)).join(', ')}${won.length > 3 ? ', …' : ''}</b> <span class="xp">+${won.reduce((a, mi) => a + mi.xp, 0)} XP</span>`, true);
+      if (won.length === 1) this.toast(`🏁 Mission complete: <b>${TX.escapeHtml(won[0][0].title)}</b> <span class="xp">+${won[0][1]} XP</span>`, true);
+      else this.toast(`🏁 ${won.length} missions complete: <b>${won.slice(0, 3).map(([mi]) => TX.escapeHtml(mi.title)).join(', ')}${won.length > 3 ? ', …' : ''}</b> <span class="xp">+${won.reduce((a, [, x]) => a + x, 0)} XP</span>`, true);
       this.confetti();
-      store.set('missions', this.done); this.renderDrawer();
+      this.renderDrawer();
     },
 
     // ---------------- UI building
-    buildLauncher() {
-      const grid = $('#launcher-grid');
-      grid.innerHTML = Object.keys(SHELLS).map((k) => {
-        const d = SHELLS[k];
-        return `<button class="launch-card" data-kind="${k}" style="--c:${d.color}"><span class="lc-badge">${badge(k)}</span><span class="lc-text"><span class="lc-name">${d.label}</span><span class="lc-sub">${d.sub}</span></span><span class="lc-go">Open →</span></button>`;
-      }).join('');
-      grid.addEventListener('click', (e) => { const b = e.target.closest('.launch-card'); if (b) this.newTab(b.dataset.kind); });
+    buildLauncher() { TX.UI.renderHome(); },
+    renderStudent() {
+      const b = $('#btn-student'); if (!b) return;
+      const st = TX.UI.state, lv = TX.UI.level(st.xp);
+      b.innerHTML = st.name ? `<span class="st-name">${TX.escapeHtml(st.name.split(' ')[0])}</span><span class="st-lv">Lv ${lv.n}</span>` : '<span class="st-name">Sign in</span>';
+      b.title = st.name ? `${st.name} · Level ${lv.n} ${lv.title} · ${st.xp} XP` : 'Type your name to start earning XP';
     },
     buildNewMenu() {
       const menu = $('#new-menu');
@@ -367,7 +369,11 @@
       $('#btn-new-menu').addEventListener('click', (e) => { e.stopPropagation(); $('#new-menu').classList.toggle('open'); });
       document.addEventListener('click', (e) => { if (!e.target.closest('#new-menu') && !e.target.closest('#btn-new-menu')) $('#new-menu').classList.remove('open'); });
       $('#btn-missions').addEventListener('click', () => this.toggleDrawer('missions'));
-      $('#btn-cheat').addEventListener('click', () => this.toggleDrawer('cheat'));
+      $('#btn-cheat').addEventListener('click', () => TX.UI.openCheatSheet());
+      $('#btn-history').addEventListener('click', () => TX.UI.openHistory());
+      $('#btn-home').addEventListener('click', () => { TX.UI.closePage(); this.showLauncher(); });
+      $('#btn-student').addEventListener('click', () => (TX.UI.state.name ? TX.UI.studentMenu() : TX.UI.welcome()));
+      $('.brand').addEventListener('click', () => { TX.UI.closePage(); this.showLauncher(); });
       $('#btn-settings').addEventListener('click', () => this.openSettings());
       $('#btn-full').addEventListener('click', () => this.toggleFullscreen());
       $('#launcher-close').addEventListener('click', () => this.hideLauncher());
@@ -376,6 +382,8 @@
       $('#settings-close').addEventListener('click', () => this.closeSettings());
       $('#modal-settings').addEventListener('click', (e) => { if (e.target.id === 'modal-settings') this.closeSettings(); });
       document.addEventListener('keydown', (e) => {
+        if (document.body.classList.contains('testing')) return;
+        if (e.key === 'Escape' && !$('#page').hidden && !document.querySelector('.ux-overlay')) { TX.UI.closePage(); e.preventDefault(); return; }
         if (e.key === 'Escape') { if ($('#modal-settings').classList.contains('open')) { this.closeSettings(); e.preventDefault(); return; } if (!$('#launcher').classList.contains('hidden') && this.sessions.length) { this.hideLauncher(); e.preventDefault(); return; } }
         if (!e.altKey || e.ctrlKey || e.metaKey) return;
         const k = e.key.toLowerCase();
@@ -387,7 +395,8 @@
         else if (k === '=' || k === '+') { e.preventDefault(); this.setSetting('fontSize', Math.min(32, this.settings.fontSize + 1)); }
         else if (k === '-') { e.preventDefault(); this.setSetting('fontSize', Math.max(9, this.settings.fontSize - 1)); }
         else if (k === 'm') { e.preventDefault(); this.toggleDrawer('missions'); }
-        else if (k === 'c') { e.preventDefault(); this.toggleDrawer('cheat'); }
+        else if (k === 'c') { e.preventDefault(); TX.UI.openCheatSheet(); }
+        else if (k === 'h') { e.preventDefault(); TX.UI.closePage(); this.showLauncher(); }
         else if (k === 'enter') { e.preventDefault(); this.toggleFullscreen(); }
       });
       // touch helper keys
@@ -407,6 +416,7 @@
       window.addEventListener('resize', () => { if (this.active) this.active.term.measure(); });
     },
     showLauncher(noClose) {
+      TX.UI.renderHome();
       $('#launcher').classList.remove('hidden');
       $('#launcher-close').style.display = noClose || !this.sessions.length ? 'none' : '';
       const first = $('#launcher .launch-card');
@@ -421,9 +431,9 @@
       const el = document.documentElement;
       try { if (!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen(); } catch (e) { /* not allowed */ }
     },
-    toggleDrawer(tab) {
+    toggleDrawer(tab, forceOpen) {
       const d = $('#drawer');
-      if (!tab || (d.classList.contains('open') && this.drawerTab === tab)) { d.classList.remove('open'); document.body.classList.remove('drawer-open'); }
+      if (!tab || (!forceOpen && d.classList.contains('open') && this.drawerTab === tab)) { d.classList.remove('open'); document.body.classList.remove('drawer-open'); }
       else { this.drawerTab = tab; d.classList.add('open'); document.body.classList.add('drawer-open'); }
       this.renderDrawer();
       setTimeout(() => { if (this.active) { this.active.term.measure(); this.active.focus(); } }, 260);
@@ -437,48 +447,56 @@
       else if (tab === 'cheat') body.innerHTML = this.cheatHTML();
       else body.innerHTML = this.keysHTML();
       this.bindDrawer(body, tab);
-      const total = Object.values(TX.missions.tracks).filter((t, i, a) => a.indexOf(t) === i).reduce((a, t) => a + t.list.filter((m) => this.done[m.id]).reduce((x, m) => x + m.xp, 0), 0);
-      $('#xp-count').textContent = total;
+      $('#xp-count').textContent = TX.UI.state.xp;
+      this.renderStudent();
     },
     missionsHTML() {
+      const UI = TX.UI;
       const track = this.active ? this.active.trackKey() : 'bash';
-      const t = TX.missions.tracks[track];
-      const tracks = [['bash', 'Linux'], ['zsh', 'macOS'], ['cmd', 'cmd'], ['powershell', 'PowerShell'], ['gitbash', 'Git Bash']];
+      const t = TX.missions.tracks[track] || TX.missions.tracks.bash;
+      const tracks = [['bash', 'Linux'], ['zsh', 'macOS'], ['freebsd', 'FreeBSD'], ['solaris', 'Solaris'], ['cmd', 'cmd'], ['powershell', 'PowerShell'], ['gitbash', 'Git Bash'], ['dos', 'MS-DOS'], ['unix', 'UNIX V7']];
       const list = t.list;
-      const doneN = list.filter((m) => this.done[m.id]).length;
-      const xp = list.filter((m) => this.done[m.id]).reduce((a, m) => a + m.xp, 0);
+      const doneN = list.filter((m) => UI.isDone(m.id)).length;
       const pct = Math.round((doneN / list.length) * 100);
-      return `<div class="m-head"><div class="m-track">${tracks.map(([k, l]) => `<button class="m-chip ${k === track || (track === 'pwsh' && k === 'powershell') ? 'on' : ''}" data-open="${k}" title="Open a ${l} tab">${l}</button>`).join('')}</div>
-        <div class="m-title">${t.name} missions</div>
-        <div class="m-progress"><div class="m-bar"><span style="width:${pct}%"></span></div><span>${doneN}/${list.length} · ${xp} XP</span></div>
-        <p class="m-note">Missions check your work automatically as you type commands in a <b>${t.name}</b> tab.</p></div>
-        <ol class="m-list">${list.map((m, i) => {
-          const done = !!this.done[m.id];
-          return `<li class="m-item ${done ? 'done' : ''}" data-id="${m.id}"><details ${!done && list.findIndex((x) => !this.done[x.id]) === i ? 'open' : ''}><summary><span class="m-dot">${done ? '✓' : i + 1}</span><span class="m-name">${TX.escapeHtml(m.title)}</span><span class="m-xp">${m.xp} XP</span></summary>
-          <div class="m-body"><p>${TX.escapeHtml(m.text)}</p><div class="m-actions"><button class="m-hint">💡 Hint</button>${this.settings.showAnswers ? '<button class="m-ans">Show answer</button>' : ''}</div><p class="m-hint-text" hidden>${TX.escapeHtml(m.hint)}</p><p class="m-ans-text" hidden><code class="ins" data-cmd="${TX.escapeHtml(m.answer)}">${TX.escapeHtml(m.answer)}</code></p></div></details></li>`;
-        }).join('')}</ol>
-        <div class="m-foot"><button class="linkish" id="m-reset">Reset mission progress</button></div>`;
+      const groups = [];
+      list.forEach((m) => { const L = TX.lessons.ofMission(m.id); const key = L ? L.id : 'other'; let g = groups.find((x) => x.key === key); if (!g) groups.push((g = { key, L, items: [] })); g.items.push(m); });
+      const firstOpen = list.find((x) => !UI.isDone(x.id));
+      const item = (m, i) => {
+        const done = UI.isDone(m.id), h = UI.state.hints[m.id] || 0;
+        return `<li class="m-item ${done ? 'done' : ''}" data-id="${m.id}"><details ${firstOpen === m ? 'open' : ''}><summary><span class="m-dot">${done ? '✓' : i + 1}</span><span class="m-name">${TX.escapeHtml(m.title)}</span><span class="m-xp">${done ? UI.state.done[m.id].xp : UI.reward(m)} XP</span></summary>
+          <div class="m-body"><p>${TX.escapeHtml(m.text)}</p><div class="m-actions"><button class="m-hint">💡 Hint${h & 1 || done ? '' : ' <small>(−20% XP)</small>'}</button>${this.settings.showAnswers ? `<button class="m-ans">Show answer${h & 2 || done ? '' : ' <small>(−30% XP)</small>'}</button>` : ''}</div><p class="m-hint-text" ${h & 1 ? '' : 'hidden'}>${TX.escapeHtml(m.hint)}</p><p class="m-ans-text" ${h & 2 ? '' : 'hidden'}><code class="ins" data-cmd="${TX.escapeHtml(m.answer)}">${TX.escapeHtml(m.answer)}</code></p></div></details></li>`;
+      };
+      let n = 0;
+      return `<div class="m-head"><div class="m-track">${tracks.map(([k, l]) => `<button class="m-chip ${k === track ? 'on' : ''}" data-open="${k}" title="Open a ${l} tab">${l}</button>`).join('')}</div>
+        <div class="m-title">${TX.escapeHtml(t.name)} missions</div>
+        <div class="m-progress"><div class="m-bar"><span style="width:${pct}%"></span></div><span>${doneN}/${list.length}</span></div>
+        <p class="m-note">Missions check your work automatically as you type in a <b>${TX.escapeHtml(t.name)}</b> tab. A hint costs 20% of a mission's XP.</p></div>
+        ${groups.map((g) => `${g.L ? `<div class="m-lesson"><span>${g.L.icon} Lesson ${g.L.n}: ${TX.escapeHtml(g.L.title)}</span><button class="linkish" data-guide="${g.L.id}">📖 guide</button>${UI.lessonDone(g.L) ? `<button class="linkish" data-test="${g.L.id}">🎓 ${UI.state.certs[g.L.id] ? 'certificate' : 'test'}</button>` : ''}</div>` : ''}<ol class="m-list">${g.items.map((m) => item(m, n++)).join('')}</ol>`).join('')}`;
     },
     cheatHTML() {
-      const k = this.active ? this.active.kind : 'bash';
-      const col = k === 'cmd' ? 2 : k === 'powershell' || k === 'pwsh' ? 3 : 1;
-      return `<p class="m-note">Same task, three languages. Click any command to type it into the active terminal.</p><table class="cheat"><thead><tr><th>Task</th><th class="${col === 1 ? 'hl' : ''}">bash / zsh</th><th class="${col === 2 ? 'hl' : ''}">cmd</th><th class="${col === 3 ? 'hl' : ''}">PowerShell</th></tr></thead><tbody>${TX.docs.CHEAT.map((r) => `<tr><td>${TX.escapeHtml(r[0])}</td>${r.slice(1).map((c, i) => `<td class="${col === i + 1 ? 'hl' : ''}"><code class="ins" data-cmd="${TX.escapeHtml(c.replace(/\s+\(.*\)$/, '').split(/\s+\/\s+/)[0])}">${TX.escapeHtml(c)}</code></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      const R = TX.reference;
+      const k = this.active ? TX.trackOf(this.active.kind) : 'bash';
+      const plat = R.PLATS.find((p) => p.k === (k === 'gitbash' ? 'bash' : k)) || R.PLATS[0];
+      return `<p class="m-note">Quick reference for <b>${TX.escapeHtml(plat.label)}</b>. Click a command to type it. <button class="linkish" id="open-cs">Open the full Interactive Cheat Sheet (all systems, ▶ Run) →</button></p>
+        ${R.CATS.map(([cat, icon, label]) => { const rows = R.TASKS.filter((t) => t.cat === cat).map((t) => [t, R.cell(t, plat.k)]).filter(([, c]) => c.c); return rows.length ? `<div class="m-lesson"><span>${icon} ${TX.escapeHtml(label)}</span></div><table class="cheat">${rows.map(([t, c]) => `<tr><td>${TX.escapeHtml(t.task)}</td><td><code class="ins" data-cmd="${TX.escapeHtml(c.c.split('\n')[0])}">${TX.escapeHtml(c.c.split('\n')[0])}</code></td></tr>`).join('')}</table>` : ''; }).join('')}`;
     },
     keysHTML() {
-      const rows = [['Tab', 'Complete a command or file name (press twice to list options in bash)'], ['↑ / ↓', 'Scroll through command history'], ['Ctrl+R', 'Search history (type to search, Enter to run)'], ['Ctrl+C', 'Stop the running command (or copy selected text)'], ['Ctrl+L', 'Clear the screen'], ['Ctrl+A / Ctrl+E', 'Jump to start / end of the line'], ['Ctrl+U / Ctrl+K', 'Delete to start / end of the line'], ['Ctrl+W', 'Delete the previous word (browsers may close the tab — careful!)'], ['Ctrl+D', 'Exit the shell (bash/zsh, on an empty line)'], ['Right-click', 'Paste (or copy, if text is selected)'], ['Alt+1 … Alt+6', 'Open Ubuntu, macOS, cmd, PowerShell, PowerShell 7, Git Bash'], ['Alt+T / Alt+W', 'Start page / close tab'], ['Alt+← / Alt+→', 'Switch tabs'], ['Alt+= / Alt+-', 'Bigger / smaller text'], ['Alt+M / Alt+C', 'Missions / cheat sheet'], ['Alt+Enter', 'Full screen']];
+      const rows = [['Tab', 'Complete a command or file name (press twice to list options in bash)'], ['↑ / ↓', 'Scroll through command history'], ['Ctrl+R', 'Search history (type to search, Enter to run)'], ['Ctrl+C', 'Stop the running command (or copy selected text)'], ['Ctrl+L', 'Clear the screen'], ['Ctrl+A / Ctrl+E', 'Jump to start / end of the line'], ['Ctrl+U / Ctrl+K', 'Delete to start / end of the line'], ['Ctrl+W', 'Delete the previous word (browsers may close the tab — careful!)'], ['Ctrl+D', 'Exit the shell (bash/zsh, on an empty line)'], ['Right-click', 'Paste (or copy, if text is selected)'], ['Alt+1 … Alt+0', 'Open ' + TX.SHELL_ORDER.map((k) => SHELLS[k].label).join(', ')], ['Alt+T / Alt+W', 'Home page / close tab'], ['Alt+← / Alt+→', 'Switch tabs'], ['Alt+= / Alt+-', 'Bigger / smaller text'], ['Alt+M / Alt+C', 'Missions / Interactive Cheat Sheet'], ['Alt+H', 'Home: lessons, tests, certificates'], ['Alt+Enter', 'Full screen']];
       return `<table class="keys">${rows.map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join('')}</table>
       <div class="m-note"><p><b>Passwords</b> in this simulator: <code>student</code> (sudo, ssh), <code>teacher</code> (su teacher). GitHub pushes want a token: anything starting with <code>ghp_</code>.</p>
-      <p><b>Machines</b>: Linux <code>ubuntu-lab</code> (192.168.1.42), Mac <code>MacBook-Pro</code> (192.168.1.57), Windows <code>DESKTOP-LAB42</code> (192.168.1.105). cmd, PowerShell and Git Bash share the same Windows disk — make a file in one and see it in the others! Try <code>ssh student@ubuntu-lab</code> from the Mac, or <code>wsl</code> from Windows.</p>
+      <p><b>Machines</b>: Linux <code>ubuntu-lab</code> (192.168.1.42), Mac <code>MacBook-Pro</code> (192.168.1.57), Windows <code>DESKTOP-LAB42</code> (192.168.1.105), FreeBSD <code>freebsd-lab</code>, Solaris <code>sol-lab</code> (SPARC), a 1994 MS-DOS PC and a 1979 PDP-11 running UNIX V7. Root's password on FreeBSD, Solaris and V7 is <code>student</code>. cmd, PowerShell and Git Bash share the same Windows disk — make a file in one and see it in the others! Try <code>ssh student@ubuntu-lab</code> from the Mac, or <code>wsl</code> from Windows.</p>
       <p><b>Broke something?</b> Type <code>reset-machine</code> in any shell (or use Settings) to restore factory files.</p></div>`;
     },
     bindDrawer(body, tab) {
       body.querySelectorAll('.ins').forEach((el) => el.addEventListener('click', () => { if (!this.active) return; this.active.term.paste(el.dataset.cmd); this.active.focus(); }));
+      const cs = body.querySelector('#open-cs'); if (cs) cs.addEventListener('click', () => TX.UI.openCheatSheet());
       if (tab === 'missions') {
-        body.querySelectorAll('.m-hint').forEach((b) => b.addEventListener('click', () => { const p = b.closest('.m-body').querySelector('.m-hint-text'); p.hidden = !p.hidden; }));
-        body.querySelectorAll('.m-ans').forEach((b) => b.addEventListener('click', () => { const p = b.closest('.m-body').querySelector('.m-ans-text'); p.hidden = !p.hidden; }));
+        const hint = (b, kind, sel) => { const id = b.closest('.m-item').dataset.id; if (!TX.UI.isDone(id)) TX.UI.useHint(id, kind); const p = b.closest('.m-body').querySelector(sel); p.hidden = false; b.querySelector('small') && b.querySelector('small').remove(); const xp = b.closest('.m-item').querySelector('.m-xp'); const mi = TX.lessons.mission(id); if (!TX.UI.isDone(id)) xp.textContent = TX.UI.reward(mi) + ' XP'; };
+        body.querySelectorAll('.m-hint').forEach((b) => b.addEventListener('click', () => hint(b, 'hint', '.m-hint-text')));
+        body.querySelectorAll('.m-ans').forEach((b) => b.addEventListener('click', () => hint(b, 'answer', '.m-ans-text')));
+        body.querySelectorAll('[data-guide]').forEach((b) => b.addEventListener('click', () => TX.UI.showGuide(TX.lessons.byId(b.dataset.guide))));
+        body.querySelectorAll('[data-test]').forEach((b) => b.addEventListener('click', () => { const L = TX.lessons.byId(b.dataset.test); if (TX.UI.state.certs[L.id]) TX.UI.showCertificate(L); else TX.UI.startTest(L); }));
         body.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.open; const ex = this.sessions.find((s) => s.trackKey() === k); if (ex) this.activate(ex); else this.newTab(k); }));
-        const r = body.querySelector('#m-reset');
-        if (r) r.addEventListener('click', () => { if (!confirm('Reset all mission progress?')) return; this.done = {}; this.log = {}; store.set('missions', {}); store.set('log', {}); this.renderDrawer(); });
       }
     },
 
@@ -497,7 +515,7 @@
         <label class="check"><input type="checkbox" id="set-crt" ${s.crt ? 'checked' : ''}> Retro CRT effect (scanlines + glow)</label>
         <label class="check"><input type="checkbox" id="set-ans" ${s.showAnswers ? 'checked' : ''}> Show "answer" buttons in missions (turn off for tests)</label>
         <div class="danger"><div><b>Reset a machine</b><br><span class="muted">Restores all files, installed packages and git repos to factory defaults.</span></div>
-          <div class="reset-row"><button data-reset="linux">Ubuntu</button><button data-reset="mac">Mac</button><button data-reset="windows">Windows</button><button data-reset="all" class="bad">Everything</button></div></div>`;
+          <div class="reset-row"><button data-reset="linux">Ubuntu</button><button data-reset="mac">Mac</button><button data-reset="windows">Windows</button><button data-reset="freebsd">FreeBSD</button><button data-reset="solaris">Solaris</button><button data-reset="dos">MS-DOS</button><button data-reset="unix">UNIX V7</button><button data-reset="all" class="bad">Everything (files only)</button></div></div>`;
       $('#modal-settings').classList.add('open');
       const on = (id, ev, fn) => $(id).addEventListener(ev, fn);
       on('#set-theme', 'change', (e) => this.setSetting('theme', e.target.value));
@@ -510,7 +528,7 @@
       $$('.swatch').forEach((b) => b.addEventListener('click', () => { this.setSetting('theme', b.dataset.theme); $('#set-theme').value = b.dataset.theme; $$('.swatch').forEach((x) => x.classList.toggle('on', x === b)); }));
       $$('[data-reset]').forEach((b) => b.addEventListener('click', () => {
         const k = b.dataset.reset;
-        if (!confirm(k === 'all' ? 'Reset EVERYTHING (all machines, history, missions, settings)?' : `Reset the ${b.textContent} machine to factory settings?`)) return;
+        if (!confirm(k === 'all' ? 'Reset the files on EVERY pretend computer? (Your XP, missions and certificates are kept.)' : `Reset the ${b.textContent} machine to factory settings?`)) return;
         if (k === 'all') { try { Object.keys(localStorage).filter((x) => x.startsWith('tx.')).forEach((x) => localStorage.removeItem(x)); } catch (e) { /* ignore */ } location.reload(); return; }
         this.resetMachine(k);
         this.closeSettings();
@@ -556,6 +574,7 @@
     return map[kind] || '>_';
   }
 
+  App.badge = badge;
   TX.app = App;
   window.addEventListener('DOMContentLoaded', () => App.init());
 })();

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>TerminalEX</title>
-  <meta name="description" content="A safe, realistic practice terminal for students: Ubuntu bash, macOS zsh, Windows Command Prompt, PowerShell and Git Bash — all in the browser.">
+  <meta name="description" content="A safe, realistic practice terminal for students: Ubuntu, macOS, FreeBSD, Solaris, Windows Command Prompt, PowerShell, Git Bash, MS-DOS and UNIX V7 — with lessons, certification tests and an interactive cheat sheet.">
   <meta name="theme-color" content="#16181d">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316181d'/%3E%3Cpath d='M8 11l6 5-6 5' stroke='%2339d98a' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M16 22h8' stroke='%23e6e6e6' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
@@ -311,12 +311,203 @@ body.touch #touch-keys { display: flex; }
 .pane[data-os="dos"] .terminal { line-height: 1.18; }
 .pane[data-os="tty"] .terminal { letter-spacing: 0.02em; }
 
+/* ======================================================================== v2: home, pages, lessons, tests */
+.ux-btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--ui-line); background: var(--ui-bg3); color: var(--ui-fg); border-radius: 8px; padding: 8px 14px; font-size: 13.5px; font-weight: 500; cursor: pointer; }
+.ux-btn:hover:not([disabled]) { border-color: #4a5160; background: #2a2f3a; }
+.ux-btn.primary { background: #1f6f4a; border-color: #2a8c5f; color: #fff; }
+.ux-btn.primary:hover:not([disabled]) { background: #24835a; }
+.ux-btn.danger { background: #5c1d1d; border-color: #8a2b2b; color: #fff; }
+.ux-btn.ghost { background: transparent; }
+.ux-btn.small { padding: 5px 10px; font-size: 12.5px; }
+.ux-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.ux-btn:focus-visible, .chip:focus-visible, .tool-card:focus-visible, .student-card:focus-visible, .linkish:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+.linkish { background: none; border: 0; padding: 0; color: var(--accent2); cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ux-dim { color: var(--ui-dim); }
+.ux-input, .ux-textarea { width: 100%; background: var(--ui-bg); color: var(--ui-fg); border: 1px solid var(--ui-line); border-radius: 8px; padding: 10px 12px; font: inherit; font-size: 15px; }
+.ux-textarea { min-height: 140px; font-family: 'Cascadia Mono', Consolas, Menlo, monospace; font-size: 12px; margin-top: 10px; }
+.ux-input:focus, .ux-textarea:focus { outline: 2px solid var(--accent2); border-color: transparent; }
+.ux-err, .ux-bad { color: #ffb4b4; background: #3a1414; border: 1px solid #6b2525; border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
+.ux-ok { color: #b4ffd4; background: #12321f; border: 1px solid #23633f; border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-weight: 600; }
+.ux-pre { background: var(--ui-bg); border: 1px solid var(--ui-line); border-radius: 8px; padding: 10px; overflow: auto; font-size: 12px; }
+.ux-stack { display: grid; gap: 8px; margin: 14px 0; }
+.ux-big-name { font-size: 30px; font-weight: 700; text-align: center; margin: 14px 0; color: var(--accent); }
+.ux-overlay { position: fixed; inset: 0; z-index: 90; background: #05060acc; backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; overflow-y: auto; }
+.ux-modal { width: min(520px, 100%); background: var(--ui-bg2); border: 1px solid var(--ui-line); border-radius: 14px; box-shadow: 0 30px 80px #000c; max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+.ux-overlay.wide .ux-modal { width: min(760px, 100%); }
+.ux-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px 6px 20px; }
+.ux-modal-head h2 { margin: 0; font-size: 18px; }
+.ux-modal-body { padding: 4px 20px 10px; overflow-y: auto; line-height: 1.55; }
+.ux-modal-body h3 { margin: 16px 0 6px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+.ux-modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px 16px; flex-wrap: wrap; }
+.guide-vocab { width: 100%; border-collapse: collapse; }
+.guide-vocab td { border-top: 1px solid var(--ui-line); padding: 7px 8px 7px 0; vertical-align: top; }
+.guide-vocab td:first-child { white-space: nowrap; width: 1%; }
+.guide-vocab code, .guide-traps code { background: var(--ui-bg3); padding: 1px 5px; border-radius: 4px; }
+.guide-traps li { margin: 4px 0; }
+
+/* home */
+.launcher-inner.home { width: min(1120px, 100%); padding: 28px 30px 24px; }
+.home-hero { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+.home-hero .hero-logo svg { width: 52px; height: 52px; }
+.home-hero-text { flex: 1; min-width: 240px; }
+.home-hero h1 { margin: 0; font-size: 30px; letter-spacing: -0.5px; }
+.home-hero h1 b { color: var(--accent); }
+.home-hero p { margin: 4px 0 0; color: var(--ui-dim); }
+.student-card { display: grid; gap: 4px; min-width: 250px; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ui-line); background: var(--ui-bg); cursor: pointer; }
+.student-card:hover { border-color: #3d6; }
+.sc-name { font-weight: 700; font-size: 16px; } .sc-level { color: var(--accent); font-size: 12.5px; } .sc-xp { color: var(--ui-dim); font-size: 12px; }
+.home-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 6px 0 4px; }
+.tool-card { display: grid; gap: 3px; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ui-line); background: linear-gradient(160deg, #1d222b, #16181e); cursor: pointer; }
+.tool-card > span:first-child { font-size: 22px; }
+.tool-card:hover { border-color: #4a5160; transform: translateY(-1px); }
+.tool-card .ux-dim { font-size: 12px; }
+.home-h { font-size: 15px; margin: 22px 0 10px; letter-spacing: .02em; }
+.home-h .ux-dim { font-weight: 400; font-size: 12.5px; }
+.lc-new { position: absolute; top: 8px; right: 10px; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); border-radius: 99px; padding: 1px 6px; }
+.lesson-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.lesson-card { position: relative; display: grid; gap: 8px; padding: 14px; border-radius: 14px; border: 1px solid var(--ui-line); background: var(--ui-bg); border-top: 3px solid var(--c); }
+.lesson-card.ready { box-shadow: 0 0 0 1px #2a8c5f inset; }
+.lesson-card.certified { background: linear-gradient(160deg, #142a1f, var(--ui-bg)); }
+.lesson-top { display: flex; gap: 10px; align-items: center; }
+.lesson-icon { font-size: 26px; }
+.lesson-n { color: var(--ui-dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; }
+.lesson-title { font-weight: 700; }
+.lesson-sub { color: var(--ui-dim); font-size: 12.5px; }
+.lesson-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.lesson-pass { color: var(--accent); font-weight: 600; font-size: 12.5px; }
+.home-foot { color: var(--ui-dim); font-size: 12px; margin: 18px 0 0; text-align: center; }
+.m-lesson { display: flex; align-items: center; gap: 10px; margin: 14px 0 4px; font-weight: 600; font-size: 12.5px; color: var(--ui-dim); text-transform: uppercase; letter-spacing: .04em; }
+.m-lesson span { flex: 1; }
+.student-pill { max-width: 160px; }
+.st-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-lv { background: #1f6f4a; color: #fff; border-radius: 99px; padding: 0 7px; font-size: 11px; }
+
+/* full-screen pages */
+.page { position: fixed; inset: 0; z-index: 60; background: var(--ui-bg); overflow-y: auto; }
+.page[hidden] { display: none; }
+.page-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 14px; padding: 10px 18px; background: #13151acc; backdrop-filter: blur(8px); border-bottom: 1px solid var(--ui-line); }
+.page-bar h1 { font-size: 18px; margin: 0; flex: 1; }
+.page-body { width: min(1240px, 100%); margin: 0 auto; padding: 18px 18px 60px; line-height: 1.5; }
+.page-lead { font-size: 15px; max-width: 80ch; }
+.chip { border: 1px solid var(--ui-line); background: var(--ui-bg2); color: var(--ui-fg); border-radius: 99px; padding: 5px 11px; font-size: 12.5px; cursor: pointer; }
+.chip.on { background: #1f6f4a; border-color: #2a8c5f; }
+.chip-check { display: inline-flex; }
+.chip-check input { position: absolute; opacity: 0; }
+.chip-check span { border: 1px solid var(--ui-line); border-radius: 99px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; border-left: 4px solid var(--c); }
+.chip-check input:checked + span { background: var(--ui-bg3); color: var(--ui-fg); font-weight: 600; }
+.chip-check input:not(:checked) + span { color: var(--ui-dim); opacity: .7; }
+.chip-check input:focus-visible + span { outline: 2px solid var(--accent2); }
+.cs-controls { display: grid; gap: 10px; margin-bottom: 14px; }
+.cs-cats, .cs-plats { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cs-task { border: 1px solid var(--ui-line); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; background: var(--ui-bg2); }
+.cs-task header h3 { margin: 0; font-size: 15px; }
+.cs-task header p { margin: 3px 0 0; color: var(--ui-dim); font-size: 13px; }
+.cs-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-top: 10px; align-items: start; }
+.cs-cell { border: 1px solid var(--ui-line); border-radius: 10px; padding: 8px 10px; background: var(--ui-bg); min-width: 0; }
+.cs-cell.none { opacity: .75; } .cs-cell.none p { margin: 6px 0 0; font-size: 12.5px; color: var(--ui-dim); }
+.cs-plat { font-size: 12px; font-weight: 700; border-left: 3px solid var(--c); padding-left: 6px; }
+.cs-plat span { font-weight: 400; color: var(--ui-dim); }
+.cs-code { margin: 6px 0; white-space: pre-wrap; word-break: break-word; font-family: 'Cascadia Mono', Consolas, Menlo, monospace; font-size: 12.5px; color: #c9f7dc; }
+.cs-note { margin: 4px 0; font-size: 12px; color: var(--ui-dim); }
+.cs-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cs-out { margin-top: 8px; background: #0b0c10; border-radius: 8px; padding: 8px; font-family: 'Cascadia Mono', Consolas, Menlo, monospace; font-size: 12px; white-space: pre; max-height: 320px; overflow: auto; color: #d6d9e0; }
+.ansi-a0 { color: #6b7280; } .ansi-a1, .ansi-a9 { color: #ff6b6b; } .ansi-a2, .ansi-a10 { color: #5be38f; } .ansi-a3, .ansi-a11 { color: #f5d06b; } .ansi-a4, .ansi-a12 { color: #73a7ff; } .ansi-a5, .ansi-a13 { color: #d58cff; } .ansi-a6, .ansi-a14 { color: #5fd7e6; } .ansi-a7, .ansi-a15 { color: #eef; } .ansi-a8 { color: #8a8f98; } .ansi-b { font-weight: 700; } .ansi-dim { opacity: .7; }
+table.compare { width: 100%; }
+
+/* history */
+.tree-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; font-size: 12.5px; color: var(--ui-dim); }
+.tree-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.tree-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: start; }
+.tree-scroll { overflow: auto; border: 1px solid var(--ui-line); border-radius: 12px; background: #0f1115; max-height: 80vh; }
+.tree-svg { display: block; }
+.tree-year { fill: #6b7280; font-size: 11px; }
+.tree-grid { stroke: #1f232b; stroke-width: 1; }
+.tree-link { fill: none; stroke-width: 2; opacity: .55; }
+.tree-node { cursor: pointer; }
+.tree-node rect { stroke-width: 1.5; transition: stroke-width .1s; }
+.tree-node:hover rect, .tree-node:focus rect, .tree-node.on rect { stroke-width: 3; }
+.tree-node:focus { outline: none; }
+.tree-node.seen rect { filter: brightness(1.4); }
+.tree-name { fill: #e6e8ee; font-size: 11.5px; font-weight: 700; text-anchor: middle; }
+.tree-y { fill: #9aa3b2; font-size: 9.5px; text-anchor: middle; }
+.tree-info { position: sticky; top: 70px; border: 1px solid var(--ui-line); border-radius: 12px; padding: 14px; background: var(--ui-bg2); }
+.tree-info h3 { margin: 4px 0 8px; }
+.tree-fam { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.era-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.era { border: 1px solid var(--ui-line); border-radius: 12px; padding: 12px; background: var(--ui-bg2); font-size: 13px; }
+.era p { margin: 6px 0 0; color: var(--ui-dim); }
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.badge-card { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--ui-line); border-radius: 12px; background: var(--ui-bg2); opacity: .55; }
+.badge-card.got { opacity: 1; border-color: #2a8c5f; }
+.badge-icon { font-size: 30px; }
+.badge-xp { font-size: 12px; color: var(--accent); margin-top: 2px; }
+
+/* certification test */
+body.testing #tabs, body.testing .actions, body.testing .newtab { visibility: hidden; }
+.test-page .page-body { width: min(820px, 100%); }
+.test-progress { display: flex; gap: 6px; margin-bottom: 16px; }
+.test-progress span { flex: 1; height: 6px; border-radius: 3px; background: var(--ui-bg3); }
+.test-progress span.ans { background: #2a8c5f88; } .test-progress span.on { background: var(--accent2); }
+.test-n { color: var(--ui-dim); font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; }
+.test-q h2 { font-size: 20px; line-height: 1.4; margin: 8px 0 16px; }
+.test-opts { display: grid; gap: 8px; }
+.test-opt { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--ui-line); border-radius: 10px; background: var(--ui-bg2); cursor: pointer; }
+.test-opt:has(input:checked) { border-color: var(--accent2); background: #1a2540; }
+.test-term { display: flex; align-items: center; gap: 8px; background: #0b0c10; border: 1px solid var(--ui-line); border-radius: 10px; padding: 10px 12px; font-family: 'Cascadia Mono', Consolas, Menlo, monospace; margin-bottom: 8px; }
+.test-prompt { color: var(--accent); white-space: nowrap; }
+.test-cmd { flex: 1; background: transparent; border: 0; color: #fff; font: inherit; font-size: 14px; outline: none; min-width: 0; }
+.test-out { background: #0b0c10; border-radius: 8px; padding: 10px; font-size: 12.5px; max-height: 260px; overflow: auto; white-space: pre-wrap; }
+.test-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
+.test-grading { text-align: center; padding: 60px 0; color: var(--ui-dim); }
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--ui-line); border-top-color: var(--accent); margin: 0 auto 14px; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.test-result { text-align: center; padding: 20px 0; }
+.test-result ul { text-align: left; display: inline-block; }
+.test-score { font-size: 64px; font-weight: 800; }
+.test-result.pass .test-score { color: var(--accent); } .test-result.fail .test-score { color: #ff9b9b; }
+.test-result .test-nav { justify-content: center; }
+
+/* certificate */
+.cert { background: #fbf8ef; color: #16181d; border-radius: 6px; padding: 18px; max-width: 900px; margin: 0 auto; box-shadow: 0 20px 60px #000a; }
+.cert-inner { border: 8px double #1f6f4a; padding: 34px 30px; text-align: center; font-family: Georgia, 'Times New Roman', serif; }
+.cert-logo { font-family: var(--ui-font); font-weight: 800; font-size: 26px; color: #1f6f4a; } .cert-logo b { color: #18a05e; }
+.cert-kicker { letter-spacing: .25em; text-transform: uppercase; font-family: var(--ui-font); font-size: 13px; color: #555; margin: 6px 0 18px; }
+.cert-this { font-style: italic; color: #444; }
+.cert-name { font-size: 40px; font-weight: 700; margin: 6px 0 10px; }
+.cert-lesson { font-family: var(--ui-font); font-size: 22px; font-weight: 700; color: #1f6f4a; margin: 6px 0 12px; }
+.cert-skills { text-align: left; display: inline-block; font-family: var(--ui-font); font-size: 14px; margin: 0 0 14px; }
+.cert-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; font-family: var(--ui-font); font-size: 13.5px; }
+.cert-code { margin-top: 16px; font-family: var(--ui-font); font-size: 11px; color: #777; }
+.cert-actions { text-align: center; margin-top: 18px; }
+@media print {
+  body * { visibility: hidden !important; }
+  #cert, #cert * { visibility: visible !important; }
+  #cert { position: fixed; inset: 0; margin: 0; box-shadow: none; max-width: none; }
+  body, .page { background: #fff !important; overflow: visible !important; }
+}
+
+@media (max-width: 900px) {
+  .home-tools { grid-template-columns: repeat(2, 1fr); }
+  .lesson-grid { grid-template-columns: repeat(2, 1fr); }
+  .tree-wrap { grid-template-columns: 1fr; }
+  .tree-info { position: static; }
+  .era-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .launcher-inner.home { padding: 18px 14px; }
+  .home-tools, .lesson-grid, .era-grid { grid-template-columns: 1fr; }
+  .student-card { min-width: 0; width: 100%; }
+  .page-body { padding: 14px 12px 50px; }
+  .cs-cells { grid-template-columns: 1fr; }
+  .student-pill { display: none; }
+}
+
   </style>
 </head>
 <body>
   <div id="app">
     <header class="topbar">
-      <div class="brand" title="TerminalEX">
+      <div class="brand" title="Home (Alt+H)" role="button" tabindex="0">
         <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#20232b"/><path d="M8 11l6 5-6 5" stroke="#39d98a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 22h8" stroke="#e6e6e6" stroke-width="3" stroke-linecap="round"/></svg>
         <span>Terminal<b>EX</b></span>
       </div>
@@ -328,8 +519,11 @@ body.touch #touch-keys { display: flex; }
       </div>
       <div class="spacer"></div>
       <div class="actions">
+        <button id="btn-home" class="icon-btn" title="Home: lessons, tests, certificates (Alt+H)" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+        <button id="btn-history" class="icon-btn" title="History &amp; family tree" aria-label="History and family tree"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="18" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v4M12 11l-6 5M12 11l6 5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
         <button id="btn-missions" class="pill" title="Missions (Alt+M)"><span aria-hidden="true">🏁</span> Missions <span class="xp-badge"><span id="xp-count">0</span> XP</span></button>
-        <button id="btn-cheat" class="icon-btn" title="Cheat sheet (Alt+C)" aria-label="Cheat sheet"><svg viewBox="0 0 24 24"><path d="M5 4h10a3 3 0 013 3v13H8a3 3 0 01-3-3z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 17a3 3 0 013-3h10" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+        <button id="btn-cheat" class="icon-btn" title="Interactive Cheat Sheet (Alt+C)" aria-label="Interactive Cheat Sheet"><svg viewBox="0 0 24 24"><path d="M5 4h10a3 3 0 013 3v13H8a3 3 0 01-3-3z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 17a3 3 0 013-3h10" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+        <button id="btn-student" class="pill student-pill" title="Your name and progress file"></button>
         <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-dasharray="3.2 2.3"/></svg></button>
         <button id="btn-full" class="icon-btn" title="Full screen (Alt+Enter)" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
       </div>
@@ -341,7 +535,7 @@ body.touch #touch-keys { display: flex; }
         <div class="drawer-head">
           <div class="drawer-tabs">
             <button class="drawer-tab active" data-tab="missions">Missions</button>
-            <button class="drawer-tab" data-tab="cheat">Cheat sheet</button>
+            <button class="drawer-tab" data-tab="cheat">Quick reference</button>
             <button class="drawer-tab" data-tab="keys">Keys &amp; tips</button>
           </div>
           <button id="drawer-close" class="icon-btn" aria-label="Close panel">×</button>
@@ -354,22 +548,11 @@ body.touch #touch-keys { display: flex; }
       <button data-k="Tab">Tab</button><button data-k="C-c">^C</button><button data-k="ArrowUp">↑</button><button data-k="ArrowDown">↓</button><button data-k="ArrowLeft">←</button><button data-k="ArrowRight">→</button><button data-k="Escape">Esc</button><button data-k="|">|</button><button data-k="-">-</button><button data-k="/">/</button><button data-k="\">\</button><button data-k="~">~</button><button data-k="$">$</button>
     </div>
 
-    <div id="launcher" class="hidden" role="dialog" aria-modal="true" aria-labelledby="launcher-title">
-      <div class="launcher-inner">
-        <button id="launcher-close" class="icon-btn" aria-label="Close start page">×</button>
-        <div class="hero">
-          <div class="hero-logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#20232b"/><path d="M8 11l6 5-6 5" stroke="#39d98a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 22h8" stroke="#e6e6e6" stroke-width="3" stroke-linecap="round"/></svg></div>
-          <h1 id="launcher-title">Terminal<b>EX</b></h1>
-          <p>Six real-feeling terminals, three pretend computers, zero risk. Pick one to start.</p>
-        </div>
-        <div id="launcher-grid" class="launch-grid"></div>
-        <div class="launch-tips">
-          <div><b>New here?</b> Open a terminal, then click <span class="kb">🏁 Missions</span> for guided challenges that check themselves.</div>
-          <div><b>It's all connected.</b> cmd, PowerShell and Git Bash share one Windows disk. <code>ssh student@ubuntu-lab</code> from the Mac. <code>wsl</code> from Windows.</div>
-          <div><b>Can't break it.</b> <code>rm -rf</code> away — <code>reset-machine</code> brings everything back.</div>
-        </div>
-      </div>
+    <div id="launcher" class="hidden" role="dialog" aria-modal="true" aria-label="TerminalEX home">
+      <div class="launcher-inner home"></div>
     </div>
+
+    <div id="page" class="page" hidden></div>
 
     <div id="modal-settings" class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div class="modal-card">
@@ -18100,13 +18283,13 @@ export EDITOR=nano
     { id: 'linux', year: 1991, name: 'Linux', fam: 'linux', x: 4, parents: ['gnu'], shell: 'bash', text: 'Linus Torvalds, a 21-year-old student in Finland, writes a kernel "just a hobby, won\'t be big". GNU + Linux = a complete free system. Ubuntu arrives in 2004.' },
     { id: 'freebsd', year: 1993, name: 'FreeBSD', fam: 'bsd', x: 0, parents: ['bsd'], shell: 'freebsd', text: 'The free continuation of Berkeley UNIX. Powers Netflix\'s servers and the PlayStation.' },
     { id: 'macos', year: 2001, name: 'Mac OS X', fam: 'bsd', x: 1, parents: ['freebsd'], shell: 'zsh', text: 'Apple rebuilds the Mac on NeXTSTEP and FreeBSD code. Every Mac — and iPhone — is a UNIX underneath. zsh became the default in 2019.' },
-    { id: 'android', year: 2008, name: 'Android', fam: 'linux', x: 5, parents: ['linux'], text: 'The Linux kernel in your pocket: billions of devices.' },
+    { id: 'android', year: 2008, name: 'Android', fam: 'linux', x: 4, parents: ['linux'], text: 'The Linux kernel in your pocket: billions of devices.' },
     { id: 'cpm', year: 1974, name: 'CP/M', fam: 'dos', x: 6, parents: [], text: 'Gary Kildall\'s OS for early microcomputers: drive letters (A:), DIR, TYPE, and 8.3 file names.' },
     { id: 'msdos', year: 1981, name: 'MS-DOS', fam: 'dos', x: 6, parents: ['cpm'], shell: 'dos', text: 'Microsoft buys QDOS (a CP/M look-alike) and ships it with the IBM PC. Version 2.0 (1983) borrows UNIX ideas: folders, pipes and > redirects — but with \\ instead of /.' },
     { id: 'windows', year: 1985, name: 'Windows', fam: 'dos', x: 7, parents: ['msdos'], text: 'Windows 1.0–3.11 and 95/98 were programs that started from DOS. Typing WIN at C:\\> launched them.' },
     { id: 'winnt', year: 1993, name: 'Windows NT & cmd.exe', fam: 'dos', x: 6, parents: ['msdos'], shell: 'cmd', text: 'A brand-new Windows core (not DOS) with cmd.exe, which keeps DOS commands working. Every Windows since XP is NT.' },
     { id: 'powershell', year: 2006, name: 'PowerShell', fam: 'dos', x: 7, parents: ['winnt', 'ksh'], shell: 'powershell', text: 'Jeffrey Snover\'s "Monad": a shell that pipes objects, not text. Borrowed ideas from UNIX shells and went open-source and cross-platform in 2016 (pwsh).' },
-    { id: 'gitbash', year: 2007, name: 'Git Bash', fam: 'linux', x: 5, parents: ['linux', 'winnt'], shell: 'gitbash', text: 'Git for Windows bundles bash and UNIX tools so git works the same everywhere: the UNIX family moving onto Windows.' },
+    { id: 'gitbash', year: 2007, name: 'Git Bash', fam: 'linux', x: 5, parents: ['linux', 'winnt'], shell: 'gitbash', text: 'Git (2005, Linus Torvalds again) comes to Windows as Git Bash (2007): it bundles bash and UNIX tools so git works the same everywhere: the UNIX family moving onto Windows.' },
     { id: 'wsl', year: 2016, name: 'WSL', fam: 'linux', x: 6, parents: ['linux', 'winnt'], text: 'Windows Subsystem for Linux: real Linux inside Windows. The two families finally live on one computer.' },
   ];
   const FAMILIES = { unix: ['#C8B88A', 'Research UNIX'], bsd: ['#AB2B28', 'BSD family'], sysv: ['#F29111', 'System V family'], linux: ['#E95420', 'GNU / Linux'], dos: ['#2671BE', 'CP/M → DOS → Windows'], idea: ['#8a8f98', 'Big ideas'] };
@@ -18198,28 +18381,727 @@ export EDITOR=nano
 (function () {
   'use strict';
   // Generated by build.js from src/banks/questions.js — fingerprints only, no answers.
-  window.TX.TESTBANK = {"linux":[{"id":"lx-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt (just the number, no file name).","shell":"bash","setup":[],"probe":[],"input":[],"h":[["Uj122D2dsrtvsbwG","YrKbcBNOTPFblyrl"]],"topic":"counting with wc"},{"id":"lx-sortu","t":"cmd","q":"Show the items in groceries.txt in alphabetical order with duplicates removed.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["vLfdytytIiH6xogz","rhoeJoDM7jlGNGpD"]],"topic":"sort and uniq"},{"id":"lx-grep","t":"cmd","q":"Show every line of groceries.txt that contains the letters \"an\".","shell":"bash","setup":[],"probe":[],"input":[],"h":[["2hqGishUSEFMBSn_","zOoZ7AWnIUQrctb-"]],"topic":"grep"},{"id":"lx-head","t":"cmd","q":"Print the first 3 lines of Documents/poem.txt.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["qEoaIT0CV6V3gal3","9rx6o-1Kv3uJPMl-"]],"topic":"head"},{"id":"lx-tail","t":"cmd","q":"Print the last 2 lines of groceries.txt.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["4wfc0-WJoGBa8FrN","EAxHHuO-xKJ48bVF"]],"topic":"tail"},{"id":"lx-cut","t":"cmd","q":"Print only the first column (name) of every line of Documents/grades.csv, header included.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["64h2J3rY4o9nfu24","SoMLSAWsWEke8nfY"]],"topic":"cut and CSV columns"},{"id":"lx-redirect","t":"cmd","q":"Save groceries.txt sorted Z→A into a new file called reversed.txt.","shell":"bash","setup":[],"probe":["cat reversed.txt"],"input":[],"h":[["4dGyCAymbEpl4pdE","e1ygOGhbOzbCTcrl"]],"topic":"redirecting output"},{"id":"lx-mkdir","t":"cmd","q":"Create the folder ~/lab/week1 (the lab folder does not exist yet) in ONE command.","shell":"bash","setup":[],"probe":["ls -d ~/lab/week1"],"input":[],"h":[["ytI9A9MgxMuWTkXP","wngIUfDYJNiUsQ0X"]],"topic":"mkdir -p"},{"id":"lx-pwd","t":"mc","q":"What does pwd print?","o":["The current directory","Your password","The printer queue","The previous command"],"h":"QZlPx555QPpNkc18","topic":"navigation"},{"id":"lx-append","t":"mc","q":"Which symbol ADDS a line to the end of a file instead of replacing it?","o":[">>",">","|","<"],"h":"nqXKyHP4peLlqOt1","topic":"redirecting output"},{"id":"lx-sudo","t":"mc","q":"On Ubuntu, which command runs ONE command as the administrator (root)?","o":["sudo","su -c","admin","runas"],"h":"D50aPZ1eNMvwDPlD","topic":"sudo"},{"id":"lx-hidden","t":"mc","q":"What does ls -a show that plain ls hides?","o":["Files whose names start with a dot","Files owned by root","Deleted files","Files bigger than 1 MB"],"h":"xr3jaiREbrTcJP69","topic":"hidden files"},{"id":"lx-pipe","t":"mc","q":"What does the pipe | do in  sort groceries.txt | uniq ?","o":["Sends the output of sort into uniq","Runs both commands at the same time on different files","Saves the output to a file named uniq","Runs uniq only if sort fails"],"h":"BllyD2cue9aMWJTF","topic":"pipes"},{"id":"lx-abs","t":"mc","q":"Which of these is an ABSOLUTE path?","o":["/home/student/Documents","Documents/poem.txt","../Documents","./poem.txt"],"h":"preFFoRNJwzMIrEn","topic":"paths"}],"mac":[{"id":"mc-count","t":"cmd","q":"Print ONLY the number of lines in Documents/todo.txt.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["2V6NFmHni37TLm9O","7oVoRQOKnkwkIBw-"]],"topic":"counting with wc"},{"id":"mc-sortr","t":"cmd","q":"Show groceries.txt sorted in REVERSE (Z→A) order.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["6ZdkE2C2XM-W_WTX","TgUvZjCXEDqSuLa0"]],"topic":"sort"},{"id":"mc-grepc","t":"cmd","q":"Print how many lines of groceries.txt contain \"coffee\" (just the number).","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["xv5FVNlSocXpEXMK","Pcx494BRcxxl7M5B"]],"topic":"grep -c"},{"id":"mc-last","t":"cmd","q":"Print the LAST line of Documents/grades.csv.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["6t06lcYqBTjvISGa","V87bj-4qucAGV7QN"]],"topic":"tail"},{"id":"mc-uniq","t":"cmd","q":"Show each item in groceries.txt once, sorted A→Z.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["tNVNwrxttfrT6nBA","FydmybDZWgG4weT-"]],"topic":"sort and uniq"},{"id":"mc-zsh","t":"mc","q":"Which shell does macOS use by default today?","o":["zsh","bash","PowerShell","cmd"],"h":"_0TURHCuti79IsnE","topic":"zsh"},{"id":"mc-home","t":"mc","q":"On a Mac, home folders live under…","o":["/Users","/home","C:\\Users","/export/home"],"h":"BQLgchCjjTzGw0Qd","topic":"paths"},{"id":"mc-brew","t":"mc","q":"How do you install the tool \"tree\" with Homebrew?","o":["brew install tree","apt install tree","pkg install tree","winget install tree"],"h":"AMeXuGKL_0JLaes0","topic":"Homebrew"},{"id":"mc-unix","t":"mc","q":"What is underneath macOS?","o":["A certified UNIX based on BSD","Linux","MS-DOS","Windows NT"],"h":"MWvIZ4ytd37mXzvk","topic":"history"},{"id":"mc-pb","t":"mc","q":"Which command copies text from the terminal to the Mac clipboard?","o":["pbcopy","clip","copy","xclip"],"h":"jBVuWzYFC0zmmSKl","topic":"macOS tools"},{"id":"mc-open","t":"mc","q":"What does  open .  do on a Mac?","o":["Opens the current folder in Finder","Opens every file in the folder","Unlocks the folder","Starts a new terminal"],"h":"4prHwvcf97_KFFTU","topic":"macOS tools"}],"cmd":[{"id":"cm-type","t":"cmd","q":"Print the contents of the file poem.txt in the Documents folder.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["u4ZX5916bI0mA2Xv","uMDhsjBzEVMkrzGy"]],"topic":"type"},{"id":"cm-sort","t":"cmd","q":"Show groceries.txt sorted A→Z.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["7oULhFwg1I1gca30","4hfNxRXmU0tjPqHb"]],"topic":"sort"},{"id":"cm-find","t":"cmd","q":"Show every line of groceries.txt that contains \"apple\".","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["tc9zYajOGFiC2h3l","H2YvE4nL8MgBFViN"],["40VaF1SYosY6Jvud","SLhTWfy2rfLfe_q3"]],"topic":"find and findstr"},{"id":"cm-findc","t":"cmd","q":"Count how many lines of groceries.txt contain \"coffee\" using find.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["zWNB90ByBUsShDGJ","TlbO_KtA-tCQxQQ_"]],"topic":"find /c"},{"id":"cm-save","t":"cmd","q":"Save groceries.txt, sorted, into a new file sorted.txt.","shell":"cmd","setup":[],"probe":["type sorted.txt"],"input":[],"h":[["S-WTlOH3ZCJpcKls","iY-tNgbzG40PYM4i"]],"topic":"redirecting output"},{"id":"cm-md","t":"cmd","q":"Create a folder named Week1 inside the Documents folder.","shell":"cmd","setup":[],"probe":["dir /b /ad Documents"],"input":[],"h":[["0pVEF-5_cbfDZuCk","nHaYCds4klpIIrQ2"]],"topic":"mkdir"},{"id":"cm-switch","t":"mc","q":"How do Windows command options usually start?","o":["With a slash, like /a","With a dash, like -a","With a plus, like +a","With a dollar sign, like $a"],"h":"d18uR3LywHHia2DQ","topic":"switches"},{"id":"cm-drive","t":"mc","q":"You are in C:\\Users\\student. How do you switch to the D: drive?","o":["Type D:","cd D","cd /D","drive D"],"h":"c0h_iCbIPfQV3h8r","topic":"drives"},{"id":"cm-ip","t":"mc","q":"Which command shows your IP address on Windows?","o":["ipconfig","ifconfig","ip addr","whoami"],"h":"wN3j491J_k1pL-G4","topic":"networking"},{"id":"cm-bat","t":"mc","q":"What file extension does a Windows batch file have?","o":[".bat",".sh",".ps1",".exe"],"h":"IDY6x9LN_33RB-rL","topic":"batch files"},{"id":"cm-kill","t":"mc","q":"Which pair lists running programs and then stops one?","o":["tasklist and taskkill","ps and kill","top and stop","dir and del"],"h":"a_xDK-3CILvNE5NM","topic":"processes"},{"id":"cm-var","t":"mc","q":"How does cmd read the variable USERNAME?","o":["%USERNAME%","$USERNAME","$env:USERNAME","{USERNAME}"],"h":"H2iXhtDJ20sekVT9","topic":"variables"}],"ps":[{"id":"ps-head","t":"cmd","q":"Show only the first 3 lines of groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["fhnC3KLEMK-chu-F","ajEb_O4FseKpn5z7"]],"topic":"Get-Content"},{"id":"ps-uniq","t":"cmd","q":"Show the lines of groceries.txt sorted, with duplicates removed.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["6hKHoinDj_Jid87o","txAcpTtz6lAU9LLp"]],"topic":"Sort-Object"},{"id":"ps-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["54tHJ-7oynyruxIZ","t-R48fu5hmOoMpQ5"]],"topic":"counting"},{"id":"ps-tail","t":"cmd","q":"Show the last 2 lines of groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["o1xMtYO6kE-leU7Z","GGUXmuDBK66zDcUe"]],"topic":"Get-Content"},{"id":"ps-match","t":"cmd","q":"Show only the lines of groceries.txt that contain \"apple\" (just the lines, as plain text).","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["_K73jzgmYEzjt9p5","hVwqR-lCocHcuD4H"]],"topic":"Where-Object"},{"id":"ps-new","t":"cmd","q":"Create a new folder called Lab1 in your home folder.","shell":"powershell","setup":[],"probe":["Test-Path Lab1"],"input":[],"h":[["CaGUsClT2yC4bNsW","_AxS4Koi_5zdD5lT"]],"topic":"New-Item"},{"id":"ps-verb","t":"mc","q":"PowerShell command names follow which pattern?","o":["Verb-Noun, like Get-Process","noun.verb, like process.get","Single letters, like p","ALL CAPS, like GETPROCESS"],"h":"3zhgaBe0-PyS6O9U","topic":"cmdlets"},{"id":"ps-eq","t":"mc","q":"How do you write \"is equal to\" in a PowerShell comparison?","o":["-eq","==","=","equals"],"h":"0u2V6Ifz8nfY4f6b","topic":"operators"},{"id":"ps-dollar","t":"mc","q":"Inside  Where-Object { ... }, what is $_ ?","o":["The current object coming down the pipeline","The last error","The home folder","A blank variable"],"h":"wAFlE9-87QOSZSN8","topic":"pipeline"},{"id":"ps-run","t":"mc","q":"How do you run the script sysinfo.ps1 that is in the current folder?","o":[".\\sysinfo.ps1","sysinfo.ps1","run sysinfo","bash sysinfo.ps1"],"h":"qyGuJS7mhB7KrIav","topic":"scripts"},{"id":"ps-obj","t":"mc","q":"What makes PowerShell different from bash and cmd?","o":["The pipeline passes objects, not plain text","It only runs on Linux","It has no variables","It cannot read files"],"h":"oDcfs1WkqNAmbxTW","topic":"objects"},{"id":"ps-help","t":"mc","q":"Which cmdlet shows the help for Get-ChildItem?","o":["Get-Help Get-ChildItem","man --ps Get-ChildItem","help.exe Get-ChildItem","Show-Info Get-ChildItem"],"h":"C4hLREr4i351uaKI","topic":"help"}],"git":[{"id":"gt-branches","t":"cmd","q":"Inside ~/projects/hello-web, list all the branches.","shell":"gitbash","setup":["cd ~/projects/hello-web"],"probe":[],"input":[],"h":[["-ay-LgXdhhpoL3nB","Eqwpvei6nZEU21NC"]],"topic":"branches"},{"id":"gt-new","t":"cmd","q":"Inside ~/projects/hello-web, create AND switch to a new branch called test-me.","shell":"gitbash","setup":["cd ~/projects/hello-web"],"probe":["git status"],"input":[],"h":[["wG4BEqJoiz3R72_Z","5MWiyZNmMwddq2MM"]],"topic":"branches"},{"id":"gt-grep","t":"cmd","q":"Git Bash speaks Linux: show the lines of groceries.txt that contain \"an\".","shell":"gitbash","setup":[],"probe":[],"input":[],"h":[["kQcNl3iLd04aPApg","Is5XJd0SUbBqti_e"]],"topic":"bash on Windows"},{"id":"gt-sort","t":"cmd","q":"Show groceries.txt sorted with duplicates removed (the Linux way).","shell":"gitbash","setup":[],"probe":[],"input":[],"h":[["kM-YDY5jGzeYHDeQ","_WXpzUoD56nyu92z"]],"topic":"bash on Windows"},{"id":"gt-add","t":"mc","q":"You changed index.html. What must you do BEFORE git commit?","o":["git add index.html","git push","git clone","git merge"],"h":"f0Bhv2hN5tyxIEXm","topic":"staging"},{"id":"gt-commit","t":"mc","q":"What is a commit?","o":["A saved snapshot of your project with a message","A copy of the project on GitHub","A new empty branch","A deleted file"],"h":"BFyMPpgb-VNnz_u5","topic":"commits"},{"id":"gt-branch","t":"mc","q":"Why make a branch?","o":["To work on a change without disturbing main","To delete old commits","To speed up the computer","To rename the repository"],"h":"KPMYzuHFFZ40grjo","topic":"branches"},{"id":"gt-conflict","t":"mc","q":"git merge reports a CONFLICT. What do you do?","o":["Edit the file, remove the <<<<<<< markers, then git add and git commit","Delete the repository","Run git clone again","Nothing: it fixes itself"],"h":"tZNTjqzMGi8kyjWP","topic":"merging"},{"id":"gt-push","t":"mc","q":"What does git push do?","o":["Sends your commits to the remote (like GitHub)","Downloads other people's commits","Deletes the branch","Undoes the last commit"],"h":"7f3hkCzKGFqWZmKy","topic":"remotes"},{"id":"gt-clone","t":"mc","q":"Which command copies a whole repository from GitHub to your computer?","o":["git clone URL","git copy URL","git pull URL","git init URL"],"h":"qk9Vp3yIIQTXPC6u","topic":"remotes"},{"id":"gt-gitbash","t":"mc","q":"Git Bash runs on which operating system?","o":["Windows","macOS only","Solaris","MS-DOS"],"h":"xrnDDkqb0V0SGq9z","topic":"Git Bash"}],"freebsd":[{"id":"bs-tail","t":"cmd","q":"Print the last 3 lines of Documents/grades.csv.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["ITMvZ2roWjyMgEay","1UhZNx2cYpfYKa-T"]],"topic":"tail"},{"id":"bs-count","t":"cmd","q":"Print ONLY the number of unique items in groceries.txt.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["QjBEmmWXAagKxE8H","KEg8kicsduEwxnQJ"]],"topic":"pipelines"},{"id":"bs-yes","t":"cmd","q":"Show the lines of /etc/rc.conf that turn something on (they contain YES).","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["MkOJz5RiLVDtBhOw","ijYGFFjpwBrGf8Kx"]],"topic":"rc.conf"},{"id":"bs-ncpu","t":"cmd","q":"Ask the kernel how many CPUs it has. Print ONLY the number (sysctl hw.ncpu).","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["H2GE-96ld0tUXjFL","XWqqiZ5XK3hYHJT2"]],"topic":"sysctl"},{"id":"bs-cut","t":"cmd","q":"Print only the second column (period) of Documents/grades.csv.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["dxrlv0JDwbglT-6N","dtIAxGF20MjZAdYD"]],"topic":"cut"},{"id":"bs-root","t":"mc","q":"FreeBSD has no sudo out of the box. How do you become root?","o":["su","pfexec","runas","admin"],"h":"Xq0UJ1Hx7cz9XA-C","topic":"root"},{"id":"bs-ports","t":"mc","q":"What is the FreeBSD Ports Collection?","o":["Recipes that build programs from source code","A list of network ports","A USB driver","A backup tool"],"h":"YKN_yPlkLA6hyNeQ","topic":"ports"},{"id":"bs-rc","t":"mc","q":"Which file decides which services start when FreeBSD boots?","o":["/etc/rc.conf","/etc/passwd","/boot/kernel","C:\\AUTOEXEC.BAT"],"h":"RFvacnLuiFsvr5fp","topic":"rc.conf"},{"id":"bs-jail","t":"mc","q":"A FreeBSD jail is…","o":["An isolated mini-system with its own files and IP address","A locked user account","A firewall rule","A deleted file"],"h":"0v9y7CAXWQay1Dk8","topic":"jails"},{"id":"bs-ps","t":"mc","q":"Which ps command works on BSD?","o":["ps aux","ps -ef","Get-Process","tasklist"],"h":"2tpSen6QGJeAkbw9","topic":"processes"},{"id":"bs-berkeley","t":"mc","q":"Where does the \"B\" in BSD come from?","o":["Berkeley — the University of California","Bell Labs","Boston","Binary"],"h":"TGSTSB13GEBFa7pU","topic":"history"}],"solaris":[{"id":"so-arch","t":"cmd","q":"Print just the processor type of this machine (uname -p).","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["kghzjVb2RqPybNRr","FYT4qi0e0xJjvS2r"]],"topic":"SPARC"},{"id":"so-head","t":"cmd","q":"Print the first 4 lines of groceries.txt.","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["kt7686-2kX-q8dO3","WxEh1LVSCp_S5_TO"]],"topic":"head"},{"id":"so-grep","t":"cmd","q":"Show the lines of Documents/grades.csv for students in period 3 (lines containing \",3,\").","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["WvcZur0nZ5Utf8lc","rU1Szt8-WZWdATj3"]],"topic":"grep"},{"id":"so-zpool","t":"cmd","q":"Create a mirrored ZFS pool named tank from the lab disks c2t0d0 and c2t1d0 (you will need pfexec).","shell":"solaris","setup":[],"probe":["zpool status tank"],"input":[],"h":[["S-ZYMVW2zXS3pbZV","prwhjSZHlecgCLps"],["3RBOpmK7w8RkJ9aB","7Nt4TR_9TWVTZiIo"]],"topic":"ZFS"},{"id":"so-sort","t":"cmd","q":"Show the unique items of groceries.txt in A→Z order.","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["609ETNXT-x0gbwPR","YNSP4-g-RluqbSZc"]],"topic":"sort"},{"id":"so-smf","t":"mc","q":"Which command explains every Solaris service that is broken and where its log is?","o":["svcs -x","systemctl --failed","Get-Service","service -e"],"h":"fLjKdXEsbiET4m7k","topic":"SMF"},{"id":"so-clear","t":"mc","q":"You fixed cups's config file. Which command takes it out of the maintenance state?","o":["pfexec svcadm clear cups","svcs -a","kill cups","zfs rollback cups"],"h":"5s1xFuWbo-AmjSE9","topic":"SMF"},{"id":"so-logs","t":"mc","q":"Where is the main Solaris system log?","o":["/var/adm/messages","/var/log/syslog","C:\\Windows\\Logs","/etc/release"],"h":"0iQMfQKW5_YmY36Y","topic":"logs"},{"id":"so-zone","t":"mc","q":"What is a Solaris zone?","o":["A separate Solaris system sharing one kernel (like a container)","A time zone setting","A disk partition","A network cable"],"h":"9lMCUCIyutThIwW9","topic":"zones"},{"id":"so-snap","t":"mc","q":"What does  zfs rollback pool/home@safe  do?","o":["Returns the files to how they were when the snapshot \"safe\" was taken","Deletes the snapshot","Makes a new snapshot","Backs up to tape"],"h":"vNuv6tK-TakdMMhw","topic":"ZFS"},{"id":"so-pfexec","t":"mc","q":"On Solaris, pfexec plays the role that ___ plays on Ubuntu.","o":["sudo","apt","grep","chmod"],"h":"EJbBxpzO6gfb6b9A","topic":"privileges"},{"id":"so-sparc","t":"mc","q":"SPARC is…","o":["Sun's own processor family, different from Intel/AMD","A file system","A shell","A web browser"],"h":"Dtzt-TYiW9qsRdyh","topic":"SPARC"}],"unix":[{"id":"ux-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["M6wNoI5ez5pJOrZK","GU01jbjlE-rmKmW3"]],"topic":"wc"},{"id":"ux-head","t":"cmd","q":"V7 has no head command. Print the first 3 lines of groceries.txt anyway.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["tbfj24QRlY3ATKPP","yB_MX9FlrrVqgGu0"]],"topic":"working without head"},{"id":"ux-uniq","t":"cmd","q":"Show each item of groceries.txt once, in A→Z order.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["S5bLeRXBO7MGr8ED","Wx_jqftdnUxvt6Il"]],"topic":"pipes"},{"id":"ux-grep","t":"cmd","q":"Show the lines of groceries.txt that contain \"ee\".","shell":"unix","setup":[],"probe":[],"input":[],"h":[["P0jjDGfE6Hh_6MqE","j-v8nULvQbHfRv9o"]],"topic":"grep"},{"id":"ux-tail","t":"cmd","q":"Print the last 2 lines of Documents/poem.txt.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["OxXj1xLnJ3y8GlAT","JarNhuD3sHAGYyDX"]],"topic":"tail"},{"id":"ux-chmod","t":"cmd","q":"Make groceries.txt readable and writable ONLY by you.","shell":"unix","setup":[],"probe":["ls -l groceries.txt"],"input":[],"h":[["aboy8xQOt10ZXUD1","P1CzfPCA5Xc0jFv1"]],"topic":"permissions"},{"id":"ux-who","t":"mc","q":"Who created UNIX at Bell Labs in 1969?","o":["Ken Thompson and Dennis Ritchie","Bill Gates and Paul Allen","Linus Torvalds","Steve Jobs and Steve Wozniak"],"h":"Y4TI8ZWyBRtXfBbA","topic":"history"},{"id":"ux-ed","t":"mc","q":"What kind of editor is ed?","o":["A line editor: no screen, you type commands","A full-screen editor with menus","A graphical editor","A spreadsheet"],"h":"V_tVNtE5UBf_dRq4","topic":"ed"},{"id":"ux-bq","t":"mc","q":"In 1979, how did you put the output of date inside another command?","o":["`date` (backquotes)","$(date)","%date%","{date}"],"h":"tWLxPapdpFzsHHAC","topic":"command substitution"},{"id":"ux-home","t":"mc","q":"Why does  cd ~  fail on V7?","o":["~ for home came later, from the C shell at Berkeley","There are no home folders","cd did not exist","The ~ key was broken"],"h":"gd_HSb4BpNghEEBB","topic":"history"},{"id":"ux-pipe","t":"mc","q":"Which idea, added to UNIX in 1973, lets small programs work together?","o":["The pipe |","The mouse","Tabs","Windows"],"h":"Yg51ElPDEHbR6557","topic":"pipes"},{"id":"ux-tty","t":"mc","q":"Why are UNIX command names so short (ls, cp, mv)?","o":["People typed on slow, noisy printing terminals","Long names were illegal","To save disk space on the files","Ken Thompson disliked vowels"],"h":"ltdqWcfGEwybKhEv","topic":"history"},{"id":"ux-c","t":"mc","q":"UNIX was rewritten in 1973 in a new language invented for it. Which?","o":["C","Python","Java","BASIC"],"h":"d2DXrjzyItQ4C11S","topic":"history"}],"dos":[{"id":"ds-type","t":"cmd","q":"Print the contents of POEM.TXT.","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["rRWk92O7oaa7J_hM","M9pW1sa9tlqF9YxQ"]],"topic":"TYPE"},{"id":"ds-sort","t":"cmd","q":"Show GROCERY.TXT sorted A→Z.","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["fvSk9etzw5mvnc2B","YOnaak2OxvrIFipp"]],"topic":"SORT"},{"id":"ds-find","t":"cmd","q":"Show the lines of GROCERY.TXT that contain \"apple\".","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["DDaPqc3wOPccRyR7","oATM8n9H8B-lSRjq"],["vzXDYw4jXG8HnrYQ","OVWWYdsi5bh71-lr"]],"topic":"FIND"},{"id":"ds-findc","t":"cmd","q":"Count the lines of GROCERY.TXT that contain \"coffee\".","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["O1ErZntnctGyPWm4","3B-AoJu_Y5txHQJN"]],"topic":"FIND /C"},{"id":"ds-save","t":"cmd","q":"Save GROCERY.TXT sorted Z→A into a new file called ZTOA.TXT.","shell":"dos","setup":["CD STUDENT"],"probe":["TYPE ZTOA.TXT"],"input":[],"h":[["qAFBoEnykgHnZU2q","fhszW1xODmcgei0_"]],"topic":"redirection"},{"id":"ds-md","t":"cmd","q":"Make a directory called HOMEWORK.","shell":"dos","setup":["CD STUDENT"],"probe":["DIR /B /AD"],"input":[],"h":[["yzhv0UB43_J36U4H","LPTQTnNXcI12Zokv"]],"topic":"MD"},{"id":"ds-83","t":"mc","q":"MS-DOS file names follow the \"8.3\" rule. What does it mean?","o":["Up to 8 letters, a dot, and a 3-letter extension","8 files per folder, 3 folders deep","Version 8.3 of DOS","8 KB files, 3 MB disks"],"h":"M5tppTuz9VahMqjZ","topic":"8.3 names"},{"id":"ds-bad","t":"mc","q":"DOS says \"Bad command or file name\". What does it mean?","o":["It found no program by that name in the current folder or on the PATH","The file is damaged","You are not allowed to run it","The disk is full"],"h":"6IK6MQ94ySZDCh6z","topic":"PATH"},{"id":"ds-autoexec","t":"mc","q":"What is AUTOEXEC.BAT?","o":["A batch file that runs every time the PC starts","The DOS kernel","A virus","A game"],"h":"qo698LUV-LY0V7XE","topic":"AUTOEXEC.BAT"},{"id":"ds-doskey","t":"mc","q":"In DOS, the up-arrow key does nothing until you load…","o":["DOSKEY","HIMEM","EDIT","MEM"],"h":"2mMqo9AqO54pSPvx","topic":"DOSKEY"},{"id":"ds-640","t":"mc","q":"How much \"conventional memory\" did DOS programs have to fit in?","o":["640 KB","640 MB","64 GB","6.4 KB"],"h":"CRNZf7BOsHL7Pue4","topic":"memory"},{"id":"ds-heir","t":"mc","q":"Which modern Windows program is DOS's descendant?","o":["cmd.exe (Command Prompt)","Git Bash","Linux","zsh"],"h":"MGj_LKDddsUWgtpm","topic":"history"},{"id":"ds-and","t":"mc","q":"How do you run two commands on one line in MS-DOS?","o":["You can't — one command per line (use a .BAT file)","A && B","A ; B","A & B"],"h":"eCHbp43WWfI3Y0LA","topic":"batch files"}],"automation":[{"id":"au-report","t":"cmd","q":"From ~/automation, run grade_report.py on data/grades.csv.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["sYK6fhF8nqFOu4nW","zkPWFGZ9-6Cb08UO"]],"topic":"running a script on a CSV"},{"id":"au-curve","t":"cmd","q":"Run grade_report.py on data/grades.csv with a 3-point curve.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["pES-UcmeIyUblWns","irchpLIrYq4B-3vo"]],"topic":"arguments"},{"id":"au-weather","t":"cmd","q":"Run weather_stats.py on data/weather.csv for Cumming only.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["ctn8nF6rs8dYunoo","LQ5xhKLQ2mRcKGek"]],"topic":"arguments"},{"id":"au-inv","t":"cmd","q":"Check which school-store items need reordering (inventory_check.py on data/inventory.csv).","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["ZF9RXy_bCNrfRT23","tfV1386kIxxWDTnP"]],"topic":"running a script on a CSV"},{"id":"au-save","t":"cmd","q":"Run sales_total.py on data/sales.csv and save what it prints into totals.txt (nothing on screen).","shell":"bash","setup":["cd ~/automation"],"probe":["cat totals.txt"],"input":[],"h":[["Dt05cOQJIfsVj1AL","muxPaUB08-Kcrj-C"]],"topic":"saving output"},{"id":"au-attend","t":"cmd","q":"Summarize data/attendance.csv with attendance_summary.py.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["jdHfqm_E3GtQgqCX","DKkh6_tTBTBc_Qg2"]],"topic":"running a script on a CSV"},{"id":"au-arg","t":"mc","q":"In  python3 hello.py Ada , what is \"Ada\"?","o":["An argument passed to the script","The name of the script","A Python module","An error"],"h":"cdw_w5OZ7W_oUWpb","topic":"arguments"},{"id":"au-exit","t":"mc","q":"A script ran successfully. What exit code did it return?","o":["0","1","-1","200"],"h":"bHkvlOoYfXoLqkTq","topic":"exit codes"},{"id":"au-and","t":"mc","q":"What does  python3 check.py data.csv && cat report.txt  do?","o":["Prints report.txt only if check.py succeeded","Runs both at the same time","Saves check.py into report.txt","Always prints report.txt"],"h":"hiX4hvbv6NCAbfDh","topic":"exit codes"},{"id":"au-append","t":"mc","q":"You want to ADD a row to data/inventory.csv. Which is safe?","o":["echo \"erasers,supplies,2,10,0.50\" >> data/inventory.csv","echo \"erasers,supplies,2,10,0.50\" > data/inventory.csv","rm data/inventory.csv","cat data/inventory.csv > erasers"],"h":"Z2abofg5oAEjGTD2","topic":"redirecting output"},{"id":"au-csv","t":"mc","q":"What is a CSV file?","o":["A table saved as plain text, with commas between columns","A compressed folder","A Python program","A picture"],"h":"jdU4UcsAq7o-Na8L","topic":"CSV"},{"id":"au-cron","t":"mc","q":"Which UNIX tool runs a script automatically every morning?","o":["cron","grep","chmod","ssh"],"h":"dpn3kNDl__xboUV3","topic":"scheduling"},{"id":"au-read","t":"mc","q":"Before running a script someone sent you, you should…","o":["Read it first (cat script.py)","Run it as root right away","Delete it","Rename it"],"h":"zefaeHXQSZG0qPwA","topic":"safety"}],"raid":[{"id":"rd-md","t":"cmd","q":"Create a RAID 1 mirror called /dev/md0 from the lab disks /dev/sdc and /dev/sdd.","shell":"bash","setup":[],"probe":["grep -c raid1 /proc/mdstat"],"input":["student","y"],"h":[["-dNTyItHF79SmmEr","tfiWzT3Z43vDJsyQ"],["JyztuUdZKPW-NChH","2OreD9jBzb89tlJ8"]],"topic":"mdadm"},{"id":"rd-ps","t":"cmd","q":"Bring Disk 3 online.","shell":"powershell","setup":[],"probe":["(Get-Disk -Number 3).OperationalStatus"],"input":[],"h":[["DO6vRXaWilZvlXpm","xwTagZdn7QoWa8bs"]],"topic":"Set-Disk"},{"id":"rd-zfs","t":"cmd","q":"Create a ZFS mirror pool called safe from c2t0d0 and c2t1d0.","shell":"solaris","setup":[],"probe":["zpool list"],"input":[],"h":[["OV7DA_4Nme2N9hoU","VVBx6I2wKhdD1sUu"],["cFO0xPthIQyuIQW1","qUXHH-jC2DfNs1Ji"]],"topic":"ZFS mirrors"},{"id":"rd-ro","t":"cmd","q":"Make Disk 4 read-only.","shell":"powershell","setup":[],"probe":["(Get-Disk -Number 4).IsReadOnly"],"input":[],"h":[["uD_HmpTRHkyaLpLa","uvBb7CR2fFE1VGFI"]],"topic":"Set-Disk"},{"id":"rd-1","t":"mc","q":"Two 1 TB disks in RAID 1 (mirror) give you how much space?","o":["1 TB","2 TB","500 GB","4 TB"],"h":"5HzxYBGirf2kUsXA","topic":"RAID levels"},{"id":"rd-0","t":"mc","q":"Two 1 TB disks in RAID 0 (stripe): one disk dies. What happens?","o":["Everything on the array is lost","Nothing: the other disk has a copy","Half the files are lost","It slows down a little"],"h":"Iny6CFv3DeViDzEd","topic":"RAID levels"},{"id":"rd-5","t":"mc","q":"What is the smallest number of disks for RAID 5?","o":["3","2","1","5"],"h":"qkPimwaRPTVkvKuR","topic":"RAID levels"},{"id":"rd-deg","t":"mc","q":"/proc/mdstat shows [2/1] [_U]. What does it mean?","o":["The mirror is degraded: one disk is missing or failed","The array is perfect","The array is 50% full","It is RAID 0"],"h":"ASvK1_F9zHo91u48","topic":"monitoring"},{"id":"rd-backup","t":"mc","q":"Why is RAID NOT a backup?","o":["Deleting a file deletes it on every disk at once","RAID disks are slower","RAID cannot store photos","RAID only works on Windows"],"h":"mLxgMLK-Tr1p13pb","topic":"backups"},{"id":"rd-mkfs","t":"mc","q":"You built /dev/md0. What must you do before saving files on it?","o":["Make a file system (mkfs) and mount it","Reboot","Run apt update","Nothing"],"h":"SN6MyMvXCi0zuXZw","topic":"file systems"},{"id":"rd-pool","t":"mc","q":"In Windows Storage Spaces, which resiliency is like RAID 1?","o":["Mirror","Simple","Parity","Primordial"],"h":"xSvVWRCveGEfpF5S","topic":"Storage Spaces"}],"history":[{"id":"hi-unix","t":"mc","q":"Where and when was UNIX created?","o":["Bell Labs, 1969","Microsoft, 1981","Berkeley, 1991","Finland, 1991"],"h":"ih8j2W5-XJQo-u1Z","topic":"UNIX"},{"id":"hi-linux","t":"mc","q":"Who wrote the first Linux kernel, as a student, in 1991?","o":["Linus Torvalds","Dennis Ritchie","Bill Gates","Richard Stallman"],"h":"Snxx0UekDVY_Wrd-","topic":"Linux"},{"id":"hi-gnu","t":"mc","q":"Linux is a kernel. Most of the classic tools around it (bash, gcc, coreutils) came from which project?","o":["GNU","BSD","Windows","Solaris"],"h":"EELE1_bYYAfOJKAB","topic":"Linux"},{"id":"hi-mac","t":"mc","q":"macOS descends mostly from…","o":["BSD UNIX (via NeXTSTEP and FreeBSD)","MS-DOS","Linux","Solaris"],"h":"j7aCS1Hs9CMYYLyE","topic":"BSD"},{"id":"hi-dos","t":"mc","q":"MS-DOS was based on an earlier system that gave it drive letters and DIR. Which?","o":["CP/M","UNIX","Multics","Solaris"],"h":"Q-2M19Bxc00Gta9i","topic":"DOS"},{"id":"hi-cmd","t":"mc","q":"Which shell is MS-DOS's direct descendant?","o":["cmd.exe","bash","ksh","zsh"],"h":"6K-9-GhSa22bPQHF","topic":"DOS"},{"id":"hi-ps","t":"mc","q":"PowerShell (2006) changed the command line by…","o":["Passing objects instead of text through the pipeline","Removing pipes","Using only a mouse","Running only on Linux"],"h":"5jK3HKfBo3dmEoXU","topic":"PowerShell"},{"id":"hi-pipe","t":"mc","q":"Which feature did MS-DOS 2.0 borrow from UNIX?","o":["Pipes | and redirects >","The / root folder","Users and passwords","Lowercase commands"],"h":"2d9W0-mDWAgwL1-N","topic":"DOS"},{"id":"hi-sysv","t":"mc","q":"Solaris belongs to which UNIX branch?","o":["System V (AT&T)","BSD only","Linux","DOS"],"h":"mT5k7r5nPZP70tGI","topic":"System V"},{"id":"hi-ksh","t":"mc","q":"Which shell introduced $( ) command substitution, later copied by bash and zsh?","o":["The Korn shell (ksh)","COMMAND.COM","The Bourne shell of V7","PowerShell"],"h":"7LcrIJP8gFkW8w16","topic":"shells"},{"id":"hi-posix","t":"mc","q":"What is POSIX?","o":["A standard so UNIX-like systems behave the same way","A kind of disk","A Windows command","A programming language"],"h":"s0Oh7hFnapzZTflv","topic":"standards"},{"id":"hi-wsl","t":"mc","q":"WSL (2016) lets Windows…","o":["Run real Linux programs","Run MS-DOS games","Run macOS","Run Solaris"],"h":"ZjhZEuWl9sRHlszH","topic":"today"},{"id":"hi-android","t":"mc","q":"Which of these runs the Linux kernel?","o":["Android phones","MS-DOS","Windows 95","The original Macintosh"],"h":"nBioudWASi8f_mHz","topic":"Linux"},{"id":"hi-slash","t":"mc","q":"Why does Windows use \\ in paths while UNIX uses / ?","o":["DOS already used / for options, so it picked \\ for folders","Bill Gates was left-handed","UNIX copied Windows","\\ is faster to type"],"h":"SGhuMdPfeAIt56vU","topic":"DOS"}]};
+  window.TX.TESTBANK = {"linux":[{"id":"lx-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt (just the number, no file name).","shell":"bash","setup":[],"probe":[],"input":[],"h":[["Uj122D2dsrtvsbwG","YrKbcBNOTPFblyrl"]],"topic":"counting with wc"},{"id":"lx-sortu","t":"cmd","q":"Show the items in groceries.txt in alphabetical order with duplicates removed.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["vLfdytytIiH6xogz","rhoeJoDM7jlGNGpD"]],"topic":"sort and uniq"},{"id":"lx-grep","t":"cmd","q":"Show every line of groceries.txt that contains the letters \"an\".","shell":"bash","setup":[],"probe":[],"input":[],"h":[["2hqGishUSEFMBSn_","zOoZ7AWnIUQrctb-"]],"topic":"grep"},{"id":"lx-head","t":"cmd","q":"Print the first 3 lines of Documents/poem.txt.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["qEoaIT0CV6V3gal3","9rx6o-1Kv3uJPMl-"]],"topic":"head"},{"id":"lx-tail","t":"cmd","q":"Print the last 2 lines of groceries.txt.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["4wfc0-WJoGBa8FrN","EAxHHuO-xKJ48bVF"]],"topic":"tail"},{"id":"lx-cut","t":"cmd","q":"Print only the first column (name) of every line of Documents/grades.csv, header included.","shell":"bash","setup":[],"probe":[],"input":[],"h":[["64h2J3rY4o9nfu24","SoMLSAWsWEke8nfY"]],"topic":"cut and CSV columns"},{"id":"lx-redirect","t":"cmd","q":"Save groceries.txt sorted Z→A into a new file called reversed.txt.","shell":"bash","setup":[],"probe":["cat reversed.txt"],"input":[],"h":[["4dGyCAymbEpl4pdE","e1ygOGhbOzbCTcrl"]],"topic":"redirecting output"},{"id":"lx-mkdir","t":"cmd","q":"Create the folder ~/lab/week1 (the lab folder does not exist yet) in ONE command.","shell":"bash","setup":[],"probe":["ls -d ~/lab/week1"],"input":[],"h":[["ytI9A9MgxMuWTkXP","wngIUfDYJNiUsQ0X"]],"topic":"mkdir -p"},{"id":"lx-pwd","t":"mc","q":"What does pwd print?","o":["The current directory","Your password","The printer queue","The previous command"],"h":"QZlPx555QPpNkc18","topic":"navigation"},{"id":"lx-append","t":"mc","q":"Which symbol ADDS a line to the end of a file instead of replacing it?","o":[">>",">","|","<"],"h":"nqXKyHP4peLlqOt1","topic":"redirecting output"},{"id":"lx-sudo","t":"mc","q":"On Ubuntu, which command runs ONE command as the administrator (root)?","o":["sudo","su -c","admin","runas"],"h":"D50aPZ1eNMvwDPlD","topic":"sudo"},{"id":"lx-hidden","t":"mc","q":"What does ls -a show that plain ls hides?","o":["Files whose names start with a dot","Files owned by root","Deleted files","Files bigger than 1 MB"],"h":"xr3jaiREbrTcJP69","topic":"hidden files"},{"id":"lx-pipe","t":"mc","q":"What does the pipe | do in  sort groceries.txt | uniq ?","o":["Sends the output of sort into uniq","Runs both commands at the same time on different files","Saves the output to a file named uniq","Runs uniq only if sort fails"],"h":"BllyD2cue9aMWJTF","topic":"pipes"},{"id":"lx-abs","t":"mc","q":"Which of these is an ABSOLUTE path?","o":["/home/student/Documents","Documents/poem.txt","../Documents","./poem.txt"],"h":"preFFoRNJwzMIrEn","topic":"paths"}],"mac":[{"id":"mc-count","t":"cmd","q":"Print ONLY the number of lines in Documents/todo.txt.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["2V6NFmHni37TLm9O","7oVoRQOKnkwkIBw-"]],"topic":"counting with wc"},{"id":"mc-sortr","t":"cmd","q":"Show groceries.txt sorted in REVERSE (Z→A) order.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["6ZdkE2C2XM-W_WTX","TgUvZjCXEDqSuLa0"]],"topic":"sort"},{"id":"mc-grepc","t":"cmd","q":"Print how many lines of groceries.txt contain \"coffee\" (just the number).","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["xv5FVNlSocXpEXMK","Pcx494BRcxxl7M5B"]],"topic":"grep -c"},{"id":"mc-last","t":"cmd","q":"Print the LAST line of Documents/grades.csv.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["6t06lcYqBTjvISGa","V87bj-4qucAGV7QN"]],"topic":"tail"},{"id":"mc-uniq","t":"cmd","q":"Show each item in groceries.txt once, sorted A→Z.","shell":"zsh","setup":[],"probe":[],"input":[],"h":[["tNVNwrxttfrT6nBA","FydmybDZWgG4weT-"]],"topic":"sort and uniq"},{"id":"mc-zsh","t":"mc","q":"Which shell does macOS use by default today?","o":["zsh","bash","PowerShell","cmd"],"h":"_0TURHCuti79IsnE","topic":"zsh"},{"id":"mc-home","t":"mc","q":"On a Mac, home folders live under…","o":["/Users","/home","C:\\Users","/export/home"],"h":"BQLgchCjjTzGw0Qd","topic":"paths"},{"id":"mc-brew","t":"mc","q":"How do you install the tool \"tree\" with Homebrew?","o":["brew install tree","apt install tree","pkg install tree","winget install tree"],"h":"AMeXuGKL_0JLaes0","topic":"Homebrew"},{"id":"mc-unix","t":"mc","q":"What is underneath macOS?","o":["A certified UNIX based on BSD","Linux","MS-DOS","Windows NT"],"h":"MWvIZ4ytd37mXzvk","topic":"history"},{"id":"mc-pb","t":"mc","q":"Which command copies text from the terminal to the Mac clipboard?","o":["pbcopy","clip","copy","xclip"],"h":"jBVuWzYFC0zmmSKl","topic":"macOS tools"},{"id":"mc-open","t":"mc","q":"What does  open .  do on a Mac?","o":["Opens the current folder in Finder","Opens every file in the folder","Unlocks the folder","Starts a new terminal"],"h":"4prHwvcf97_KFFTU","topic":"macOS tools"}],"cmd":[{"id":"cm-type","t":"cmd","q":"Print the contents of the file poem.txt in the Documents folder.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["u4ZX5916bI0mA2Xv","uMDhsjBzEVMkrzGy"]],"topic":"type"},{"id":"cm-sort","t":"cmd","q":"Show groceries.txt sorted A→Z.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["7oULhFwg1I1gca30","4hfNxRXmU0tjPqHb"]],"topic":"sort"},{"id":"cm-find","t":"cmd","q":"Show every line of groceries.txt that contains \"apple\".","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["tc9zYajOGFiC2h3l","H2YvE4nL8MgBFViN"],["40VaF1SYosY6Jvud","SLhTWfy2rfLfe_q3"]],"topic":"find and findstr"},{"id":"cm-findc","t":"cmd","q":"Count how many lines of groceries.txt contain \"coffee\" using find.","shell":"cmd","setup":[],"probe":[],"input":[],"h":[["zWNB90ByBUsShDGJ","TlbO_KtA-tCQxQQ_"]],"topic":"find /c"},{"id":"cm-save","t":"cmd","q":"Save groceries.txt, sorted, into a new file sorted.txt.","shell":"cmd","setup":[],"probe":["type sorted.txt"],"input":[],"h":[["S-WTlOH3ZCJpcKls","iY-tNgbzG40PYM4i"]],"topic":"redirecting output"},{"id":"cm-md","t":"cmd","q":"Create a folder named Week1 inside the Documents folder.","shell":"cmd","setup":[],"probe":["dir /b /ad Documents"],"input":[],"h":[["0pVEF-5_cbfDZuCk","nHaYCds4klpIIrQ2"]],"topic":"mkdir"},{"id":"cm-switch","t":"mc","q":"How do Windows command options usually start?","o":["With a slash, like /a","With a dash, like -a","With a plus, like +a","With a dollar sign, like $a"],"h":"d18uR3LywHHia2DQ","topic":"switches"},{"id":"cm-drive","t":"mc","q":"You are in C:\\Users\\student. How do you switch to the D: drive?","o":["Type D:","cd D","cd /D","drive D"],"h":"c0h_iCbIPfQV3h8r","topic":"drives"},{"id":"cm-ip","t":"mc","q":"Which command shows your IP address on Windows?","o":["ipconfig","ifconfig","ip addr","whoami"],"h":"wN3j491J_k1pL-G4","topic":"networking"},{"id":"cm-bat","t":"mc","q":"What file extension does a Windows batch file have?","o":[".bat",".sh",".ps1",".exe"],"h":"IDY6x9LN_33RB-rL","topic":"batch files"},{"id":"cm-kill","t":"mc","q":"Which pair lists running programs and then stops one?","o":["tasklist and taskkill","ps and kill","top and stop","dir and del"],"h":"a_xDK-3CILvNE5NM","topic":"processes"},{"id":"cm-var","t":"mc","q":"How does cmd read the variable USERNAME?","o":["%USERNAME%","$USERNAME","$env:USERNAME","{USERNAME}"],"h":"H2iXhtDJ20sekVT9","topic":"variables"}],"ps":[{"id":"ps-head","t":"cmd","q":"Show only the first 3 lines of groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["fhnC3KLEMK-chu-F","ajEb_O4FseKpn5z7"]],"topic":"Get-Content"},{"id":"ps-uniq","t":"cmd","q":"Show the lines of groceries.txt sorted, with duplicates removed.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["6hKHoinDj_Jid87o","txAcpTtz6lAU9LLp"]],"topic":"Sort-Object"},{"id":"ps-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["54tHJ-7oynyruxIZ","t-R48fu5hmOoMpQ5"]],"topic":"counting"},{"id":"ps-tail","t":"cmd","q":"Show the last 2 lines of groceries.txt.","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["o1xMtYO6kE-leU7Z","GGUXmuDBK66zDcUe"]],"topic":"Get-Content"},{"id":"ps-match","t":"cmd","q":"Show only the lines of groceries.txt that contain \"apple\" (just the lines, as plain text).","shell":"powershell","setup":[],"probe":[],"input":[],"h":[["_K73jzgmYEzjt9p5","hVwqR-lCocHcuD4H"]],"topic":"Where-Object"},{"id":"ps-new","t":"cmd","q":"Create a new folder called Lab1 in your home folder.","shell":"powershell","setup":[],"probe":["Test-Path Lab1"],"input":[],"h":[["wsWjSOS2O6mb95hZ","hGnpUym5zkT_2Zcv"]],"topic":"New-Item"},{"id":"ps-verb","t":"mc","q":"PowerShell command names follow which pattern?","o":["Verb-Noun, like Get-Process","noun.verb, like process.get","Single letters, like p","ALL CAPS, like GETPROCESS"],"h":"3zhgaBe0-PyS6O9U","topic":"cmdlets"},{"id":"ps-eq","t":"mc","q":"How do you write \"is equal to\" in a PowerShell comparison?","o":["-eq","==","=","equals"],"h":"0u2V6Ifz8nfY4f6b","topic":"operators"},{"id":"ps-dollar","t":"mc","q":"Inside  Where-Object { ... }, what is $_ ?","o":["The current object coming down the pipeline","The last error","The home folder","A blank variable"],"h":"wAFlE9-87QOSZSN8","topic":"pipeline"},{"id":"ps-run","t":"mc","q":"How do you run the script sysinfo.ps1 that is in the current folder?","o":[".\\sysinfo.ps1","sysinfo.ps1","run sysinfo","bash sysinfo.ps1"],"h":"qyGuJS7mhB7KrIav","topic":"scripts"},{"id":"ps-obj","t":"mc","q":"What makes PowerShell different from bash and cmd?","o":["The pipeline passes objects, not plain text","It only runs on Linux","It has no variables","It cannot read files"],"h":"oDcfs1WkqNAmbxTW","topic":"objects"},{"id":"ps-help","t":"mc","q":"Which cmdlet shows the help for Get-ChildItem?","o":["Get-Help Get-ChildItem","man --ps Get-ChildItem","help.exe Get-ChildItem","Show-Info Get-ChildItem"],"h":"C4hLREr4i351uaKI","topic":"help"}],"git":[{"id":"gt-branches","t":"cmd","q":"Inside ~/projects/hello-web, list all the branches.","shell":"gitbash","setup":["cd ~/projects/hello-web"],"probe":[],"input":[],"h":[["-ay-LgXdhhpoL3nB","Eqwpvei6nZEU21NC"]],"topic":"branches"},{"id":"gt-new","t":"cmd","q":"Inside ~/projects/hello-web, create AND switch to a new branch called test-me.","shell":"gitbash","setup":["cd ~/projects/hello-web"],"probe":["git status"],"input":[],"h":[["wG4BEqJoiz3R72_Z","5MWiyZNmMwddq2MM"]],"topic":"branches"},{"id":"gt-grep","t":"cmd","q":"Git Bash speaks Linux: show the lines of groceries.txt that contain \"an\".","shell":"gitbash","setup":[],"probe":[],"input":[],"h":[["kQcNl3iLd04aPApg","Is5XJd0SUbBqti_e"]],"topic":"bash on Windows"},{"id":"gt-sort","t":"cmd","q":"Show groceries.txt sorted with duplicates removed (the Linux way).","shell":"gitbash","setup":[],"probe":[],"input":[],"h":[["kM-YDY5jGzeYHDeQ","_WXpzUoD56nyu92z"]],"topic":"bash on Windows"},{"id":"gt-add","t":"mc","q":"You changed index.html. What must you do BEFORE git commit?","o":["git add index.html","git push","git clone","git merge"],"h":"f0Bhv2hN5tyxIEXm","topic":"staging"},{"id":"gt-commit","t":"mc","q":"What is a commit?","o":["A saved snapshot of your project with a message","A copy of the project on GitHub","A new empty branch","A deleted file"],"h":"BFyMPpgb-VNnz_u5","topic":"commits"},{"id":"gt-branch","t":"mc","q":"Why make a branch?","o":["To work on a change without disturbing main","To delete old commits","To speed up the computer","To rename the repository"],"h":"KPMYzuHFFZ40grjo","topic":"branches"},{"id":"gt-conflict","t":"mc","q":"git merge reports a CONFLICT. What do you do?","o":["Edit the file, remove the <<<<<<< markers, then git add and git commit","Delete the repository","Run git clone again","Nothing: it fixes itself"],"h":"tZNTjqzMGi8kyjWP","topic":"merging"},{"id":"gt-push","t":"mc","q":"What does git push do?","o":["Sends your commits to the remote (like GitHub)","Downloads other people's commits","Deletes the branch","Undoes the last commit"],"h":"7f3hkCzKGFqWZmKy","topic":"remotes"},{"id":"gt-clone","t":"mc","q":"Which command copies a whole repository from GitHub to your computer?","o":["git clone URL","git copy URL","git pull URL","git init URL"],"h":"qk9Vp3yIIQTXPC6u","topic":"remotes"},{"id":"gt-gitbash","t":"mc","q":"Git Bash runs on which operating system?","o":["Windows","macOS only","Solaris","MS-DOS"],"h":"xrnDDkqb0V0SGq9z","topic":"Git Bash"}],"freebsd":[{"id":"bs-tail","t":"cmd","q":"Print the last 3 lines of Documents/grades.csv.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["ITMvZ2roWjyMgEay","1UhZNx2cYpfYKa-T"]],"topic":"tail"},{"id":"bs-count","t":"cmd","q":"Print ONLY the number of unique items in groceries.txt.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["QjBEmmWXAagKxE8H","KEg8kicsduEwxnQJ"]],"topic":"pipelines"},{"id":"bs-yes","t":"cmd","q":"Show the lines of /etc/rc.conf that turn something on (they contain YES).","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["MkOJz5RiLVDtBhOw","ijYGFFjpwBrGf8Kx"]],"topic":"rc.conf"},{"id":"bs-ncpu","t":"cmd","q":"Ask the kernel how many CPUs it has. Print ONLY the number (sysctl hw.ncpu).","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["H2GE-96ld0tUXjFL","XWqqiZ5XK3hYHJT2"]],"topic":"sysctl"},{"id":"bs-cut","t":"cmd","q":"Print only the second column (period) of Documents/grades.csv.","shell":"freebsd","setup":[],"probe":[],"input":[],"h":[["dxrlv0JDwbglT-6N","dtIAxGF20MjZAdYD"]],"topic":"cut"},{"id":"bs-root","t":"mc","q":"FreeBSD has no sudo out of the box. How do you become root?","o":["su","pfexec","runas","admin"],"h":"Xq0UJ1Hx7cz9XA-C","topic":"root"},{"id":"bs-ports","t":"mc","q":"What is the FreeBSD Ports Collection?","o":["Recipes that build programs from source code","A list of network ports","A USB driver","A backup tool"],"h":"YKN_yPlkLA6hyNeQ","topic":"ports"},{"id":"bs-rc","t":"mc","q":"Which file decides which services start when FreeBSD boots?","o":["/etc/rc.conf","/etc/passwd","/boot/kernel","C:\\AUTOEXEC.BAT"],"h":"RFvacnLuiFsvr5fp","topic":"rc.conf"},{"id":"bs-jail","t":"mc","q":"A FreeBSD jail is…","o":["An isolated mini-system with its own files and IP address","A locked user account","A firewall rule","A deleted file"],"h":"0v9y7CAXWQay1Dk8","topic":"jails"},{"id":"bs-ps","t":"mc","q":"Which ps command works on BSD?","o":["ps aux","ps -ef","Get-Process","tasklist"],"h":"2tpSen6QGJeAkbw9","topic":"processes"},{"id":"bs-berkeley","t":"mc","q":"Where does the \"B\" in BSD come from?","o":["Berkeley — the University of California","Bell Labs","Boston","Binary"],"h":"TGSTSB13GEBFa7pU","topic":"history"}],"solaris":[{"id":"so-arch","t":"cmd","q":"Print just the processor type of this machine (uname -p).","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["kghzjVb2RqPybNRr","FYT4qi0e0xJjvS2r"]],"topic":"SPARC"},{"id":"so-head","t":"cmd","q":"Print the first 4 lines of groceries.txt.","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["kt7686-2kX-q8dO3","WxEh1LVSCp_S5_TO"]],"topic":"head"},{"id":"so-grep","t":"cmd","q":"Show the lines of Documents/grades.csv for students in period 3 (lines containing \",3,\").","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["WvcZur0nZ5Utf8lc","rU1Szt8-WZWdATj3"]],"topic":"grep"},{"id":"so-zpool","t":"cmd","q":"Create a mirrored ZFS pool named tank from the lab disks c2t0d0 and c2t1d0 (you will need pfexec).","shell":"solaris","setup":[],"probe":["zpool status tank"],"input":[],"h":[["S-ZYMVW2zXS3pbZV","prwhjSZHlecgCLps"],["3RBOpmK7w8RkJ9aB","7Nt4TR_9TWVTZiIo"]],"topic":"ZFS"},{"id":"so-sort","t":"cmd","q":"Show the unique items of groceries.txt in A→Z order.","shell":"solaris","setup":[],"probe":[],"input":[],"h":[["609ETNXT-x0gbwPR","YNSP4-g-RluqbSZc"]],"topic":"sort"},{"id":"so-smf","t":"mc","q":"Which command explains every Solaris service that is broken and where its log is?","o":["svcs -x","systemctl --failed","Get-Service","service -e"],"h":"fLjKdXEsbiET4m7k","topic":"SMF"},{"id":"so-clear","t":"mc","q":"You fixed cups's config file. Which command takes it out of the maintenance state?","o":["pfexec svcadm clear cups","svcs -a","kill cups","zfs rollback cups"],"h":"5s1xFuWbo-AmjSE9","topic":"SMF"},{"id":"so-logs","t":"mc","q":"Where is the main Solaris system log?","o":["/var/adm/messages","/var/log/syslog","C:\\Windows\\Logs","/etc/release"],"h":"0iQMfQKW5_YmY36Y","topic":"logs"},{"id":"so-zone","t":"mc","q":"What is a Solaris zone?","o":["A separate Solaris system sharing one kernel (like a container)","A time zone setting","A disk partition","A network cable"],"h":"9lMCUCIyutThIwW9","topic":"zones"},{"id":"so-snap","t":"mc","q":"What does  zfs rollback pool/home@safe  do?","o":["Returns the files to how they were when the snapshot \"safe\" was taken","Deletes the snapshot","Makes a new snapshot","Backs up to tape"],"h":"vNuv6tK-TakdMMhw","topic":"ZFS"},{"id":"so-pfexec","t":"mc","q":"On Solaris, pfexec plays the role that ___ plays on Ubuntu.","o":["sudo","apt","grep","chmod"],"h":"EJbBxpzO6gfb6b9A","topic":"privileges"},{"id":"so-sparc","t":"mc","q":"SPARC is…","o":["Sun's own processor family, different from Intel/AMD","A file system","A shell","A web browser"],"h":"Dtzt-TYiW9qsRdyh","topic":"SPARC"}],"unix":[{"id":"ux-count","t":"cmd","q":"Print ONLY the number of lines in groceries.txt.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["M6wNoI5ez5pJOrZK","GU01jbjlE-rmKmW3"]],"topic":"wc"},{"id":"ux-head","t":"cmd","q":"V7 has no head command. Print the first 3 lines of groceries.txt anyway.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["tbfj24QRlY3ATKPP","yB_MX9FlrrVqgGu0"]],"topic":"working without head"},{"id":"ux-uniq","t":"cmd","q":"Show each item of groceries.txt once, in A→Z order.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["S5bLeRXBO7MGr8ED","Wx_jqftdnUxvt6Il"]],"topic":"pipes"},{"id":"ux-grep","t":"cmd","q":"Show the lines of groceries.txt that contain \"ee\".","shell":"unix","setup":[],"probe":[],"input":[],"h":[["P0jjDGfE6Hh_6MqE","j-v8nULvQbHfRv9o"]],"topic":"grep"},{"id":"ux-tail","t":"cmd","q":"Print the last 2 lines of Documents/poem.txt.","shell":"unix","setup":[],"probe":[],"input":[],"h":[["OxXj1xLnJ3y8GlAT","JarNhuD3sHAGYyDX"]],"topic":"tail"},{"id":"ux-chmod","t":"cmd","q":"Make groceries.txt readable and writable ONLY by you.","shell":"unix","setup":[],"probe":["ls -l groceries.txt"],"input":[],"h":[["aboy8xQOt10ZXUD1","P1CzfPCA5Xc0jFv1"]],"topic":"permissions"},{"id":"ux-who","t":"mc","q":"Who created UNIX at Bell Labs in 1969?","o":["Ken Thompson and Dennis Ritchie","Bill Gates and Paul Allen","Linus Torvalds","Steve Jobs and Steve Wozniak"],"h":"Y4TI8ZWyBRtXfBbA","topic":"history"},{"id":"ux-ed","t":"mc","q":"What kind of editor is ed?","o":["A line editor: no screen, you type commands","A full-screen editor with menus","A graphical editor","A spreadsheet"],"h":"V_tVNtE5UBf_dRq4","topic":"ed"},{"id":"ux-bq","t":"mc","q":"In 1979, how did you put the output of date inside another command?","o":["`date` (backquotes)","$(date)","%date%","{date}"],"h":"tWLxPapdpFzsHHAC","topic":"command substitution"},{"id":"ux-home","t":"mc","q":"Why does  cd ~  fail on V7?","o":["~ for home came later, from the C shell at Berkeley","There are no home folders","cd did not exist","The ~ key was broken"],"h":"gd_HSb4BpNghEEBB","topic":"history"},{"id":"ux-pipe","t":"mc","q":"Which idea, added to UNIX in 1973, lets small programs work together?","o":["The pipe |","The mouse","Tabs","Windows"],"h":"Yg51ElPDEHbR6557","topic":"pipes"},{"id":"ux-tty","t":"mc","q":"Why are UNIX command names so short (ls, cp, mv)?","o":["People typed on slow, noisy printing terminals","Long names were illegal","To save disk space on the files","Ken Thompson disliked vowels"],"h":"ltdqWcfGEwybKhEv","topic":"history"},{"id":"ux-c","t":"mc","q":"UNIX was rewritten in 1973 in a new language invented for it. Which?","o":["C","Python","Java","BASIC"],"h":"d2DXrjzyItQ4C11S","topic":"history"}],"dos":[{"id":"ds-type","t":"cmd","q":"Print the contents of POEM.TXT.","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["rRWk92O7oaa7J_hM","M9pW1sa9tlqF9YxQ"]],"topic":"TYPE"},{"id":"ds-sort","t":"cmd","q":"Show GROCERY.TXT sorted A→Z.","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["fvSk9etzw5mvnc2B","YOnaak2OxvrIFipp"]],"topic":"SORT"},{"id":"ds-find","t":"cmd","q":"Show the lines of GROCERY.TXT that contain \"apple\".","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["DDaPqc3wOPccRyR7","oATM8n9H8B-lSRjq"],["vzXDYw4jXG8HnrYQ","OVWWYdsi5bh71-lr"]],"topic":"FIND"},{"id":"ds-findc","t":"cmd","q":"Count the lines of GROCERY.TXT that contain \"coffee\".","shell":"dos","setup":["CD STUDENT"],"probe":[],"input":[],"h":[["O1ErZntnctGyPWm4","3B-AoJu_Y5txHQJN"]],"topic":"FIND /C"},{"id":"ds-save","t":"cmd","q":"Save GROCERY.TXT sorted Z→A into a new file called ZTOA.TXT.","shell":"dos","setup":["CD STUDENT"],"probe":["TYPE ZTOA.TXT"],"input":[],"h":[["qAFBoEnykgHnZU2q","fhszW1xODmcgei0_"]],"topic":"redirection"},{"id":"ds-md","t":"cmd","q":"Make a directory called HOMEWORK.","shell":"dos","setup":["CD STUDENT"],"probe":["DIR /B /AD"],"input":[],"h":[["yzhv0UB43_J36U4H","LPTQTnNXcI12Zokv"]],"topic":"MD"},{"id":"ds-83","t":"mc","q":"MS-DOS file names follow the \"8.3\" rule. What does it mean?","o":["Up to 8 letters, a dot, and a 3-letter extension","8 files per folder, 3 folders deep","Version 8.3 of DOS","8 KB files, 3 MB disks"],"h":"M5tppTuz9VahMqjZ","topic":"8.3 names"},{"id":"ds-bad","t":"mc","q":"DOS says \"Bad command or file name\". What does it mean?","o":["It found no program by that name in the current folder or on the PATH","The file is damaged","You are not allowed to run it","The disk is full"],"h":"6IK6MQ94ySZDCh6z","topic":"PATH"},{"id":"ds-autoexec","t":"mc","q":"What is AUTOEXEC.BAT?","o":["A batch file that runs every time the PC starts","The DOS kernel","A virus","A game"],"h":"qo698LUV-LY0V7XE","topic":"AUTOEXEC.BAT"},{"id":"ds-doskey","t":"mc","q":"In DOS, the up-arrow key does nothing until you load…","o":["DOSKEY","HIMEM","EDIT","MEM"],"h":"2mMqo9AqO54pSPvx","topic":"DOSKEY"},{"id":"ds-640","t":"mc","q":"How much \"conventional memory\" did DOS programs have to fit in?","o":["640 KB","640 MB","64 GB","6.4 KB"],"h":"CRNZf7BOsHL7Pue4","topic":"memory"},{"id":"ds-heir","t":"mc","q":"Which modern Windows program is DOS's descendant?","o":["cmd.exe (Command Prompt)","Git Bash","Linux","zsh"],"h":"MGj_LKDddsUWgtpm","topic":"history"},{"id":"ds-and","t":"mc","q":"How do you run two commands on one line in MS-DOS?","o":["You can't — one command per line (use a .BAT file)","A && B","A ; B","A & B"],"h":"eCHbp43WWfI3Y0LA","topic":"batch files"}],"automation":[{"id":"au-report","t":"cmd","q":"From ~/automation, run grade_report.py on data/grades.csv.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["sYK6fhF8nqFOu4nW","zkPWFGZ9-6Cb08UO"]],"topic":"running a script on a CSV"},{"id":"au-curve","t":"cmd","q":"Run grade_report.py on data/grades.csv with a 3-point curve.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["pES-UcmeIyUblWns","irchpLIrYq4B-3vo"]],"topic":"arguments"},{"id":"au-weather","t":"cmd","q":"Run weather_stats.py on data/weather.csv for Cumming only.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["ctn8nF6rs8dYunoo","LQ5xhKLQ2mRcKGek"]],"topic":"arguments"},{"id":"au-inv","t":"cmd","q":"Check which school-store items need reordering (inventory_check.py on data/inventory.csv).","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["ZF9RXy_bCNrfRT23","tfV1386kIxxWDTnP"]],"topic":"running a script on a CSV"},{"id":"au-save","t":"cmd","q":"Run sales_total.py on data/sales.csv and save what it prints into totals.txt (nothing on screen).","shell":"bash","setup":["cd ~/automation"],"probe":["cat totals.txt"],"input":[],"h":[["Dt05cOQJIfsVj1AL","muxPaUB08-Kcrj-C"]],"topic":"saving output"},{"id":"au-attend","t":"cmd","q":"Summarize data/attendance.csv with attendance_summary.py.","shell":"bash","setup":["cd ~/automation"],"probe":[],"input":[],"h":[["jdHfqm_E3GtQgqCX","DKkh6_tTBTBc_Qg2"]],"topic":"running a script on a CSV"},{"id":"au-arg","t":"mc","q":"In  python3 hello.py Ada , what is \"Ada\"?","o":["An argument passed to the script","The name of the script","A Python module","An error"],"h":"cdw_w5OZ7W_oUWpb","topic":"arguments"},{"id":"au-exit","t":"mc","q":"A script ran successfully. What exit code did it return?","o":["0","1","-1","200"],"h":"bHkvlOoYfXoLqkTq","topic":"exit codes"},{"id":"au-and","t":"mc","q":"What does  python3 check.py data.csv && cat report.txt  do?","o":["Prints report.txt only if check.py succeeded","Runs both at the same time","Saves check.py into report.txt","Always prints report.txt"],"h":"hiX4hvbv6NCAbfDh","topic":"exit codes"},{"id":"au-append","t":"mc","q":"You want to ADD a row to data/inventory.csv. Which is safe?","o":["echo \"erasers,supplies,2,10,0.50\" >> data/inventory.csv","echo \"erasers,supplies,2,10,0.50\" > data/inventory.csv","rm data/inventory.csv","cat data/inventory.csv > erasers"],"h":"Z2abofg5oAEjGTD2","topic":"redirecting output"},{"id":"au-csv","t":"mc","q":"What is a CSV file?","o":["A table saved as plain text, with commas between columns","A compressed folder","A Python program","A picture"],"h":"jdU4UcsAq7o-Na8L","topic":"CSV"},{"id":"au-cron","t":"mc","q":"Which UNIX tool runs a script automatically every morning?","o":["cron","grep","chmod","ssh"],"h":"dpn3kNDl__xboUV3","topic":"scheduling"},{"id":"au-read","t":"mc","q":"Before running a script someone sent you, you should…","o":["Read it first (cat script.py)","Run it as root right away","Delete it","Rename it"],"h":"zefaeHXQSZG0qPwA","topic":"safety"}],"raid":[{"id":"rd-md","t":"cmd","q":"Create a RAID 1 mirror called /dev/md0 from the lab disks /dev/sdc and /dev/sdd.","shell":"bash","setup":[],"probe":["grep -c raid1 /proc/mdstat"],"input":["student","y"],"h":[["-dNTyItHF79SmmEr","tfiWzT3Z43vDJsyQ"],["JyztuUdZKPW-NChH","2OreD9jBzb89tlJ8"]],"topic":"mdadm"},{"id":"rd-ps","t":"cmd","q":"Bring Disk 3 online.","shell":"powershell","setup":[],"probe":["(Get-Disk -Number 3).OperationalStatus"],"input":[],"h":[["DO6vRXaWilZvlXpm","xwTagZdn7QoWa8bs"]],"topic":"Set-Disk"},{"id":"rd-zfs","t":"cmd","q":"Create a ZFS mirror pool called safe from c2t0d0 and c2t1d0.","shell":"solaris","setup":[],"probe":["zpool list"],"input":[],"h":[["OV7DA_4Nme2N9hoU","VVBx6I2wKhdD1sUu"],["cFO0xPthIQyuIQW1","qUXHH-jC2DfNs1Ji"]],"topic":"ZFS mirrors"},{"id":"rd-ro","t":"cmd","q":"Make Disk 4 read-only.","shell":"powershell","setup":[],"probe":["(Get-Disk -Number 4).IsReadOnly"],"input":[],"h":[["uD_HmpTRHkyaLpLa","uvBb7CR2fFE1VGFI"]],"topic":"Set-Disk"},{"id":"rd-1","t":"mc","q":"Two 1 TB disks in RAID 1 (mirror) give you how much space?","o":["1 TB","2 TB","500 GB","4 TB"],"h":"5HzxYBGirf2kUsXA","topic":"RAID levels"},{"id":"rd-0","t":"mc","q":"Two 1 TB disks in RAID 0 (stripe): one disk dies. What happens?","o":["Everything on the array is lost","Nothing: the other disk has a copy","Half the files are lost","It slows down a little"],"h":"Iny6CFv3DeViDzEd","topic":"RAID levels"},{"id":"rd-5","t":"mc","q":"What is the smallest number of disks for RAID 5?","o":["3","2","1","5"],"h":"qkPimwaRPTVkvKuR","topic":"RAID levels"},{"id":"rd-deg","t":"mc","q":"/proc/mdstat shows [2/1] [_U]. What does it mean?","o":["The mirror is degraded: one disk is missing or failed","The array is perfect","The array is 50% full","It is RAID 0"],"h":"ASvK1_F9zHo91u48","topic":"monitoring"},{"id":"rd-backup","t":"mc","q":"Why is RAID NOT a backup?","o":["Deleting a file deletes it on every disk at once","RAID disks are slower","RAID cannot store photos","RAID only works on Windows"],"h":"mLxgMLK-Tr1p13pb","topic":"backups"},{"id":"rd-mkfs","t":"mc","q":"You built /dev/md0. What must you do before saving files on it?","o":["Make a file system (mkfs) and mount it","Reboot","Run apt update","Nothing"],"h":"SN6MyMvXCi0zuXZw","topic":"file systems"},{"id":"rd-pool","t":"mc","q":"In Windows Storage Spaces, which resiliency is like RAID 1?","o":["Mirror","Simple","Parity","Primordial"],"h":"xSvVWRCveGEfpF5S","topic":"Storage Spaces"}],"history":[{"id":"hi-unix","t":"mc","q":"Where and when was UNIX created?","o":["Bell Labs, 1969","Microsoft, 1981","Berkeley, 1991","Finland, 1991"],"h":"ih8j2W5-XJQo-u1Z","topic":"UNIX"},{"id":"hi-linux","t":"mc","q":"Who wrote the first Linux kernel, as a student, in 1991?","o":["Linus Torvalds","Dennis Ritchie","Bill Gates","Richard Stallman"],"h":"Snxx0UekDVY_Wrd-","topic":"Linux"},{"id":"hi-gnu","t":"mc","q":"Linux is a kernel. Most of the classic tools around it (bash, gcc, coreutils) came from which project?","o":["GNU","BSD","Windows","Solaris"],"h":"EELE1_bYYAfOJKAB","topic":"Linux"},{"id":"hi-mac","t":"mc","q":"macOS descends mostly from…","o":["BSD UNIX (via NeXTSTEP and FreeBSD)","MS-DOS","Linux","Solaris"],"h":"j7aCS1Hs9CMYYLyE","topic":"BSD"},{"id":"hi-dos","t":"mc","q":"MS-DOS was based on an earlier system that gave it drive letters and DIR. Which?","o":["CP/M","UNIX","Multics","Solaris"],"h":"Q-2M19Bxc00Gta9i","topic":"DOS"},{"id":"hi-cmd","t":"mc","q":"Which shell is MS-DOS's direct descendant?","o":["cmd.exe","bash","ksh","zsh"],"h":"6K-9-GhSa22bPQHF","topic":"DOS"},{"id":"hi-ps","t":"mc","q":"PowerShell (2006) changed the command line by…","o":["Passing objects instead of text through the pipeline","Removing pipes","Using only a mouse","Running only on Linux"],"h":"5jK3HKfBo3dmEoXU","topic":"PowerShell"},{"id":"hi-pipe","t":"mc","q":"Which feature did MS-DOS 2.0 borrow from UNIX?","o":["Pipes | and redirects >","The / root folder","Users and passwords","Lowercase commands"],"h":"2d9W0-mDWAgwL1-N","topic":"DOS"},{"id":"hi-sysv","t":"mc","q":"Solaris belongs to which UNIX branch?","o":["System V (AT&T)","BSD only","Linux","DOS"],"h":"mT5k7r5nPZP70tGI","topic":"System V"},{"id":"hi-ksh","t":"mc","q":"Which shell introduced $( ) command substitution, later copied by bash and zsh?","o":["The Korn shell (ksh)","COMMAND.COM","The Bourne shell of V7","PowerShell"],"h":"7LcrIJP8gFkW8w16","topic":"shells"},{"id":"hi-posix","t":"mc","q":"What is POSIX?","o":["A standard so UNIX-like systems behave the same way","A kind of disk","A Windows command","A programming language"],"h":"s0Oh7hFnapzZTflv","topic":"standards"},{"id":"hi-wsl","t":"mc","q":"WSL (2016) lets Windows…","o":["Run real Linux programs","Run MS-DOS games","Run macOS","Run Solaris"],"h":"ZjhZEuWl9sRHlszH","topic":"today"},{"id":"hi-android","t":"mc","q":"Which of these runs the Linux kernel?","o":["Android phones","MS-DOS","Windows 95","The original Macintosh"],"h":"nBioudWASi8f_mHz","topic":"Linux"},{"id":"hi-slash","t":"mc","q":"Why does Windows use \\ in paths while UNIX uses / ?","o":["DOS already used / for options, so it picked \\ for folders","Bill Gates was left-handed","UNIX copied Windows","\\ is faster to type"],"h":"SGhuMdPfeAIt56vU","topic":"DOS"}]};
 })();
 
 // ---- ui-core.js ----
-/* TerminalEX — ui-core */
-(function () { 'use strict'; })();
+/* TerminalEX — the student's record: locked name, XP, levels, badges, mission hints, tests, certificates,
+ * and ONE sealed progress file that is both the proof of work and the way back (same design as SheetEX).
+ * Nothing is sent anywhere: the record lives in this browser and in the file the student saves. */
+(function () {
+  'use strict';
+  const TX = window.TX;
+  const UI = (TX.UI = {});
+  const esc = (s) => TX.escapeHtml(String(s == null ? '' : s));
+  UI.esc = esc;
+
+  // ------------------------------------------------------------------ persistence
+  // CORE is sealed with TX.seal, so editing it in the browser's storage makes the save invalid.
+  const KEY = 'terminalex.v2';
+  const CORE = ['name', 'sid', 'xp', 'done', 'hints', 'badges', 'visited', 'stats', 'tests', 'certs', 'guides', 'created'];
+  const fresh = () => ({ name: '', sid: '', xp: 0, done: {}, hints: {}, badges: {}, visited: {}, stats: { refRuns: 0, historyNodes: 0, historySeen: 0, tests: 0 }, tests: {}, certs: {}, guides: {}, created: 0 });
+  const get = (k) => { try { return window.localStorage.getItem(k); } catch (e) { return null; } };
+  const set = (k, v) => { try { window.localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+  function lock(st) {
+    if (st.name) ['name', 'sid'].forEach((k) => Object.defineProperty(st, k, { value: st[k], writable: false, enumerable: true, configurable: false }));
+    return st;
+  }
+  const coreOf = (st) => { const c = {}; CORE.forEach((k) => { c[k] = st[k]; }); return c; };
+  function serialize(st) { const core = JSON.stringify(coreOf(st)); return JSON.stringify({ v: 2, core, sig: TX.seal.mac('save|' + core) }); }
+  UI.loadNotice = null;
+  function load() {
+    const raw = get(KEY);
+    if (!raw) return migrate(fresh());
+    try {
+      const o = JSON.parse(raw);
+      if (!o || o.v !== 2 || typeof o.core !== 'string' || TX.seal.mac('save|' + o.core) !== o.sig) throw new Error('bad seal');
+      const st = fresh(); const core = JSON.parse(o.core);
+      CORE.forEach((k) => { if (core[k] !== undefined) st[k] = core[k]; });
+      st.stats = Object.assign(fresh().stats, st.stats);
+      return lock(st);
+    } catch (e) {
+      UI.loadNotice = 'The progress saved in this browser was changed outside TerminalEX, so it could not be used. You are starting fresh — if you have a progress file, load it.';
+      return fresh();
+    }
+  }
+  // TerminalEX v1 kept mission progress unsealed: bring it across once.
+  function migrate(st) {
+    try { const old = JSON.parse(get('tx.missions') || '{}'); Object.keys(old).forEach((id) => { const mi = TX.lessons.mission(id); if (mi && !st.done[id]) { st.done[id] = { xp: mi.xp, at: old[id], hints: 0 }; st.xp += mi.xp; } }); } catch (e) { /* none */ }
+    return st;
+  }
+  UI.state = load();
+  UI.storageOk = set(KEY, serialize(UI.state));
+  let saveTimer = null;
+  UI.saveNow = () => { clearTimeout(saveTimer); if (!set(KEY, serialize(UI.state))) UI.storageOk = false; };
+  UI.save = () => { clearTimeout(saveTimer); saveTimer = setTimeout(UI.saveNow, 250); };
+
+  // ------------------------------------------------------------------ levels & badges
+  const LEVELS = [[0, 'Keyboard Rookie'], [60, 'Prompt Explorer'], [160, 'Path Finder'], [300, 'Pipe Fitter'], [480, 'Script Runner'], [700, 'Power User'], [980, 'Sysadmin'], [1300, 'Kernel Hacker'], [1700, 'Shell Wizard'], [2200, 'UNIX Greybeard']];
+  UI.LEVELS = LEVELS;
+  UI.level = (xp) => {
+    let i = 0; while (i + 1 < LEVELS.length && xp >= LEVELS[i + 1][0]) i++;
+    const next = LEVELS[i + 1];
+    return { n: i + 1, title: LEVELS[i][1], floor: LEVELS[i][0], next: next ? next[0] : null, pct: next ? Math.round((100 * (xp - LEVELS[i][0])) / (next[0] - LEVELS[i][0])) : 100 };
+  };
+  const BADGES = [
+    { id: 'first', icon: '⌨️', name: 'Hello, Terminal', desc: 'Finish your first mission.', xp: 10 },
+    { id: 'explorer', icon: '🧭', name: 'Explorer', desc: 'Open all ten terminals.', xp: 25 },
+    { id: 'timetravel', icon: '⏳', name: 'Time Traveler', desc: 'Open both MS-DOS (1994) and UNIX V7 (1979).', xp: 15 },
+    { id: 'polyglot', icon: '🌐', name: 'Polyglot', desc: 'Finish a mission on five different systems.', xp: 25 },
+    { id: 'no-hints', icon: '🧠', name: 'No Hints Needed', desc: 'Finish 10 missions without hints.', xp: 25 },
+    { id: 'researcher', icon: '📚', name: 'Researcher', desc: 'Run 15 examples in the Interactive Cheat Sheet.', xp: 15 },
+    { id: 'historian', icon: '🌳', name: 'Historian', desc: 'Explore 10 systems on the family tree.', xp: 15 },
+    { id: 'automator', icon: '🤖', name: 'Automator', desc: 'Finish the Automation Lab.', xp: 30 },
+    { id: 'raid', icon: '🗄️', name: 'Mirror Maker', desc: 'Finish Disks & RAID.', xp: 30 },
+    { id: 'retro', icon: '💾', name: 'Retro Computing', desc: 'Finish the MS-DOS and UNIX V7 lessons.', xp: 30 },
+    { id: 'bigiron', icon: '☀️', name: 'Big Iron', desc: 'Finish the Solaris and FreeBSD lessons.', xp: 30 },
+    { id: 'certified', icon: '🎓', name: 'Certified', desc: 'Pass your first certification test.', xp: 25 },
+    { id: 'ace', icon: '💯', name: 'Perfect Score', desc: 'Score 10/10 on a certification test.', xp: 40 },
+    { id: 'cert-5', icon: '🏛️', name: 'Five Certificates', desc: 'Earn 5 certificates.', xp: 50 },
+    { id: 'all', icon: '🏆', name: 'Completionist', desc: 'Finish every mission in TerminalEX.', xp: 100 },
+  ];
+  UI.BADGES = BADGES;
+  const toast = (h, big) => { if (TX.app && TX.app.toast) TX.app.toast(h, big); };
+  UI.addXP = (n) => {
+    if (!n) return;
+    const before = UI.level(UI.state.xp);
+    UI.state.xp += n;
+    const after = UI.level(UI.state.xp);
+    if (after.n > before.n) setTimeout(() => toast(`⬆️ Level ${after.n}: <b>${esc(after.title)}</b>`, true), 900);
+    UI.save(); UI.refresh();
+  };
+  UI.badge = (id) => {
+    if (UI.state.badges[id]) return;
+    const b = BADGES.find((x) => x.id === id); if (!b) return;
+    UI.state.badges[id] = Date.now();
+    setTimeout(() => toast(`${b.icon} Badge: <b>${esc(b.name)}</b> <span class="xp">+${b.xp} XP</span>`, true), 600);
+    UI.addXP(b.xp);
+  };
+  UI.refresh = () => { if (UI.onChange) UI.onChange(); };
+
+  // ------------------------------------------------------------------ missions, hints, lessons
+  // A hint costs 20% of a mission's XP; revealing the answer costs another 30%.
+  UI.useHint = (mid, kind) => { const cur = UI.state.hints[mid] || 0; const v = kind === 'answer' ? cur | 2 : cur | 1; if (v !== cur) { UI.state.hints[mid] = v; UI.save(); } };
+  UI.reward = (mi) => { const h = UI.state.hints[mi.id] || 0; return Math.max(1, Math.round(mi.xp * (1 - (h & 1 ? 0.2 : 0) - (h & 2 ? 0.3 : 0)))); };
+  UI.isDone = (mid) => !!UI.state.done[mid];
+  UI.completeMission = (mi) => {
+    if (UI.state.done[mi.id]) return 0;
+    const xp = UI.reward(mi);
+    UI.state.done[mi.id] = { xp, at: Date.now(), hints: UI.state.hints[mi.id] || 0 };
+    UI.addXP(xp);
+    const done = Object.keys(UI.state.done);
+    UI.badge('first');
+    if (done.filter((id) => !UI.state.done[id].hints).length >= 10) UI.badge('no-hints');
+    const tracks = new Set(done.map((id) => { const m = TX.lessons.mission(id); return m && m.track; }).filter(Boolean));
+    if (tracks.size >= 5) UI.badge('polyglot');
+    const L = TX.lessons.ofMission(mi.id);
+    if (L && UI.lessonDone(L)) {
+      setTimeout(() => toast(`📗 Lesson complete: <b>${esc(L.title)}</b> — the certification test is unlocked!`, true), 1600);
+      if (L.id === 'automation') UI.badge('automator');
+      if (L.id === 'raid') UI.badge('raid');
+      if (['dos', 'unix'].every((x) => UI.lessonDone(TX.lessons.byId(x)))) UI.badge('retro');
+      if (['solaris', 'freebsd'].every((x) => UI.lessonDone(TX.lessons.byId(x)))) UI.badge('bigiron');
+    }
+    if (TX.lessons.LIST.every((x) => UI.lessonDone(x))) UI.badge('all');
+    return xp;
+  };
+  UI.lessonProgress = (L) => { const n = L.missions.filter((id) => UI.state.done[id]).length; return { done: n, total: L.missions.length, pct: L.missions.length ? Math.round((100 * n) / L.missions.length) : 100 }; };
+  UI.lessonDone = (L) => (L.history ? UI.state.stats.historyNodes >= 6 : L.missions.every((id) => UI.state.done[id]));
+  UI.visit = (kind) => {
+    if (!UI.state.visited[kind]) { UI.state.visited[kind] = Date.now(); UI.save(); }
+    if (TX.SHELL_ORDER.every((k) => UI.state.visited[k])) UI.badge('explorer');
+    if (UI.state.visited.dos && UI.state.visited.unix) UI.badge('timetravel');
+  };
+  UI.stat = (k, n = 1) => { UI.state.stats[k] = (UI.state.stats[k] || 0) + n; UI.save(); if (k === 'refRuns' && UI.state.stats.refRuns >= 15) UI.badge('researcher'); if (k === 'historyNodes' && UI.state.stats.historyNodes >= 10) UI.badge('historian'); };
+
+  // ------------------------------------------------------------------ identity
+  UI.validName = (v) => {
+    v = String(v || '').trim().replace(/\s+/g, ' ');
+    if (v.length < 3 || v.length > 40 || !/^[A-Za-zÀ-ÖØ-öø-ÿ'’.\- ]+$/.test(v) || !/\S+ \S+/.test(v)) return null;
+    return v;
+  };
+  function newSid() { let b = []; try { const a = new Uint8Array(9); window.crypto.getRandomValues(a); b = Array.from(a); } catch (e) { for (let i = 0; i < 9; i++) b.push(Math.floor(Math.random() * 256)); } return TX.seal.b64u(b); }
+  UI.setIdentity = (name) => {
+    if (UI.state.name) return false; // locked forever
+    UI.state.name = name; UI.state.sid = newSid(); UI.state.created = UI.state.created || Date.now();
+    lock(UI.state); UI.saveNow(); UI.refresh();
+    return true;
+  };
+
+  // ------------------------------------------------------------------ certificates
+  UI.makeCert = (L, t) => TX.seal.pack('TXCERT', { v: 1, name: UI.state.name, sid: UI.state.sid, lesson: L.id, title: L.title, n: L.n, score: t.passScore, of: t.of, attempt: t.passAttempt, missions: UI.lessonProgress(L).done, hints: L.missions.filter((id) => UI.state.done[id] && UI.state.done[id].hints).length, date: new Date(t.passed).toISOString().slice(0, 10) });
+  UI.readCert = (code) => { const r = TX.seal.unpack('TXCERT', code); return r.ok ? { ok: true, cert: r.obj } : r; };
+
+  // ------------------------------------------------------------------ the progress file
+  // Holds the record AND the student's work (every pretend computer's files), sealed.
+  const FILE_APP = 'TerminalEX', FILE_FORMAT = 2;
+  const FILE_KEYS = ['app', 'format', 'student', 'id', 'savedAt', 'summary', 'progress', 'work', 'seal'];
+  function summaryOf(p) {
+    const lv = UI.level(p.xp);
+    const all = TX.lessons.LIST.flatMap((L) => L.missions);
+    return {
+      level: lv.n + ' ' + lv.title, xp: p.xp, missions: Object.keys(p.done).length + '/' + all.length, badges: Object.keys(p.badges).length,
+      certificates: TX.lessons.LIST.filter((L) => p.tests[L.id] && p.tests[L.id].passed).map((L) => { const t = p.tests[L.id]; return { lesson: L.n + '. ' + L.title, test: t.passScore + '/' + t.of, attempt: t.passAttempt, passed: new Date(t.passed).toISOString().slice(0, 10) }; }),
+    };
+  }
+  function workNow() {
+    if (TX.app && TX.app.saveNow) TX.app.saveNow();
+    const machines = {};
+    Object.keys(TX.MACHINE_KINDS).forEach((k) => { const raw = get('tx.fs.' + k); if (raw) { try { machines[k] = JSON.parse(raw); } catch (e) { /* skip */ } } });
+    let remotes = null; try { remotes = JSON.parse(get('tx.remotes') || 'null'); } catch (e) { /* none */ }
+    return { machines, remotes };
+  }
+  UI.progressFileText = () => {
+    UI.saveNow();
+    const st = UI.state;
+    const f = { app: FILE_APP, format: FILE_FORMAT, student: st.name, id: st.sid, savedAt: new Date().toISOString(), summary: summaryOf(st), progress: JSON.parse(JSON.stringify(coreOf(st))), work: workNow() };
+    f.seal = TX.seal.mac('file|' + JSON.stringify(f));
+    return JSON.stringify(f, null, 2) + '\n';
+  };
+  UI.progressFileName = () => 'TerminalEX-' + UI.state.name.replace(/[^A-Za-z0-9]+/g, '-') + '.json';
+  const isObj = (o) => !!o && typeof o === 'object' && !Array.isArray(o);
+  const isInt = (x, lo, hi) => typeof x === 'number' && Number.isInteger(x) && x >= lo && x <= hi;
+  function validProgress(p, f) {
+    if (!isObj(p) || Object.keys(p).some((k) => !CORE.includes(k))) return 'unexpected fields';
+    if (UI.validName(p.name) !== p.name || p.name !== f.student || p.sid !== f.id || !/^[A-Za-z0-9_-]{12}$/.test(p.sid)) return 'name';
+    if (!isInt(p.xp, 0, 1e6)) return 'xp';
+    const ids = new Set(TX.lessons.LIST.flatMap((L) => L.missions));
+    if (!isObj(p.done) || Object.keys(p.done).some((k) => !ids.has(k) || !isObj(p.done[k]) || !isInt(p.done[k].xp, 0, 1000))) return 'missions';
+    if (!isObj(p.badges) || Object.keys(p.badges).some((k) => !BADGES.some((b) => b.id === k))) return 'badges';
+    if (!isObj(p.certs) || Object.keys(p.certs).some((k) => { const r = UI.readCert(p.certs[k].code); return !r.ok || r.cert.sid !== p.sid || r.cert.name !== p.name || r.cert.lesson !== k; })) return 'certificates';
+    if (!isObj(p.tests) || Object.keys(p.tests).some((k) => !TX.lessons.byId(k))) return 'tests';
+    return '';
+  }
+  UI.readProgressFile = (text) => {
+    text = String(text == null ? '' : text).replace(/^﻿/, '').replace(/\r\n/g, '\n');
+    if (!text.trim()) return { ok: false, why: 'The file is empty.' };
+    let f;
+    try { f = JSON.parse(text); } catch (e) { return { ok: false, why: 'That is not a TerminalEX progress file (it is not valid JSON).' }; }
+    if (!isObj(f) || f.app !== FILE_APP) return { ok: false, why: 'That is not a TerminalEX progress file.' };
+    if (f.format !== FILE_FORMAT) return { ok: false, why: 'This progress file was made by a different version of TerminalEX.' };
+    if (Object.keys(f).join() !== FILE_KEYS.join() || typeof f.seal !== 'string') return { ok: false, why: 'This file does not have the exact layout TerminalEX writes. It was changed, so it cannot be used.' };
+    if (JSON.stringify(f, null, 2) !== text.replace(/\n+$/, '')) return { ok: false, why: 'The formatting of this file was changed (spaces, line breaks or order). TerminalEX only accepts files exactly as it saved them.' };
+    const seal = f.seal; delete f.seal;
+    const good = TX.seal.mac('file|' + JSON.stringify(f));
+    f.seal = seal;
+    if (good !== seal) return { ok: false, why: 'This file was changed after TerminalEX saved it, or it was made by a different copy of TerminalEX. It cannot be used.' };
+    const bad = validProgress(f.progress, f);
+    if (bad || JSON.stringify(summaryOf(f.progress)) !== JSON.stringify(f.summary)) return { ok: false, why: 'This file is not in the exact format TerminalEX makes' + (bad ? ' (' + bad + ')' : '') + '.' };
+    return { ok: true, file: f };
+  };
+  UI.restoreFromFile = (text) => {
+    const r = UI.readProgressFile(text);
+    if (!r.ok) return r;
+    const p = r.file.progress;
+    if (UI.state.name && UI.state.sid !== p.sid) return { ok: false, why: `This file belongs to ${p.name}, not to ${UI.state.name}. A name can never be changed, so it was not loaded.` };
+    const st = fresh();
+    CORE.forEach((k) => { if (p[k] !== undefined) st[k] = JSON.parse(JSON.stringify(p[k])); });
+    if (UI.state.name) { // same student: never lower anything
+      st.xp = Math.max(st.xp, UI.state.xp);
+      ['done', 'badges', 'certs', 'visited', 'guides', 'hints'].forEach((k) => { st[k] = Object.assign({}, st[k], UI.state[k]); });
+      Object.keys(UI.state.tests).forEach((k) => { const a = UI.state.tests[k], b = st.tests[k]; if (!b || (a.passed && !b.passed)) st.tests[k] = a; });
+    }
+    set(KEY, serialize(st));
+    const w = r.file.work || {};
+    Object.keys(w.machines || {}).forEach((k) => set('tx.fs.' + k, JSON.stringify(w.machines[k])));
+    if (w.remotes) set('tx.remotes', JSON.stringify(w.remotes));
+    return { ok: true, name: p.name, reload: true };
+  };
+
+  // ------------------------------------------------------------------ small UI helpers
+  UI.modal = (title, body, buttons, opts = {}) => {
+    const ov = document.createElement('div');
+    ov.className = 'ux-overlay' + (opts.wide ? ' wide' : '');
+    ov.innerHTML = `<div class="ux-modal" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="ux-modal-head"><h2>${title}</h2>${opts.sticky ? '' : '<button class="icon-btn ux-x" aria-label="Close">×</button>'}</div><div class="ux-modal-body">${body}</div>${buttons && buttons.length ? `<div class="ux-modal-foot">${buttons.map((b, i) => `<button class="ux-btn ${b.primary ? 'primary' : ''} ${b.danger ? 'danger' : ''}" data-i="${i}">${b.text}</button>`).join('')}</div>` : ''}</div>`;
+    const close = () => { ov.remove(); if (opts.onClose) opts.onClose(); };
+    ov.addEventListener('click', (e) => {
+      if (e.target === ov && !opts.sticky) close();
+      if (e.target.closest('.ux-x')) close();
+      const b = e.target.closest('[data-i]');
+      if (b && b.closest('.ux-modal-foot')) { const def = buttons[+b.dataset.i]; if (!def.onclick || def.onclick(ov) !== false) close(); }
+    });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !opts.sticky) { e.stopPropagation(); close(); } });
+    document.body.appendChild(ov);
+    const f = ov.querySelector('input, textarea, .ux-btn.primary, button');
+    if (f) setTimeout(() => f.focus(), 30);
+    return { el: ov, close };
+  };
+  // Save a file; if the school blocks downloads, show the text with a Copy button instead.
+  UI.download = (name, text, type) => {
+    let ok = false;
+    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); ok = true; } catch (e) { ok = false; }
+    if (!ok || UI.forceCopy) UI.modal('Copy your progress file', `<p>Downloads seem to be blocked. Copy this text and paste it into a document called <b>${esc(name)}</b>. You can paste it back in later to load it.</p><textarea class="ux-textarea" readonly>${esc(text)}</textarea>`, [{ text: 'Copy', primary: true, onclick: (ov) => { const t = ov.querySelector('textarea'); t.select(); try { navigator.clipboard.writeText(t.value); } catch (e) { document.execCommand('copy'); } return false; } }, { text: 'Done' }], { wide: true });
+  };
+  UI.pickFile = (cb) => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json,text/plain'; i.onchange = () => { const f = i.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => cb(String(r.result)); r.readAsText(f); }; i.click(); };
+  UI.ansiToHtml = (s) => {
+    // Colors from ANSI codes, safely escaped.
+    const COL = { 30: 'a0', 31: 'a1', 32: 'a2', 33: 'a3', 34: 'a4', 35: 'a5', 36: 'a6', 37: 'a7', 90: 'a8', 91: 'a9', 92: 'a10', 93: 'a11', 94: 'a12', 95: 'a13', 96: 'a14', 97: 'a15' };
+    let out = '', open = 0;
+    String(s).replace(/\r/g, '').split(/(\x1b\[[0-9;]*m)/).forEach((part) => {
+      const m = /^\x1b\[([0-9;]*)m$/.exec(part);
+      if (!m) { out += esc(part); return; }
+      const codes = m[1].split(';').map(Number);
+      if (codes.includes(0) || !m[1]) { out += '</span>'.repeat(open); open = 0; return; }
+      const cls = codes.map((c) => (COL[c] ? 'ansi-' + COL[c] : c === 1 ? 'ansi-b' : c === 2 ? 'ansi-dim' : '')).filter(Boolean).join(' ');
+      if (cls) { out += `<span class="${cls}">`; open++; }
+    });
+    return out + '</span>'.repeat(open);
+  };
+})();
 
 // ---- ui-home.js ----
-/* TerminalEX — ui-home */
-(function () { 'use strict'; })();
+/* TerminalEX — home page, lessons and guides, the History & Lineage page, badges, and the student menu. */
+(function () {
+  'use strict';
+  const TX = window.TX;
+  const UI = TX.UI;
+  const esc = UI.esc;
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // ------------------------------------------------------------------ full-screen pages
+  // One overlay (#page) shows the cheat sheet, the history page, badges, a test or a certificate.
+  UI.openPage = (id, title, html, opts = {}) => {
+    let p = $('#page');
+    if (!p) { p = document.createElement('div'); p.id = 'page'; document.getElementById('app').appendChild(p); }
+    p.className = 'page ' + (opts.cls || '');
+    p.dataset.page = id;
+    p.innerHTML = `<div class="page-bar"><button class="ux-btn ghost page-back">← ${opts.back || 'Back'}</button><h1>${title}</h1><div class="page-tools">${opts.tools || ''}</div></div><div class="page-body">${html}</div>`;
+    p.hidden = false;
+    document.body.classList.add('page-open');
+    p.querySelector('.page-back').addEventListener('click', () => (opts.onBack ? opts.onBack() : UI.closePage()));
+    p.scrollTop = 0;
+    return p;
+  };
+  UI.closePage = () => { const p = $('#page'); if (p) { p.hidden = true; p.innerHTML = ''; } document.body.classList.remove('page-open'); if (TX.app && TX.app.active) TX.app.active.focus(); };
+
+  // ------------------------------------------------------------------ welcome / name lock
+  UI.welcome = () => {
+    if (UI.state.name) return;
+    const m = UI.modal('Welcome to TerminalEX', `
+      <p>Type your <b>first and last name</b> as you want it on your certificates.</p>
+      <input class="ux-input" id="w-name" maxlength="40" autocomplete="off" placeholder="First Last">
+      <p class="ux-err" id="w-err" hidden></p>
+      <p class="ux-dim">Your name is locked once you confirm it. Nothing is sent anywhere: your progress stays in this browser and in the progress file you save.</p>
+      <p><button class="linkish" id="w-load">Coming back? Load your progress file</button></p>`, [{ text: 'Continue', primary: true, onclick: (ov) => {
+      const v = UI.validName($('#w-name', ov).value);
+      if (!v) { const e = $('#w-err', ov); e.hidden = false; e.textContent = 'Please type a first AND last name (letters only).'; return false; }
+      UI.modal('Is this right?', `<p class="ux-big-name">${esc(v)}</p><p>This name goes on every certificate and <b>cannot be changed later</b>, not even by you.</p>`, [{ text: '← Fix it', onclick: () => { setTimeout(UI.welcome, 10); } }, { text: 'Yes, lock it in', primary: true, onclick: () => { UI.setIdentity(v); UI.renderHome(); } }], { sticky: true });
+    } }], { sticky: true });
+    $('#w-load', m.el).addEventListener('click', () => { m.close(); UI.loadFileFlow(() => setTimeout(UI.welcome, 10)); });
+    $('#w-name', m.el).addEventListener('keydown', (e) => { if (e.key === 'Enter') m.el.querySelector('.ux-btn.primary').click(); });
+  };
+  UI.loadFileFlow = (onCancel) => {
+    const m = UI.modal('Load your progress file', `<p>Pick your <b>TerminalEX-First-Last.json</b> file, or paste its text below.</p><button class="ux-btn" id="lf-pick">📂 Choose file…</button><textarea class="ux-textarea" id="lf-text" placeholder="…or paste the file's text here"></textarea><p class="ux-err" id="lf-err" hidden></p>`, [
+      { text: 'Cancel', onclick: () => { if (onCancel) onCancel(); } },
+      { text: 'Load', primary: true, onclick: (ov) => { go($('#lf-text', ov).value, ov); return false; } }], { wide: true, sticky: !UI.state.name });
+    const go = (text, ov) => {
+      const r = UI.restoreFromFile(text);
+      if (!r.ok) { const e = $('#lf-err', ov); e.hidden = false; e.textContent = r.why; return; }
+      m.close(); location.reload();
+    };
+    $('#lf-pick', m.el).addEventListener('click', () => UI.pickFile((t) => go(t, m.el)));
+  };
+  UI.checkFileFlow = () => {
+    const m = UI.modal('Check a progress file (view only)', '<p>For teachers: pick or paste a student\'s file. Nothing is loaded or changed.</p><button class="ux-btn" id="cf-pick">📂 Choose file…</button><textarea class="ux-textarea" id="cf-text" placeholder="…or paste the text"></textarea><div id="cf-out"></div>', [{ text: 'Check', primary: true, onclick: (ov) => { show($('#cf-text', ov).value); return false; } }, { text: 'Close' }], { wide: true });
+    const show = (text) => {
+      const r = UI.readProgressFile(text);
+      $('#cf-out', m.el).innerHTML = r.ok ? `<div class="ux-ok">✓ Genuine — made by this TerminalEX</div><pre class="ux-pre">${esc(JSON.stringify(Object.assign({ student: r.file.student, saved: r.file.savedAt }, r.file.summary), null, 2))}</pre>` : `<div class="ux-bad">✗ Refused: ${esc(r.why)}</div>`;
+    };
+    $('#cf-pick', m.el).addEventListener('click', () => UI.pickFile(show));
+  };
+  UI.studentMenu = () => {
+    const lv = UI.level(UI.state.xp);
+    UI.modal(esc(UI.state.name || 'Not signed in'), `
+      <p>Level ${lv.n}: <b>${esc(lv.title)}</b> · ${UI.state.xp} XP · ${Object.keys(UI.state.done).length} missions · ${Object.keys(UI.state.certs).length} certificates</p>
+      <div class="ux-stack">
+        <button class="ux-btn primary" data-a="save">⬇ Download my progress file</button>
+        <button class="ux-btn" data-a="load">📂 Load a progress file</button>
+        <button class="ux-btn" data-a="badges">🏅 My badges</button>
+        <button class="ux-btn" data-a="check">🔍 Check a progress file (teachers)</button>
+        <button class="ux-btn danger" data-a="erase">Erase everything and start over</button>
+      </div>
+      <p class="ux-dim">Your progress file holds your name, XP, missions, test results, certificates and all your files on every pretend computer. Load it on any computer to pick up where you left off.</p>`, [{ text: 'Close' }]).el.addEventListener('click', (e) => {
+      const a = e.target.closest('[data-a]'); if (!a) return;
+      const ov = e.currentTarget; ov.remove();
+      if (a.dataset.a === 'save') { if (!UI.state.name) return UI.welcome(); UI.download(UI.progressFileName(), UI.progressFileText()); }
+      if (a.dataset.a === 'load') UI.loadFileFlow();
+      if (a.dataset.a === 'badges') UI.showBadges();
+      if (a.dataset.a === 'check') UI.checkFileFlow();
+      if (a.dataset.a === 'erase') UI.modal('Erase everything?', '<p>This deletes your name, XP, certificates and every file on every pretend computer <b>in this browser</b>. Download your progress file first if you might want it back.</p>', [{ text: 'Cancel' }, { text: 'Erase everything', danger: true, onclick: () => { try { Object.keys(localStorage).filter((k) => k.startsWith('tx.') || k.startsWith('terminalex')).forEach((k) => localStorage.removeItem(k)); } catch (err) { /* ignore */ } location.reload(); } }]);
+    });
+  };
+  UI.showBadges = () => {
+    UI.openPage('badges', '🏅 Badges', `<div class="badge-grid">${UI.BADGES.map((b) => { const got = UI.state.badges[b.id]; return `<div class="badge-card ${got ? 'got' : ''}"><div class="badge-icon">${b.icon}</div><div><b>${esc(b.name)}</b><div class="ux-dim">${esc(b.desc)}</div><div class="badge-xp">${got ? '✓ earned ' + new Date(got).toLocaleDateString() : '+' + b.xp + ' XP'}</div></div></div>`; }).join('')}</div>`);
+  };
+
+  // ------------------------------------------------------------------ the home page
+  const open = (kind) => { UI.closePage(); TX.app.newTab(kind); };
+  UI.renderHome = () => {
+    const host = $('#launcher .launcher-inner');
+    if (!host) return;
+    const st = UI.state, lv = UI.level(st.xp);
+    const shellCard = (k) => { const d = TX.SHELLS[k]; return `<button class="launch-card" data-kind="${k}" style="--c:${d.color}" title="${esc(d.blurb)}"><span class="lc-badge">${TX.app.badge(k)}</span><span class="lc-text"><span class="lc-name">${esc(d.label)}</span><span class="lc-sub">${esc(d.sub)}</span></span>${st.visited[k] ? '' : '<span class="lc-new">new</span>'}</button>`; };
+    const lessonCard = (L) => {
+      const p = UI.lessonProgress(L), done = UI.lessonDone(L), t = st.tests[L.id] || {}, cert = st.certs[L.id];
+      const d = TX.SHELLS[L.shell];
+      return `<div class="lesson-card ${cert ? 'certified' : done ? 'ready' : ''}" style="--c:${d.color}">
+        <div class="lesson-top"><span class="lesson-icon">${L.icon}</span><div><div class="lesson-n">Lesson ${L.n}</div><div class="lesson-title">${esc(L.title)}</div></div></div>
+        ${L.history ? `<div class="lesson-sub">Explore the family tree (${Math.min(st.stats.historyNodes || 0, 6)}/6 systems)</div>` : `<div class="m-bar"><span style="width:${p.pct}%"></span></div><div class="lesson-sub">${p.done}/${p.total} missions · ${esc(d.label)}</div>`}
+        <div class="lesson-actions">
+          <button class="ux-btn small" data-guide="${L.id}">📖 Guide</button>
+          ${L.history ? `<button class="ux-btn small" data-history="1">🌳 Explore</button>` : `<button class="ux-btn small" data-practice="${L.id}">▶ Practice</button>`}
+          ${cert ? `<button class="ux-btn small primary" data-cert="${L.id}">🎓 Certificate</button>` : `<button class="ux-btn small ${done ? 'primary' : ''}" data-test="${L.id}" ${done ? '' : 'disabled title="Finish the practice first"'}>${t.attempts ? '🔁 Retake test' : '🎓 Take test'}</button>`}
+        </div>
+        ${cert ? `<div class="lesson-pass">✓ Passed ${t.passScore}/${t.of}</div>` : t.attempts ? `<div class="lesson-sub">Best ${t.best || 0}/${t.of || 10} · ${t.attempts} attempt${t.attempts > 1 ? 's' : ''}</div>` : ''}
+      </div>`;
+    };
+    host.innerHTML = `
+      <button id="launcher-close" class="icon-btn" aria-label="Close start page" ${TX.app.sessions.length ? '' : 'style="display:none"'}>×</button>
+      <div class="home-hero">
+        <div class="hero-logo"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#20232b"/><path d="M8 11l6 5-6 5" stroke="#39d98a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 22h8" stroke="#e6e6e6" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <div class="home-hero-text"><h1>Terminal<b>EX</b></h1><p>Ten real-feeling terminals from 1979 to today. Nothing you type can hurt a real computer.</p></div>
+        <button class="student-card" id="home-student">${st.name ? `<span class="sc-name">${esc(st.name)}</span><span class="sc-level">Level ${lv.n} · ${esc(lv.title)}</span><span class="m-bar"><span style="width:${lv.pct}%"></span></span><span class="sc-xp">${st.xp} XP · ${Object.keys(st.badges).length} badges · ${Object.keys(st.certs).length} certificates</span>` : '<span class="sc-name">Sign in</span><span class="sc-level">Type your name to start earning XP</span>'}</button>
+      </div>
+      ${UI.loadNotice ? `<div class="ux-bad">${esc(UI.loadNotice)}</div>` : ''}${UI.storageOk ? '' : '<div class="ux-bad">This browser is not letting TerminalEX save. Everything works today, but download your progress file before you leave.</div>'}
+      <div class="home-tools">
+        <button class="tool-card" data-tool="cheat"><span>📘</span><b>Interactive Cheat Sheet</b><span class="ux-dim">${TX.reference.TASKS.length} tasks × 8 systems, each with ▶ Run</span></button>
+        <button class="tool-card" data-tool="history"><span>🌳</span><b>History & Family Tree</b><span class="ux-dim">From UNIX (1969) and CP/M to today</span></button>
+        <button class="tool-card" data-tool="automation"><span>🤖</span><b>Automation Lab</b><span class="ux-dim">Ready-made Python scripts + CSV data</span></button>
+        <button class="tool-card" data-tool="badges"><span>🏅</span><b>Badges</b><span class="ux-dim">${Object.keys(st.badges).length}/${UI.BADGES.length} earned</span></button>
+      </div>
+      ${TX.SHELL_ERAS.map(([era, label]) => `<h2 class="home-h">${label}</h2><div class="launch-grid">${TX.SHELL_ORDER.filter((k) => TX.SHELLS[k].era === era).map(shellCard).join('')}</div>`).join('')}
+      <h2 class="home-h">Lessons <span class="ux-dim">— practice missions → guide → certification test → certificate</span></h2>
+      <div class="lesson-grid">${TX.lessons.LIST.map(lessonCard).join('')}</div>
+      <div class="launch-tips">
+        <div><b>New here?</b> Pick Lesson 1, press ▶ Practice. Missions check themselves as you type.</div>
+        <div><b>It's all connected.</b> cmd, PowerShell and Git Bash share one Windows disk. <code>ssh student@ubuntu-lab</code> from the Mac.</div>
+        <div><b>Can't break it.</b> <code>rm -rf</code> away — <code>reset-machine</code> brings everything back.</div>
+      </div>
+      <p class="home-foot">TerminalEX collects no student data: no accounts, no tracking, no network requests. Progress stays in this browser and in the progress file you save. <button class="linkish" id="home-check">Teachers: check a progress file</button></p>`;
+    host.onclick = (e) => {
+      const t = e.target;
+      const c = t.closest('.launch-card'); if (c) return open(c.dataset.kind);
+      if (t.closest('#launcher-close')) return TX.app.hideLauncher();
+      if (t.closest('#home-student')) return st.name ? UI.studentMenu() : UI.welcome();
+      if (t.closest('#home-check')) return UI.checkFileFlow();
+      const tool = t.closest('[data-tool]');
+      if (tool) { const k = tool.dataset.tool; if (k === 'cheat') return UI.openCheatSheet(); if (k === 'history') return UI.openHistory(); if (k === 'badges') return UI.showBadges(); if (k === 'automation') return UI.practice('automation'); }
+      const b = t.closest('button[data-guide],button[data-practice],button[data-test],button[data-cert],button[data-history]');
+      if (!b) return;
+      if (b.dataset.guide) UI.showGuide(TX.lessons.byId(b.dataset.guide));
+      if (b.dataset.practice) UI.practice(b.dataset.practice);
+      if (b.dataset.history) UI.openHistory();
+      if (b.dataset.test) UI.startTest(TX.lessons.byId(b.dataset.test));
+      if (b.dataset.cert) UI.showCertificate(TX.lessons.byId(b.dataset.cert));
+    };
+  };
+  // Open the lesson's terminal with its missions panel; show the guide the first time.
+  UI.practice = (id) => {
+    const L = TX.lessons.byId(id);
+    TX.app.lessonFocus = id;
+    const ex = TX.app.sessions.find((s) => s.kind === L.shell);
+    UI.closePage();
+    if (ex) TX.app.activate(ex); else TX.app.newTab(L.shell);
+    TX.app.hideLauncher();
+    TX.app.toggleDrawer('missions', true);
+    if (id === 'automation' && TX.app.active) setTimeout(() => TX.app.active.term.paste('cd ~/automation'), 400);
+    if (!UI.state.guides[id]) UI.showGuide(L);
+  };
+  UI.showGuide = (L) => {
+    UI.state.guides[L.id] = UI.state.guides[L.id] || Date.now(); UI.save();
+    const g = L.guide;
+    UI.modal(`${L.icon} Lesson ${L.n}: ${esc(L.title)}`, `
+      <h3>Why it matters</h3><p>${esc(g.why)}</p>
+      <h3>You will be able to</h3><ul>${L.skills.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+      <h3>Vocabulary</h3><table class="guide-vocab">${g.vocab.map(([t, d, ex]) => `<tr><td><b>${esc(t)}</b></td><td>${esc(d)}${ex ? `<div><code>${esc(ex)}</code></div>` : ''}</td></tr>`).join('')}</table>
+      <h3>Common traps</h3><ul class="guide-traps">${g.traps.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+      <p class="ux-dim">Practice: ${L.history ? 'explore 6 systems on the family tree' : L.missions.length + ' missions in the ' + esc(TX.SHELLS[L.shell].label) + ' terminal'} · Test: ${TX.certtest.COUNT} questions, no hints, ${TX.certtest.PASS} to pass.</p>`,
+    [{ text: L.history ? '🌳 Explore the family tree' : '▶ Start practicing', primary: true, onclick: () => { if (L.history) UI.openHistory(); else if (!TX.app.active || TX.app.active.kind !== L.shell) UI.practice(L.id); } }, { text: 'Close' }], { wide: true });
+  };
+
+  // ------------------------------------------------------------------ History & Lineage
+  UI.openHistory = () => {
+    const H = TX.lessons.HISTORY, F = TX.lessons.FAMILIES;
+    UI.state.stats.historySeen = (UI.state.stats.historySeen || 0) + 1; UI.save();
+    const seen = new Set(UI.state.stats.historyVisited || []);
+    const y0 = 1963, y1 = 2018, W = 940, colW = 108, top = 30, yScale = 16;
+    const xOf = (n) => 50 + n.x * colW, yOf = (n) => top + (n.year - y0) * yScale;
+    const byId = Object.fromEntries(H.map((n) => [n.id, n]));
+    const lines = H.flatMap((n) => (n.parents || []).map((p) => byId[p] ? `<path d="M${xOf(byId[p]) + 46} ${yOf(byId[p]) + 26} C ${xOf(byId[p]) + 46} ${(yOf(byId[p]) + yOf(n)) / 2 + 13}, ${xOf(n) + 46} ${(yOf(byId[p]) + yOf(n)) / 2 + 13}, ${xOf(n) + 46} ${yOf(n)}" class="tree-link" style="stroke:${F[n.fam][0]}"/>` : '')).join('');
+    const years = []; for (let y = 1965; y <= 2015; y += 5) years.push(`<text x="6" y="${top + (y - y0) * yScale + 4}" class="tree-year">${y}</text><line x1="40" x2="${W}" y1="${top + (y - y0) * yScale}" y2="${top + (y - y0) * yScale}" class="tree-grid"/>`);
+    const nodes = H.map((n) => `<g class="tree-node ${seen.has(n.id) ? 'seen' : ''}" data-id="${n.id}" tabindex="0" role="button" aria-label="${esc(n.name)}, ${n.year}"><rect x="${xOf(n)}" y="${yOf(n)}" width="92" height="26" rx="7" style="fill:${F[n.fam][0]}22;stroke:${F[n.fam][0]}"/><text x="${xOf(n) + 46}" y="${yOf(n) + 12}" class="tree-name">${esc(n.name)}</text><text x="${xOf(n) + 46}" y="${yOf(n) + 22}" class="tree-y">${n.year}${n.shell ? ' · ▶' : ''}</text></g>`).join('');
+    const svgH = top + (y1 - y0) * yScale;
+    const COMPARE = [['List files', 'ls', 'DIR / dir', 'Get-ChildItem'], ['Print a file', 'cat', 'TYPE', 'Get-Content'], ['Search text', 'grep', 'FIND / findstr', 'Select-String'], ['Copy', 'cp', 'COPY', 'Copy-Item'], ['Admin rights', 'sudo / su / pfexec', '(none in DOS) / runas', 'Start-Process -Verb RunAs'], ['Path separator', '/', '\\', '\\ (or /)'], ['Options', '-l', '/W', '-Recurse']];
+    const p = UI.openPage('history', '🌳 History & Lineage of the Terminal', `
+      <p class="page-lead">Every terminal in TerminalEX belongs to one of two big families. <b>UNIX</b> (1969) gave us Linux, macOS, FreeBSD, Solaris and Android. <b>CP/M → MS-DOS</b> gave us Windows' Command Prompt and, later, PowerShell. Click a box to read its story; ▶ opens that terminal.</p>
+      <div class="tree-legend">${Object.keys(F).map((k) => `<span><i style="background:${F[k][0]}"></i>${esc(F[k][1])}</span>`).join('')}</div>
+      <div class="tree-wrap"><div class="tree-scroll"><svg viewBox="0 0 ${W} ${svgH}" width="${W}" height="${svgH}" class="tree-svg" role="img" aria-label="Family tree of operating systems and shells">${years.join('')}${lines}${nodes}</svg></div>
+        <aside class="tree-info" id="tree-info"><h3>Pick a system</h3><p class="ux-dim">Explore at least 6 to unlock the History certification test (${Math.min(seen.size, 6)}/6).</p></aside></div>
+      <h2 class="home-h">Eras of the command line</h2>
+      <div class="era-grid">
+        <div class="era"><b>1960s–70s · Time-sharing</b><p>Computers filled rooms and cost millions, so dozens of people shared one through typewriter-like terminals. Commands were short (ls, cp, mv) because typing was slow and loud. UNIX's ideas — small tools, pipes, "everything is a file" — come from here.</p></div>
+        <div class="era"><b>1980s · The personal computer</b><p>Computers came home and to school desks: one person, one program at a time, floppy disks, MS-DOS. No passwords and no users. Batch files were the first automation most people ever wrote.</p></div>
+        <div class="era"><b>1990s · Networks and free software</b><p>The internet grew up on UNIX. Linux (1991) and FreeBSD (1993) gave everyone a free UNIX. Windows NT replaced DOS underneath with cmd.exe on top.</p></div>
+        <div class="era"><b>2000s–today · Servers, clouds, scripts</b><p>Macs became UNIX. PowerShell brought objects to the pipeline. Most of the internet runs on Linux servers that nobody touches with a mouse: everything is done in a terminal — usually by scripts.</p></div>
+      </div>
+      <h2 class="home-h">Same job, different families</h2>
+      <table class="cheat compare"><thead><tr><th>Task</th><th>UNIX family</th><th>DOS / cmd</th><th>PowerShell</th></tr></thead><tbody>${COMPARE.map((r) => `<tr><td>${esc(r[0])}</td>${r.slice(1).map((c) => `<td><code>${esc(c)}</code></td>`).join('')}</tr>`).join('')}</tbody></table>
+      <p><button class="ux-btn" data-guide="history">📖 Lesson 12 guide</button> <button class="ux-btn" id="hist-test">🎓 History certification test</button></p>`);
+    const info = $('#tree-info', p);
+    const pick = (id) => {
+      const n = byId[id];
+      if (!seen.has(id)) { seen.add(id); UI.state.stats.historyVisited = [...seen]; UI.stat('historyNodes'); if (seen.size === 6) setTimeout(() => TX.app.toast('🌳 History test unlocked! Find it on the home page.', true), 300); }
+      p.querySelectorAll('.tree-node').forEach((g) => g.classList.toggle('on', g.dataset.id === id));
+      const g = p.querySelector(`.tree-node[data-id="${id}"]`); if (g) g.classList.add('seen');
+      const kids = H.filter((x) => (x.parents || []).includes(id)).map((x) => x.name);
+      info.innerHTML = `<div class="tree-fam" style="color:${F[n.fam][0]}">${esc(F[n.fam][1])}</div><h3>${esc(n.name)} <span class="ux-dim">${n.year}</span></h3><p>${esc(n.text)}</p>${(n.parents || []).length ? `<p class="ux-dim">Came from: ${n.parents.map((x) => esc(byId[x] ? byId[x].name : x)).join(', ')}</p>` : ''}${kids.length ? `<p class="ux-dim">Led to: ${kids.map(esc).join(', ')}</p>` : ''}${n.shell ? `<button class="ux-btn primary" data-open="${n.shell}">▶ Open the ${esc(TX.SHELLS[n.shell].label)} terminal</button>` : ''}<p class="ux-dim">${Math.min(seen.size, 6)}/6 explored</p>`;
+    };
+    p.addEventListener('click', (e) => {
+      const g = e.target.closest('.tree-node'); if (g) return pick(g.dataset.id);
+      const o = e.target.closest('[data-open]'); if (o) return open(o.dataset.open);
+      if (e.target.closest('[data-guide]')) UI.showGuide(TX.lessons.byId('history'));
+      if (e.target.closest('#hist-test')) { const L = TX.lessons.byId('history'); if (UI.lessonDone(L)) UI.startTest(L); else TX.app.toast('Explore 6 systems on the tree first.'); }
+    });
+    p.addEventListener('keydown', (e) => { const g = e.target.closest('.tree-node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pick(g.dataset.id); } });
+  };
+})();
 
 // ---- ui-reference.js ----
-/* TerminalEX — ui-reference */
-(function () { 'use strict'; })();
+/* TerminalEX — the Interactive Cheat Sheet page: every task side by side on eight systems, with ▶ Run on a fresh
+ * pretend computer (nothing changes on yours) and "type it in my terminal". */
+(function () {
+  'use strict';
+  const TX = window.TX;
+  const UI = TX.UI;
+  const esc = UI.esc;
+  const R = () => TX.reference;
+  const pref = { get(k, d) { try { const v = localStorage.getItem('tx.cheat.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('tx.cheat.' + k, JSON.stringify(v)); } catch (e) { /* ignore */ } } };
+
+  UI.openCheatSheet = (q) => {
+    const PL = R().PLATS;
+    let shown = pref.get('plats', ['bash', 'zsh', 'cmd', 'powershell', 'dos', 'unix']).filter((k) => PL.some((p) => p.k === k));
+    if (TX.app && TX.app.active) { const k = TX.trackOf(TX.app.active.kind) === 'gitbash' ? 'bash' : TX.trackOf(TX.app.active.kind); if (PL.some((p) => p.k === k) && !shown.includes(k)) shown = [k].concat(shown); }
+    let cat = '';
+    const p = UI.openPage('cheat', '📘 Interactive Cheat Sheet', `
+      <div class="cs-controls">
+        <input class="ux-input cs-search" type="search" placeholder="Search: copy, hidden, RAID, python, ping…" value="${esc(q || '')}" aria-label="Search the cheat sheet">
+        <div class="cs-cats"><button class="chip on" data-cat="">All</button>${R().CATS.map(([k, i, l]) => `<button class="chip" data-cat="${k}">${i} ${esc(l)}</button>`).join('')}</div>
+        <div class="cs-plats"><span class="ux-dim">Compare:</span>${PL.map((x) => `<label class="chip-check"><input type="checkbox" value="${x.k}" ${shown.includes(x.k) ? 'checked' : ''}><span style="--c:${TX.SHELLS[x.shell].color}">${esc(x.label)}</span></label>`).join('')}</div>
+        <p class="ux-dim">▶ Run tries the command on a brand-new pretend computer, so nothing changes on yours. ⤵ types it into your terminal.</p>
+      </div>
+      <div class="cs-list" aria-live="polite"></div>`, { cls: 'cheat-page' });
+    const list = p.querySelector('.cs-list');
+    const render = () => {
+      const tasks = R().search(p.querySelector('.cs-search').value).filter((t) => !cat || t.cat === cat);
+      const plats = PL.filter((x) => shown.includes(x.k));
+      list.innerHTML = tasks.length ? tasks.map((t) => `<section class="cs-task" data-id="${t.id}">
+        <header><h3>${esc(t.task)}</h3>${t.why ? `<p>${esc(t.why)}</p>` : ''}</header>
+        <div class="cs-cells" style="--n:${plats.length}">${plats.map((x) => {
+          const c = R().cell(t, x.k);
+          const head = `<div class="cs-plat" style="--c:${TX.SHELLS[x.shell].color}">${esc(x.label)} <span>${esc(x.sub)}</span></div>`;
+          if (!c.c) return `<div class="cs-cell none">${head}<p>✗ ${esc(c.none)}</p></div>`;
+          return `<div class="cs-cell" data-plat="${x.k}">${head}<pre class="cs-code">${esc(c.c)}</pre>${c.n ? `<p class="cs-note">${esc(c.n)}</p>` : ''}<div class="cs-btns">${c.run === false ? '<span class="ux-dim">interactive — try it in a tab</span>' : `<button class="ux-btn small" data-run>▶ Run</button>`}<button class="ux-btn small ghost" data-type title="Type it into a ${esc(x.label)} terminal">⤵ Type it</button></div><div class="cs-out" hidden></div></div>`;
+        }).join('')}</div></section>`).join('') : '<p class="ux-dim">Nothing matches. Try fewer words.</p>';
+    };
+    p.querySelector('.cs-search').addEventListener('input', render);
+    p.querySelector('.cs-cats').addEventListener('click', (e) => { const b = e.target.closest('[data-cat]'); if (!b) return; cat = b.dataset.cat; p.querySelectorAll('.cs-cats .chip').forEach((x) => x.classList.toggle('on', x === b)); render(); });
+    p.querySelector('.cs-plats').addEventListener('change', () => { shown = [...p.querySelectorAll('.cs-plats input:checked')].map((i) => i.value); pref.set('plats', shown); render(); });
+    list.addEventListener('click', async (e) => {
+      const cellEl = e.target.closest('.cs-cell'); if (!cellEl) return;
+      const t = R().TASKS.find((x) => x.id === cellEl.closest('.cs-task').dataset.id), plat = cellEl.dataset.plat;
+      const c = R().cell(t, plat);
+      if (e.target.closest('[data-run]')) {
+        const b = e.target.closest('[data-run]'), out = cellEl.querySelector('.cs-out');
+        b.disabled = true; b.textContent = '… running'; out.hidden = false; out.innerHTML = '';
+        try {
+          const prompt = { dos: 'C:\\STUDENT>', cmd: 'C:\\Users\\student>', powershell: 'PS C:\\Users\\student> ', unix: '$ ' }[plat] || '$ ';
+          const r = await R().runCell(t, plat, { echo: prompt + (prompt.endsWith(' ') ? '' : ' ') });
+          out.innerHTML = UI.ansiToHtml(r.out.replace(/\n+$/, '')) || '<span class="ux-dim">(no output — that usually means it worked!)</span>';
+          UI.stat('refRuns');
+        } catch (err) { out.textContent = 'Could not run: ' + (err && err.message); }
+        b.disabled = false; b.textContent = '▶ Run again';
+      }
+      if (e.target.closest('[data-type]')) {
+        const shell = R().PLATS.find((x) => x.k === plat).shell;
+        const first = c.c.split('\n')[0];
+        UI.closePage();
+        const ex = TX.app.sessions.find((s) => TX.trackOf(s.kind) === shell);
+        if (ex) TX.app.activate(ex); else TX.app.newTab(shell);
+        setTimeout(() => { if (TX.app.active) { TX.app.active.term.paste(first); TX.app.active.focus(); } }, ex ? 60 : 900);
+        if (c.c.includes('\n')) TX.app.toast('Typed the first line. This example has more lines: check the cheat sheet for the rest.');
+      }
+    });
+    render();
+    setTimeout(() => p.querySelector('.cs-search').focus(), 30);
+  };
+})();
 
 // ---- ui-test.js ----
-/* TerminalEX — ui-test */
-(function () { 'use strict'; })();
+/* TerminalEX — the certification test screen. Covers everything: no hints, no cheat sheet, no terminal tabs.
+ * Starting a test counts as an attempt; closing or reloading mid-test counts as a fail. A failed attempt has a
+ * 2-minute review break. Results show the topics to review, never the answers. */
+(function () {
+  'use strict';
+  const TX = window.TX;
+  const UI = TX.UI;
+  const esc = UI.esc;
+  const BREAK_MS = 2 * 60 * 1000;
+  const PROMPT = { bash: 'student@ubuntu-lab:~$', zsh: 'student@MacBook-Pro ~ %', gitbash: 'student@DESKTOP-LAB42 MINGW64 ~ $', freebsd: 'student@freebsd-lab:~ $', solaris: 'student@sol-lab:~$', unix: '$', cmd: 'C:\\Users\\student>', powershell: 'PS C:\\Users\\student>', pwsh: 'PS C:\\Users\\student>', dos: 'C:\\STUDENT>' };
+
+  // A test left open (page closed or reloaded) is recorded as a failed attempt the next time the app starts.
+  UI.settleOpenTests = () => {
+    Object.keys(UI.state.tests).forEach((k) => { const t = UI.state.tests[k]; if (t.open) { t.open = 0; t.lastFail = Date.now(); t.best = t.best || 0; } });
+    UI.save();
+  };
+
+  UI.startTest = (L) => {
+    if (!UI.state.name) return UI.welcome();
+    if (!UI.lessonDone(L)) return TX.app.toast('Finish the practice missions first.');
+    const t = UI.state.tests[L.id] = UI.state.tests[L.id] || { attempts: 0, best: 0, of: TX.certtest.COUNT };
+    if (t.lastFail && Date.now() - t.lastFail < BREAK_MS && !t.passed) {
+      const s = Math.ceil((BREAK_MS - (Date.now() - t.lastFail)) / 1000);
+      return UI.modal('Review break', `<p>Take ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} to review before trying again. Re-read the 📖 guide and redo a few missions.</p>`, [{ text: '📖 Open the guide', primary: true, onclick: () => { UI.showGuide(L); } }, { text: 'OK' }]);
+    }
+    UI.modal(`🎓 ${esc(L.title)}: certification test`, `<ul><li>${TX.certtest.COUNT} questions, drawn at random. About half are <b>hands-on</b>: you type a real command.</li><li>Hands-on answers are run on a pretend computer and checked by what they DO, so any command that works is right.</li><li><b>No hints, no cheat sheet, no terminal tabs.</b> You need ${TX.certtest.PASS} of ${TX.certtest.COUNT} to pass.</li><li>The attempt counts as soon as you start. Closing the page counts as a fail.</li></ul>`, [{ text: 'Not yet' }, { text: 'Start the test', primary: true, onclick: () => run(L) }]);
+  };
+
+  function run(L) {
+    const t = UI.state.tests[L.id];
+    t.attempts = (t.attempts || 0) + 1; t.open = 1; t.of = TX.certtest.COUNT;
+    UI.saveNow();
+    const qs = TX.certtest.draw(L.id);
+    const answers = new Array(qs.length).fill('');
+    let i = 0;
+    const started = Date.now();
+    const p = UI.openPage('test', `🎓 ${esc(L.title)} — test`, '<div class="test-wrap"></div>', { cls: 'test-page', back: 'Quit test', onBack: () => UI.modal('Quit the test?', '<p>Quitting now counts as a failed attempt.</p>', [{ text: 'Keep going', primary: true }, { text: 'Quit', danger: true, onclick: () => finish(true) }]) });
+    document.body.classList.add('testing');
+    const wrap = p.querySelector('.test-wrap');
+    const show = () => {
+      const q = qs[i];
+      wrap.innerHTML = `<div class="test-progress">${qs.map((_, k) => `<span class="${k === i ? 'on' : answers[k] ? 'ans' : ''}"></span>`).join('')}</div>
+        <div class="test-q"><div class="test-n">Question ${i + 1} of ${qs.length}${q.t === 'cmd' ? ` · hands-on · ${esc(TX.SHELLS[q.shell].label)}` : ''}</div><h2>${esc(q.q)}</h2>
+        ${q.t === 'mc' ? `<div class="test-opts">${q.o.map((o, k) => `<label class="test-opt"><input type="radio" name="o" value="${k}" ${answers[i] === o ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('')}</div>`
+          : `<div class="test-term"><span class="test-prompt">${esc(PROMPT[q.shell] || '$')}</span><input class="test-cmd" spellcheck="false" autocomplete="off" autocapitalize="off" value="${esc(answers[i])}" aria-label="Your command"></div>
+             ${q.setup.length ? `<p class="ux-dim">Before your command runs: <code>${esc(q.setup.join(' ; '))}</code></p>` : ''}
+             <button class="ux-btn small" data-try>▶ Try it</button><pre class="test-out" hidden></pre><p class="ux-dim">"Try it" shows what your command prints. It does not tell you if it is right — that is your job!</p>`}
+        </div>
+        <div class="test-nav"><button class="ux-btn" data-prev ${i ? '' : 'disabled'}>← Back</button><button class="ux-btn primary" data-next>${i === qs.length - 1 ? 'Finish and grade' : 'Next →'}</button></div>`;
+      const inp = wrap.querySelector('.test-cmd');
+      if (inp) { inp.focus(); inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') wrap.querySelector('[data-try]').click(); }); }
+    };
+    const save = () => {
+      const q = qs[i];
+      if (q.t === 'mc') { const r = wrap.querySelector('input[name="o"]:checked'); answers[i] = r ? q.o[+r.value] : ''; }
+      else answers[i] = wrap.querySelector('.test-cmd').value;
+    };
+    wrap.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-try]')) {
+        save();
+        const q = qs[i], out = wrap.querySelector('.test-out'), b = e.target.closest('[data-try]');
+        if (!answers[i].trim()) return;
+        b.disabled = true; out.hidden = false; out.textContent = '… running';
+        out.textContent = (await TX.certtest.runOn(q, answers[i].trim(), 'a')).replace('\u0000timeout', '(it took too long — is it waiting for input?)') || '(no output)';
+        b.disabled = false;
+      }
+      if (e.target.closest('[data-prev]')) { save(); i--; show(); }
+      if (e.target.closest('[data-next]')) {
+        save();
+        if (i < qs.length - 1) { i++; show(); return; }
+        const blank = answers.filter((a) => !String(a).trim()).length;
+        if (blank) UI.modal('Some answers are blank', `<p>${blank} question${blank > 1 ? 's are' : ' is'} empty. Grade anyway?</p>`, [{ text: 'Go back' }, { text: 'Grade it', primary: true, onclick: () => finish(false) }]);
+        else finish(false);
+      }
+    });
+    wrap.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('input[type=radio]')) wrap.querySelector('[data-next]').click(); });
+    async function finish(quit) {
+      wrap.innerHTML = '<div class="test-grading"><div class="spinner"></div><p>Grading… hands-on answers are being run on two pretend computers.</p></div>';
+      const ok = [];
+      for (let k = 0; k < qs.length; k++) ok.push(quit ? false : await TX.certtest.grade(qs[k], answers[k]));
+      const score = ok.filter(Boolean).length, passed = !quit && score >= TX.certtest.PASS;
+      t.open = 0; t.best = Math.max(t.best || 0, score); t.secs = Math.round((Date.now() - started) / 1000);
+      UI.stat('tests');
+      if (passed && !t.passed) {
+        t.passed = Date.now(); t.passScore = score; t.passAttempt = t.attempts;
+        UI.state.certs[L.id] = { code: UI.makeCert(L, t), t: Date.now() };
+        UI.badge('certified');
+        if (score === qs.length) UI.badge('ace');
+        if (Object.keys(UI.state.certs).length >= 5) UI.badge('cert-5');
+        UI.addXP(50);
+      } else if (!passed) t.lastFail = Date.now();
+      UI.saveNow();
+      document.body.classList.remove('testing');
+      const missed = [...new Set(qs.filter((q, k) => !ok[k]).map((q) => q.topic).filter(Boolean))];
+      wrap.innerHTML = `<div class="test-result ${passed ? 'pass' : 'fail'}"><div class="test-score">${score}/${qs.length}</div><h2>${passed ? '🎉 Passed! Certificate earned (+50 XP)' : quit ? 'Test ended' : 'Not this time'}</h2>
+        ${passed ? '' : `<p>You need ${TX.certtest.PASS}. Take a 2-minute review break, then try a new set of questions.</p>`}
+        ${missed.length ? `<h3>Topics to review</h3><ul>${missed.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
+        <div class="test-nav">${passed ? '<button class="ux-btn primary" data-cert>🎓 See my certificate</button>' : '<button class="ux-btn primary" data-guide>📖 Review the guide</button>'}<button class="ux-btn" data-home>Home</button></div></div>`;
+      wrap.onclick = (ev) => {
+        if (ev.target.closest('[data-cert]')) UI.showCertificate(L);
+        if (ev.target.closest('[data-guide]')) { UI.closePage(); TX.app.showLauncher(); UI.showGuide(L); }
+        if (ev.target.closest('[data-home]')) { UI.closePage(); TX.app.showLauncher(); }
+      };
+      UI.renderHome();
+    }
+    show();
+  }
+})();
 
 // ---- ui-cert.js ----
-/* TerminalEX — ui-cert */
-(function () { 'use strict'; })();
+/* TerminalEX — certificates: shown on screen, printable / savable as PDF, downloadable as an image. */
+(function () {
+  'use strict';
+  const TX = window.TX;
+  const UI = TX.UI;
+  const esc = UI.esc;
+
+  UI.showCertificate = (L) => {
+    const rec = UI.state.certs[L.id];
+    if (!rec) return;
+    const r = UI.readCert(rec.code);
+    if (!r.ok) return UI.modal('Certificate problem', `<p>${esc(r.why)}</p>`, [{ text: 'OK' }]);
+    const c = r.cert;
+    const p = UI.openPage('cert', '🎓 Certificate', `
+      <div class="cert" id="cert">
+        <div class="cert-inner">
+          <div class="cert-logo">Terminal<b>EX</b></div>
+          <div class="cert-kicker">Certificate of Completion</div>
+          <div class="cert-this">This certifies that</div>
+          <div class="cert-name">${esc(c.name)}</div>
+          <div class="cert-this">has completed</div>
+          <div class="cert-lesson">Lesson ${c.n}: ${esc(c.title)}</div>
+          <ul class="cert-skills">${L.skills.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+          <div class="cert-facts"><span>Test score <b>${c.score}/${c.of}</b></span><span>Attempt <b>${c.attempt}</b></span><span>Practice missions <b>${c.missions}</b></span><span>Missions with hints <b>${c.hints}</b></span><span>Date <b>${esc(c.date)}</b></span></div>
+          <div class="cert-code">Verification: the student's sealed progress file. Code ${esc(rec.code.slice(-12))}</div>
+        </div>
+      </div>
+      <p class="cert-actions"><button class="ux-btn primary" data-print>🖨 Print / save as PDF</button> <button class="ux-btn" data-img>⬇ Download image</button></p>`, { cls: 'cert-page' });
+    p.querySelector('[data-print]').addEventListener('click', () => window.print());
+    p.querySelector('[data-img]').addEventListener('click', () => drawImage(c, L));
+  };
+
+  function drawImage(c, L) {
+    const W = 1600, H = 1130;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d');
+    g.fillStyle = '#fbf8ef'; g.fillRect(0, 0, W, H);
+    g.strokeStyle = '#1f6f4a'; g.lineWidth = 14; g.strokeRect(40, 40, W - 80, H - 80);
+    g.strokeStyle = '#39d98a'; g.lineWidth = 3; g.strokeRect(70, 70, W - 140, H - 140);
+    g.textAlign = 'center'; g.fillStyle = '#16181d';
+    const t = (s, y, font, color) => { g.font = font; g.fillStyle = color || '#16181d'; g.fillText(s, W / 2, y); };
+    t('TerminalEX', 170, '700 56px Georgia, serif', '#1f6f4a');
+    t('CERTIFICATE OF COMPLETION', 240, '600 30px Helvetica, Arial, sans-serif', '#555');
+    t('This certifies that', 330, 'italic 30px Georgia, serif', '#444');
+    t(c.name, 420, '700 76px Georgia, serif');
+    t('has completed', 490, 'italic 30px Georgia, serif', '#444');
+    t(`Lesson ${c.n}: ${c.title}`, 570, '700 44px Helvetica, Arial, sans-serif', '#1f6f4a');
+    L.skills.slice(0, 4).forEach((s, i) => t('• ' + s, 650 + i * 44, '28px Helvetica, Arial, sans-serif', '#333'));
+    t(`Test ${c.score}/${c.of}  ·  Attempt ${c.attempt}  ·  ${c.missions} practice missions  ·  ${c.date}`, 900, '600 28px Helvetica, Arial, sans-serif', '#333');
+    t('Verified by the student\'s sealed TerminalEX progress file', 1000, '22px Helvetica, Arial, sans-serif', '#777');
+    try {
+      cv.toBlob((b) => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `TerminalEX-Certificate-${c.n}-${c.name.replace(/[^A-Za-z0-9]+/g, '-')}.png`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); });
+    } catch (e) { TX.app.toast('Downloads are blocked here — use Print / save as PDF instead.'); }
+  }
+})();
 
 // ---- app.js ----
 /* TerminalEX — application shell: tabs, sessions, themes, settings, persistence, drawer */
@@ -18312,6 +19194,7 @@ export EDITOR=nano
       this.term.write(root.banner ? root.banner() : '');
       this.refreshTitle();
       this.applyTheme();
+      if (TX.UI) TX.UI.visit(this.kind);
       if (root.boot) { try { await root.boot(); } catch (e) { console.error(e); } }
       while (gen === this.gen) {
         const sh = this.top;
@@ -18423,7 +19306,6 @@ export EDITOR=nano
     active: null,
     histories: store.get('history', {}),
     log: store.get('log', {}),
-    done: store.get('missions', {}),
     settings: Object.assign({}, DEFAULT_SETTINGS, store.get('settings', {})),
     saveTimer: null,
 
@@ -18431,6 +19313,9 @@ export EDITOR=nano
       const remotes = store.get('remotes', null);
       if (remotes) Object.assign(TX.gitRemotes, remotes);
       TX.psExecPolicy = store.get('psExecPolicy', null) || undefined;
+      const UI = TX.UI;
+      UI.settleOpenTests();
+      UI.onChange = () => { this.renderDrawer(); if (!$('#launcher').classList.contains('hidden')) UI.renderHome(); this.renderStudent(); };
       this.buildLauncher();
       this.buildNewMenu();
       this.bindUI();
@@ -18438,7 +19323,9 @@ export EDITOR=nano
       const open = store.get('openTabs', []);
       if (open.length) open.forEach((k) => this.newTab(k, {}, true));
       if (this.sessions.length) this.activate(this.sessions[0]); else this.showLauncher(true);
-      window.addEventListener('beforeunload', () => this.saveNow());
+      this.renderStudent();
+      if (!UI.state.name) setTimeout(() => UI.welcome(), 300);
+      window.addEventListener('beforeunload', () => { this.saveNow(); UI.saveNow(); });
       document.addEventListener('visibilitychange', () => { if (document.hidden) this.saveNow(); });
     },
 
@@ -18470,8 +19357,6 @@ export EDITOR=nano
       store.del('fs.' + kind);
       delete this.machines[kind];
       this.sessions.filter((s) => s.def.machine === kind).forEach((s) => { s.colorOverride = null; s.start(); });
-      Object.keys(this.done).forEach((id) => { const t = this.trackOfMission(id); if (t && SHELLS[t] && SHELLS[t].machine === kind) delete this.done[id]; });
-      store.set('missions', this.done);
       this.renderDrawer();
       this.toast('♻️  Machine reset to factory settings');
     },
@@ -18553,27 +19438,26 @@ export EDITOR=nano
       const ctx = this.missionCtx(track);
       const won = [];
       t.list.forEach((mi) => {
-        if (this.done[mi.id]) return;
+        if (TX.UI.isDone(mi.id)) return;
         let ok = false;
         try { ok = mi.check(ctx); } catch (e) { ok = false; }
-        if (ok) { this.done[mi.id] = Date.now(); won.push(mi); }
+        if (ok) won.push([mi, TX.UI.completeMission(mi)]);
       });
       if (!won.length) return;
       // One command can finish several missions at once; show one combined toast instead of a stack.
-      if (won.length === 1) this.toast(`🏁 Mission complete: <b>${TX.escapeHtml(won[0].title)}</b> <span class="xp">+${won[0].xp} XP</span>`, true);
-      else this.toast(`🏁 ${won.length} missions complete: <b>${won.slice(0, 3).map((mi) => TX.escapeHtml(mi.title)).join(', ')}${won.length > 3 ? ', …' : ''}</b> <span class="xp">+${won.reduce((a, mi) => a + mi.xp, 0)} XP</span>`, true);
+      if (won.length === 1) this.toast(`🏁 Mission complete: <b>${TX.escapeHtml(won[0][0].title)}</b> <span class="xp">+${won[0][1]} XP</span>`, true);
+      else this.toast(`🏁 ${won.length} missions complete: <b>${won.slice(0, 3).map(([mi]) => TX.escapeHtml(mi.title)).join(', ')}${won.length > 3 ? ', …' : ''}</b> <span class="xp">+${won.reduce((a, [, x]) => a + x, 0)} XP</span>`, true);
       this.confetti();
-      store.set('missions', this.done); this.renderDrawer();
+      this.renderDrawer();
     },
 
     // ---------------- UI building
-    buildLauncher() {
-      const grid = $('#launcher-grid');
-      grid.innerHTML = Object.keys(SHELLS).map((k) => {
-        const d = SHELLS[k];
-        return `<button class="launch-card" data-kind="${k}" style="--c:${d.color}"><span class="lc-badge">${badge(k)}</span><span class="lc-text"><span class="lc-name">${d.label}</span><span class="lc-sub">${d.sub}</span></span><span class="lc-go">Open →</span></button>`;
-      }).join('');
-      grid.addEventListener('click', (e) => { const b = e.target.closest('.launch-card'); if (b) this.newTab(b.dataset.kind); });
+    buildLauncher() { TX.UI.renderHome(); },
+    renderStudent() {
+      const b = $('#btn-student'); if (!b) return;
+      const st = TX.UI.state, lv = TX.UI.level(st.xp);
+      b.innerHTML = st.name ? `<span class="st-name">${TX.escapeHtml(st.name.split(' ')[0])}</span><span class="st-lv">Lv ${lv.n}</span>` : '<span class="st-name">Sign in</span>';
+      b.title = st.name ? `${st.name} · Level ${lv.n} ${lv.title} · ${st.xp} XP` : 'Type your name to start earning XP';
     },
     buildNewMenu() {
       const menu = $('#new-menu');
@@ -18591,7 +19475,11 @@ export EDITOR=nano
       $('#btn-new-menu').addEventListener('click', (e) => { e.stopPropagation(); $('#new-menu').classList.toggle('open'); });
       document.addEventListener('click', (e) => { if (!e.target.closest('#new-menu') && !e.target.closest('#btn-new-menu')) $('#new-menu').classList.remove('open'); });
       $('#btn-missions').addEventListener('click', () => this.toggleDrawer('missions'));
-      $('#btn-cheat').addEventListener('click', () => this.toggleDrawer('cheat'));
+      $('#btn-cheat').addEventListener('click', () => TX.UI.openCheatSheet());
+      $('#btn-history').addEventListener('click', () => TX.UI.openHistory());
+      $('#btn-home').addEventListener('click', () => { TX.UI.closePage(); this.showLauncher(); });
+      $('#btn-student').addEventListener('click', () => (TX.UI.state.name ? TX.UI.studentMenu() : TX.UI.welcome()));
+      $('.brand').addEventListener('click', () => { TX.UI.closePage(); this.showLauncher(); });
       $('#btn-settings').addEventListener('click', () => this.openSettings());
       $('#btn-full').addEventListener('click', () => this.toggleFullscreen());
       $('#launcher-close').addEventListener('click', () => this.hideLauncher());
@@ -18600,6 +19488,8 @@ export EDITOR=nano
       $('#settings-close').addEventListener('click', () => this.closeSettings());
       $('#modal-settings').addEventListener('click', (e) => { if (e.target.id === 'modal-settings') this.closeSettings(); });
       document.addEventListener('keydown', (e) => {
+        if (document.body.classList.contains('testing')) return;
+        if (e.key === 'Escape' && !$('#page').hidden && !document.querySelector('.ux-overlay')) { TX.UI.closePage(); e.preventDefault(); return; }
         if (e.key === 'Escape') { if ($('#modal-settings').classList.contains('open')) { this.closeSettings(); e.preventDefault(); return; } if (!$('#launcher').classList.contains('hidden') && this.sessions.length) { this.hideLauncher(); e.preventDefault(); return; } }
         if (!e.altKey || e.ctrlKey || e.metaKey) return;
         const k = e.key.toLowerCase();
@@ -18611,7 +19501,8 @@ export EDITOR=nano
         else if (k === '=' || k === '+') { e.preventDefault(); this.setSetting('fontSize', Math.min(32, this.settings.fontSize + 1)); }
         else if (k === '-') { e.preventDefault(); this.setSetting('fontSize', Math.max(9, this.settings.fontSize - 1)); }
         else if (k === 'm') { e.preventDefault(); this.toggleDrawer('missions'); }
-        else if (k === 'c') { e.preventDefault(); this.toggleDrawer('cheat'); }
+        else if (k === 'c') { e.preventDefault(); TX.UI.openCheatSheet(); }
+        else if (k === 'h') { e.preventDefault(); TX.UI.closePage(); this.showLauncher(); }
         else if (k === 'enter') { e.preventDefault(); this.toggleFullscreen(); }
       });
       // touch helper keys
@@ -18631,6 +19522,7 @@ export EDITOR=nano
       window.addEventListener('resize', () => { if (this.active) this.active.term.measure(); });
     },
     showLauncher(noClose) {
+      TX.UI.renderHome();
       $('#launcher').classList.remove('hidden');
       $('#launcher-close').style.display = noClose || !this.sessions.length ? 'none' : '';
       const first = $('#launcher .launch-card');
@@ -18645,9 +19537,9 @@ export EDITOR=nano
       const el = document.documentElement;
       try { if (!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen(); } catch (e) { /* not allowed */ }
     },
-    toggleDrawer(tab) {
+    toggleDrawer(tab, forceOpen) {
       const d = $('#drawer');
-      if (!tab || (d.classList.contains('open') && this.drawerTab === tab)) { d.classList.remove('open'); document.body.classList.remove('drawer-open'); }
+      if (!tab || (!forceOpen && d.classList.contains('open') && this.drawerTab === tab)) { d.classList.remove('open'); document.body.classList.remove('drawer-open'); }
       else { this.drawerTab = tab; d.classList.add('open'); document.body.classList.add('drawer-open'); }
       this.renderDrawer();
       setTimeout(() => { if (this.active) { this.active.term.measure(); this.active.focus(); } }, 260);
@@ -18661,48 +19553,56 @@ export EDITOR=nano
       else if (tab === 'cheat') body.innerHTML = this.cheatHTML();
       else body.innerHTML = this.keysHTML();
       this.bindDrawer(body, tab);
-      const total = Object.values(TX.missions.tracks).filter((t, i, a) => a.indexOf(t) === i).reduce((a, t) => a + t.list.filter((m) => this.done[m.id]).reduce((x, m) => x + m.xp, 0), 0);
-      $('#xp-count').textContent = total;
+      $('#xp-count').textContent = TX.UI.state.xp;
+      this.renderStudent();
     },
     missionsHTML() {
+      const UI = TX.UI;
       const track = this.active ? this.active.trackKey() : 'bash';
-      const t = TX.missions.tracks[track];
-      const tracks = [['bash', 'Linux'], ['zsh', 'macOS'], ['cmd', 'cmd'], ['powershell', 'PowerShell'], ['gitbash', 'Git Bash']];
+      const t = TX.missions.tracks[track] || TX.missions.tracks.bash;
+      const tracks = [['bash', 'Linux'], ['zsh', 'macOS'], ['freebsd', 'FreeBSD'], ['solaris', 'Solaris'], ['cmd', 'cmd'], ['powershell', 'PowerShell'], ['gitbash', 'Git Bash'], ['dos', 'MS-DOS'], ['unix', 'UNIX V7']];
       const list = t.list;
-      const doneN = list.filter((m) => this.done[m.id]).length;
-      const xp = list.filter((m) => this.done[m.id]).reduce((a, m) => a + m.xp, 0);
+      const doneN = list.filter((m) => UI.isDone(m.id)).length;
       const pct = Math.round((doneN / list.length) * 100);
-      return `<div class="m-head"><div class="m-track">${tracks.map(([k, l]) => `<button class="m-chip ${k === track || (track === 'pwsh' && k === 'powershell') ? 'on' : ''}" data-open="${k}" title="Open a ${l} tab">${l}</button>`).join('')}</div>
-        <div class="m-title">${t.name} missions</div>
-        <div class="m-progress"><div class="m-bar"><span style="width:${pct}%"></span></div><span>${doneN}/${list.length} · ${xp} XP</span></div>
-        <p class="m-note">Missions check your work automatically as you type commands in a <b>${t.name}</b> tab.</p></div>
-        <ol class="m-list">${list.map((m, i) => {
-          const done = !!this.done[m.id];
-          return `<li class="m-item ${done ? 'done' : ''}" data-id="${m.id}"><details ${!done && list.findIndex((x) => !this.done[x.id]) === i ? 'open' : ''}><summary><span class="m-dot">${done ? '✓' : i + 1}</span><span class="m-name">${TX.escapeHtml(m.title)}</span><span class="m-xp">${m.xp} XP</span></summary>
-          <div class="m-body"><p>${TX.escapeHtml(m.text)}</p><div class="m-actions"><button class="m-hint">💡 Hint</button>${this.settings.showAnswers ? '<button class="m-ans">Show answer</button>' : ''}</div><p class="m-hint-text" hidden>${TX.escapeHtml(m.hint)}</p><p class="m-ans-text" hidden><code class="ins" data-cmd="${TX.escapeHtml(m.answer)}">${TX.escapeHtml(m.answer)}</code></p></div></details></li>`;
-        }).join('')}</ol>
-        <div class="m-foot"><button class="linkish" id="m-reset">Reset mission progress</button></div>`;
+      const groups = [];
+      list.forEach((m) => { const L = TX.lessons.ofMission(m.id); const key = L ? L.id : 'other'; let g = groups.find((x) => x.key === key); if (!g) groups.push((g = { key, L, items: [] })); g.items.push(m); });
+      const firstOpen = list.find((x) => !UI.isDone(x.id));
+      const item = (m, i) => {
+        const done = UI.isDone(m.id), h = UI.state.hints[m.id] || 0;
+        return `<li class="m-item ${done ? 'done' : ''}" data-id="${m.id}"><details ${firstOpen === m ? 'open' : ''}><summary><span class="m-dot">${done ? '✓' : i + 1}</span><span class="m-name">${TX.escapeHtml(m.title)}</span><span class="m-xp">${done ? UI.state.done[m.id].xp : UI.reward(m)} XP</span></summary>
+          <div class="m-body"><p>${TX.escapeHtml(m.text)}</p><div class="m-actions"><button class="m-hint">💡 Hint${h & 1 || done ? '' : ' <small>(−20% XP)</small>'}</button>${this.settings.showAnswers ? `<button class="m-ans">Show answer${h & 2 || done ? '' : ' <small>(−30% XP)</small>'}</button>` : ''}</div><p class="m-hint-text" ${h & 1 ? '' : 'hidden'}>${TX.escapeHtml(m.hint)}</p><p class="m-ans-text" ${h & 2 ? '' : 'hidden'}><code class="ins" data-cmd="${TX.escapeHtml(m.answer)}">${TX.escapeHtml(m.answer)}</code></p></div></details></li>`;
+      };
+      let n = 0;
+      return `<div class="m-head"><div class="m-track">${tracks.map(([k, l]) => `<button class="m-chip ${k === track ? 'on' : ''}" data-open="${k}" title="Open a ${l} tab">${l}</button>`).join('')}</div>
+        <div class="m-title">${TX.escapeHtml(t.name)} missions</div>
+        <div class="m-progress"><div class="m-bar"><span style="width:${pct}%"></span></div><span>${doneN}/${list.length}</span></div>
+        <p class="m-note">Missions check your work automatically as you type in a <b>${TX.escapeHtml(t.name)}</b> tab. A hint costs 20% of a mission's XP.</p></div>
+        ${groups.map((g) => `${g.L ? `<div class="m-lesson"><span>${g.L.icon} Lesson ${g.L.n}: ${TX.escapeHtml(g.L.title)}</span><button class="linkish" data-guide="${g.L.id}">📖 guide</button>${UI.lessonDone(g.L) ? `<button class="linkish" data-test="${g.L.id}">🎓 ${UI.state.certs[g.L.id] ? 'certificate' : 'test'}</button>` : ''}</div>` : ''}<ol class="m-list">${g.items.map((m) => item(m, n++)).join('')}</ol>`).join('')}`;
     },
     cheatHTML() {
-      const k = this.active ? this.active.kind : 'bash';
-      const col = k === 'cmd' ? 2 : k === 'powershell' || k === 'pwsh' ? 3 : 1;
-      return `<p class="m-note">Same task, three languages. Click any command to type it into the active terminal.</p><table class="cheat"><thead><tr><th>Task</th><th class="${col === 1 ? 'hl' : ''}">bash / zsh</th><th class="${col === 2 ? 'hl' : ''}">cmd</th><th class="${col === 3 ? 'hl' : ''}">PowerShell</th></tr></thead><tbody>${TX.docs.CHEAT.map((r) => `<tr><td>${TX.escapeHtml(r[0])}</td>${r.slice(1).map((c, i) => `<td class="${col === i + 1 ? 'hl' : ''}"><code class="ins" data-cmd="${TX.escapeHtml(c.replace(/\s+\(.*\)$/, '').split(/\s+\/\s+/)[0])}">${TX.escapeHtml(c)}</code></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      const R = TX.reference;
+      const k = this.active ? TX.trackOf(this.active.kind) : 'bash';
+      const plat = R.PLATS.find((p) => p.k === (k === 'gitbash' ? 'bash' : k)) || R.PLATS[0];
+      return `<p class="m-note">Quick reference for <b>${TX.escapeHtml(plat.label)}</b>. Click a command to type it. <button class="linkish" id="open-cs">Open the full Interactive Cheat Sheet (all systems, ▶ Run) →</button></p>
+        ${R.CATS.map(([cat, icon, label]) => { const rows = R.TASKS.filter((t) => t.cat === cat).map((t) => [t, R.cell(t, plat.k)]).filter(([, c]) => c.c); return rows.length ? `<div class="m-lesson"><span>${icon} ${TX.escapeHtml(label)}</span></div><table class="cheat">${rows.map(([t, c]) => `<tr><td>${TX.escapeHtml(t.task)}</td><td><code class="ins" data-cmd="${TX.escapeHtml(c.c.split('\n')[0])}">${TX.escapeHtml(c.c.split('\n')[0])}</code></td></tr>`).join('')}</table>` : ''; }).join('')}`;
     },
     keysHTML() {
-      const rows = [['Tab', 'Complete a command or file name (press twice to list options in bash)'], ['↑ / ↓', 'Scroll through command history'], ['Ctrl+R', 'Search history (type to search, Enter to run)'], ['Ctrl+C', 'Stop the running command (or copy selected text)'], ['Ctrl+L', 'Clear the screen'], ['Ctrl+A / Ctrl+E', 'Jump to start / end of the line'], ['Ctrl+U / Ctrl+K', 'Delete to start / end of the line'], ['Ctrl+W', 'Delete the previous word (browsers may close the tab — careful!)'], ['Ctrl+D', 'Exit the shell (bash/zsh, on an empty line)'], ['Right-click', 'Paste (or copy, if text is selected)'], ['Alt+1 … Alt+6', 'Open Ubuntu, macOS, cmd, PowerShell, PowerShell 7, Git Bash'], ['Alt+T / Alt+W', 'Start page / close tab'], ['Alt+← / Alt+→', 'Switch tabs'], ['Alt+= / Alt+-', 'Bigger / smaller text'], ['Alt+M / Alt+C', 'Missions / cheat sheet'], ['Alt+Enter', 'Full screen']];
+      const rows = [['Tab', 'Complete a command or file name (press twice to list options in bash)'], ['↑ / ↓', 'Scroll through command history'], ['Ctrl+R', 'Search history (type to search, Enter to run)'], ['Ctrl+C', 'Stop the running command (or copy selected text)'], ['Ctrl+L', 'Clear the screen'], ['Ctrl+A / Ctrl+E', 'Jump to start / end of the line'], ['Ctrl+U / Ctrl+K', 'Delete to start / end of the line'], ['Ctrl+W', 'Delete the previous word (browsers may close the tab — careful!)'], ['Ctrl+D', 'Exit the shell (bash/zsh, on an empty line)'], ['Right-click', 'Paste (or copy, if text is selected)'], ['Alt+1 … Alt+0', 'Open ' + TX.SHELL_ORDER.map((k) => SHELLS[k].label).join(', ')], ['Alt+T / Alt+W', 'Home page / close tab'], ['Alt+← / Alt+→', 'Switch tabs'], ['Alt+= / Alt+-', 'Bigger / smaller text'], ['Alt+M / Alt+C', 'Missions / Interactive Cheat Sheet'], ['Alt+H', 'Home: lessons, tests, certificates'], ['Alt+Enter', 'Full screen']];
       return `<table class="keys">${rows.map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join('')}</table>
       <div class="m-note"><p><b>Passwords</b> in this simulator: <code>student</code> (sudo, ssh), <code>teacher</code> (su teacher). GitHub pushes want a token: anything starting with <code>ghp_</code>.</p>
-      <p><b>Machines</b>: Linux <code>ubuntu-lab</code> (192.168.1.42), Mac <code>MacBook-Pro</code> (192.168.1.57), Windows <code>DESKTOP-LAB42</code> (192.168.1.105). cmd, PowerShell and Git Bash share the same Windows disk — make a file in one and see it in the others! Try <code>ssh student@ubuntu-lab</code> from the Mac, or <code>wsl</code> from Windows.</p>
+      <p><b>Machines</b>: Linux <code>ubuntu-lab</code> (192.168.1.42), Mac <code>MacBook-Pro</code> (192.168.1.57), Windows <code>DESKTOP-LAB42</code> (192.168.1.105), FreeBSD <code>freebsd-lab</code>, Solaris <code>sol-lab</code> (SPARC), a 1994 MS-DOS PC and a 1979 PDP-11 running UNIX V7. Root's password on FreeBSD, Solaris and V7 is <code>student</code>. cmd, PowerShell and Git Bash share the same Windows disk — make a file in one and see it in the others! Try <code>ssh student@ubuntu-lab</code> from the Mac, or <code>wsl</code> from Windows.</p>
       <p><b>Broke something?</b> Type <code>reset-machine</code> in any shell (or use Settings) to restore factory files.</p></div>`;
     },
     bindDrawer(body, tab) {
       body.querySelectorAll('.ins').forEach((el) => el.addEventListener('click', () => { if (!this.active) return; this.active.term.paste(el.dataset.cmd); this.active.focus(); }));
+      const cs = body.querySelector('#open-cs'); if (cs) cs.addEventListener('click', () => TX.UI.openCheatSheet());
       if (tab === 'missions') {
-        body.querySelectorAll('.m-hint').forEach((b) => b.addEventListener('click', () => { const p = b.closest('.m-body').querySelector('.m-hint-text'); p.hidden = !p.hidden; }));
-        body.querySelectorAll('.m-ans').forEach((b) => b.addEventListener('click', () => { const p = b.closest('.m-body').querySelector('.m-ans-text'); p.hidden = !p.hidden; }));
+        const hint = (b, kind, sel) => { const id = b.closest('.m-item').dataset.id; if (!TX.UI.isDone(id)) TX.UI.useHint(id, kind); const p = b.closest('.m-body').querySelector(sel); p.hidden = false; b.querySelector('small') && b.querySelector('small').remove(); const xp = b.closest('.m-item').querySelector('.m-xp'); const mi = TX.lessons.mission(id); if (!TX.UI.isDone(id)) xp.textContent = TX.UI.reward(mi) + ' XP'; };
+        body.querySelectorAll('.m-hint').forEach((b) => b.addEventListener('click', () => hint(b, 'hint', '.m-hint-text')));
+        body.querySelectorAll('.m-ans').forEach((b) => b.addEventListener('click', () => hint(b, 'answer', '.m-ans-text')));
+        body.querySelectorAll('[data-guide]').forEach((b) => b.addEventListener('click', () => TX.UI.showGuide(TX.lessons.byId(b.dataset.guide))));
+        body.querySelectorAll('[data-test]').forEach((b) => b.addEventListener('click', () => { const L = TX.lessons.byId(b.dataset.test); if (TX.UI.state.certs[L.id]) TX.UI.showCertificate(L); else TX.UI.startTest(L); }));
         body.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.open; const ex = this.sessions.find((s) => s.trackKey() === k); if (ex) this.activate(ex); else this.newTab(k); }));
-        const r = body.querySelector('#m-reset');
-        if (r) r.addEventListener('click', () => { if (!confirm('Reset all mission progress?')) return; this.done = {}; this.log = {}; store.set('missions', {}); store.set('log', {}); this.renderDrawer(); });
       }
     },
 
@@ -18721,7 +19621,7 @@ export EDITOR=nano
         <label class="check"><input type="checkbox" id="set-crt" ${s.crt ? 'checked' : ''}> Retro CRT effect (scanlines + glow)</label>
         <label class="check"><input type="checkbox" id="set-ans" ${s.showAnswers ? 'checked' : ''}> Show "answer" buttons in missions (turn off for tests)</label>
         <div class="danger"><div><b>Reset a machine</b><br><span class="muted">Restores all files, installed packages and git repos to factory defaults.</span></div>
-          <div class="reset-row"><button data-reset="linux">Ubuntu</button><button data-reset="mac">Mac</button><button data-reset="windows">Windows</button><button data-reset="all" class="bad">Everything</button></div></div>`;
+          <div class="reset-row"><button data-reset="linux">Ubuntu</button><button data-reset="mac">Mac</button><button data-reset="windows">Windows</button><button data-reset="freebsd">FreeBSD</button><button data-reset="solaris">Solaris</button><button data-reset="dos">MS-DOS</button><button data-reset="unix">UNIX V7</button><button data-reset="all" class="bad">Everything (files only)</button></div></div>`;
       $('#modal-settings').classList.add('open');
       const on = (id, ev, fn) => $(id).addEventListener(ev, fn);
       on('#set-theme', 'change', (e) => this.setSetting('theme', e.target.value));
@@ -18734,7 +19634,7 @@ export EDITOR=nano
       $$('.swatch').forEach((b) => b.addEventListener('click', () => { this.setSetting('theme', b.dataset.theme); $('#set-theme').value = b.dataset.theme; $$('.swatch').forEach((x) => x.classList.toggle('on', x === b)); }));
       $$('[data-reset]').forEach((b) => b.addEventListener('click', () => {
         const k = b.dataset.reset;
-        if (!confirm(k === 'all' ? 'Reset EVERYTHING (all machines, history, missions, settings)?' : `Reset the ${b.textContent} machine to factory settings?`)) return;
+        if (!confirm(k === 'all' ? 'Reset the files on EVERY pretend computer? (Your XP, missions and certificates are kept.)' : `Reset the ${b.textContent} machine to factory settings?`)) return;
         if (k === 'all') { try { Object.keys(localStorage).filter((x) => x.startsWith('tx.')).forEach((x) => localStorage.removeItem(x)); } catch (e) { /* ignore */ } location.reload(); return; }
         this.resetMachine(k);
         this.closeSettings();
@@ -18780,6 +19680,7 @@ export EDITOR=nano
     return map[kind] || '>_';
   }
 
+  App.badge = badge;
   TX.app = App;
   window.addEventListener('DOMContentLoaded', () => App.init());
 })();
