@@ -226,7 +226,8 @@
 
     machine(kind) {
       if (this.machines[kind]) return this.machines[kind];
-      const saved = store.get('fs.' + kind, null);
+      const saved = (this.restored && this.restored[kind]) || store.get('fs.' + kind, null);
+      if (this.restored) delete this.restored[kind];
       let m;
       if (saved && saved.root) {
         try {
@@ -254,6 +255,21 @@
       this.sessions.filter((s) => s.def.machine === kind).forEach((s) => { s.colorOverride = null; s.start(); });
       this.renderDrawer();
       this.toast('♻️  Machine reset to factory settings');
+    },
+    // A progress file was loaded: swap in its pretend computers and remotes now, in place. (Reloading the page
+    // instead would let beforeunload save the old in-memory machines over the restored ones.)
+    loadWork(w) {
+      const machines = (w && w.machines) || {};
+      this.restored = this.restored || {};
+      Object.keys(machines).forEach((k) => {
+        delete this.machines[k];
+        this.restored[k] = machines[k]; // used even if this browser won't store it
+        store.set('fs.' + k, machines[k]);
+      });
+      if (w && w.remotes) { Object.keys(TX.gitRemotes).forEach((u) => delete TX.gitRemotes[u]); Object.assign(TX.gitRemotes, w.remotes); }
+      this.sessions.filter((s) => machines[s.def.machine]).forEach((s) => { s.colorOverride = null; s.start(); });
+      this.saveNow();
+      this.renderDrawer();
     },
     trackOfMission(id) { for (const k of Object.keys(TX.missions.tracks)) if (TX.missions.tracks[k].list.some((m) => m.id === id)) return k; return null; },
     save() { clearTimeout(this.saveTimer); this.saveTimer = setTimeout(() => this.saveNow(), 800); },

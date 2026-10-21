@@ -108,6 +108,29 @@ const ok = (m) => console.log('✓ ' + m);
   const bad = await page.evaluate((t) => TX.UI.readProgressFile(t.replace('"xp": ', '"xp": 1')).ok, text);
   if (!good || bad) fail('progress file seal'); else ok('progress file: genuine accepted, edited refused');
 
+  // loading the file on a NEW computer (empty storage) through the welcome screen keeps the name, XP and files,
+  // also after a later reload (a reload during the restore used to save the blank record over it)
+  await page.evaluate(() => { const m = TX.app.machine('linux'); m.vfs.writeFile(m.home.concat('proof.txt'), 'mine\n'); TX.app.saveNow(); });
+  const text2 = await page.evaluate(() => TX.UI.progressFileText());
+  const want = await page.evaluate(() => TX.UI.state.xp);
+  const ctx2 = await browser.newContext();
+  const p2 = await ctx2.newPage();
+  p2.on('pageerror', (e) => errors.push(e.message));
+  await p2.goto(FILE);
+  await p2.click('#w-load');
+  const pf = path.join(require('os').tmpdir(), 'TerminalEX-Ada-Lovelace.json');
+  fs.writeFileSync(pf, text2);
+  const [chooser] = await Promise.all([p2.waitForEvent('filechooser'), p2.click('#lf-pick')]);
+  await chooser.setFiles(pf);
+  await p2.waitForTimeout(500);
+  const after = () => p2.evaluate(() => { const m = TX.app.machine('linux'); return { name: TX.UI.state.name, xp: TX.UI.state.xp, welcome: !!document.querySelector('#w-name'), file: !!m.vfs.get(m.home.concat('proof.txt')) }; });
+  const r1 = await after();
+  await p2.reload(); await p2.waitForTimeout(600);
+  const r2 = await after();
+  if ([r1, r2].some((r) => r.name !== 'Ada Lovelace' || r.xp !== want || r.welcome || !r.file)) fail('progress file restore on a new computer: ' + JSON.stringify([r1, r2]));
+  else ok('progress file restores name, ' + want + ' XP and files on a new computer, and they survive a reload');
+  await ctx2.close();
+
   if (requests.length) fail('network requests made (FERPA): ' + requests.join(', ')); else ok('no network requests at all');
   if (errors.length) fail('page errors:\n' + errors.join('\n')); else ok('no page errors');
   await browser.close();

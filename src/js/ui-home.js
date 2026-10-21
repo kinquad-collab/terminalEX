@@ -45,7 +45,9 @@
     const go = (text, ov) => {
       const r = UI.restoreFromFile(text);
       if (!r.ok) { const e = $('#lf-err', ov); e.hidden = false; e.textContent = r.why; return; }
-      m.close(); location.reload();
+      m.close();
+      UI.renderHome();
+      if (TX.app && TX.app.toast) TX.app.toast(`📂 Welcome back, <b>${esc(r.name)}</b>! Your progress and files are loaded.`, true);
     };
     $('#lf-pick', m.el).addEventListener('click', () => UI.pickFile((t) => go(t, m.el)));
   };

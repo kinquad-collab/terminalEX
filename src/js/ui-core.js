@@ -214,11 +214,21 @@
       ['done', 'badges', 'certs', 'visited', 'guides', 'hints'].forEach((k) => { st[k] = Object.assign({}, st[k], UI.state[k]); });
       Object.keys(UI.state.tests).forEach((k) => { const a = UI.state.tests[k], b = st.tests[k]; if (!b || (a.passed && !b.passed)) st.tests[k] = a; });
     }
-    set(KEY, serialize(st));
+    // Apply it in place, no page reload: a reload let beforeunload save the old in-memory record (often a blank,
+    // nameless one on a new computer) over the restored one, which sent students back to the name screen.
+    st.stats = Object.assign(fresh().stats, st.stats);
+    UI.state = lock(st);
+    UI.loadNotice = null;
+    UI.saveNow();
     const w = r.file.work || {};
-    Object.keys(w.machines || {}).forEach((k) => set('tx.fs.' + k, JSON.stringify(w.machines[k])));
-    if (w.remotes) set('tx.remotes', JSON.stringify(w.remotes));
-    return { ok: true, name: p.name, reload: true };
+    if (TX.app && TX.app.loadWork) TX.app.loadWork(w);
+    else {
+      Object.keys(w.machines || {}).forEach((k) => set('tx.fs.' + k, JSON.stringify(w.machines[k])));
+      if (w.remotes) set('tx.remotes', JSON.stringify(w.remotes));
+    }
+    UI.settleOpenTests();
+    UI.refresh();
+    return { ok: true, name: p.name };
   };
 
   // ------------------------------------------------------------------ small UI helpers
