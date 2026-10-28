@@ -2178,15 +2178,29 @@
     try { return await sh.invoke(runArgs, c.io); } finally { sh.user = saved; }
   }, { only: UNIX });
   def('su', async (c) => {
-    const target = c.args.filter((a) => a !== '-' && a !== '-l')[0] || 'root';
-    if (c.user === 'root') { c.sh.session.pushShell(new TX.PosixShell(c.sh.session, c.m, c.sh.flavor, { user: target })); return 0; }
+    // su [-] [-flm] [login] [-c command]: options are skipped, -c runs one command as the user and comes back
+    // (FreeBSD's own docs use  su -m root -c 'command').
+    let target = null, cmd = null;
+    for (let i = 0; i < c.args.length; i++) {
+      const a = c.args[i];
+      if (a === '-c' || a === '--command') { cmd = c.args.slice(i + 1).join(' '); break; }
+      if (/^-/.test(a)) continue;
+      if (!target) target = a;
+    }
+    target = target || 'root';
+    const become = async () => {
+      if (cmd == null) { c.sh.session.pushShell(new TX.PosixShell(c.sh.session, c.m, c.sh.flavor, { user: target })); return 0; }
+      const saved = c.sh.user;
+      c.sh.user = target;
+      try { return await c.sh.run(cmd, c.io); } finally { c.sh.user = saved; }
+    };
+    if (c.user === 'root') return become();
     const pw = await c.readLine('Password: ', { hidden: true });
     // FreeBSD, Solaris and old UNIX give root a real password (here: student); Ubuntu and macOS lock it.
     const rootPw = ['freebsd', 'solaris', 'unix'].includes(c.m.kind);
     const ok = (target === 'teacher' && pw === 'teacher') || (target === 'student' && pw === 'student') || (target === 'root' && rootPw && pw === 'student');
     if (!ok) { await c.sleep(1500); c.err(c.m.kind === 'unix' ? 'Sorry\n' : 'su: Authentication failure\n'); if (target === 'root') c.err(C.dim(rootPw ? '(hint: in TerminalEX the root password is  student )\n' : c.m.kind === 'mac' ? '(hint: macOS disables root. Try  sudo -i  instead.)\n' : '(hint: Ubuntu locks the root password. Try  sudo -i  instead.)\n')); return 1; }
-    c.sh.session.pushShell(new TX.PosixShell(c.sh.session, c.m, c.sh.flavor, { user: target }));
-    return 0;
+    return become();
   }, { only: UNIX });
   def('passwd', async (c) => {
     const who = c.args[0] || c.user;
